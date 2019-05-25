@@ -41,6 +41,7 @@ public class StaticElectricSolver{
 		setTmat(model);
 		annexTmat();
 
+		
 	}
 
 	public Vect solve(Model model ){
@@ -58,8 +59,6 @@ public class StaticElectricSolver{
 		SpMat Ks=conductiveMat.deepCopy();
 
 			//Ks.diagSym().show();
-
-		//Ks.shownz();
 
 		Vect Ci=Ks.scale(RHS);
 	//	util.pr(Ks.maxAbs());
@@ -86,8 +85,9 @@ public class StaticElectricSolver{
 
 		x.timesVoid(Ci);
 
-	//	x.show();
+		//x.show();
 		//util.pr("x --------------------------> "+x.norm());
+		
 
 		return x;
 
@@ -122,7 +122,11 @@ public class StaticElectricSolver{
 		//	if(!model.region[ir].isConductor) continue;
 
 			double conductivity=1;//model.phiCoils[coilIndices[ir]].conductivity;
-			
+			if(coilIndices[ir]>0){
+				double conductivity1=model.phiCoils[0].conductivity;
+				double conductivity2=model.phiCoils[coilIndices[ir]].conductivity;
+			if(conductivity1>0) conductivity=conductivity2/conductivity1;
+			}
 			for(int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++){
 
 				//if(!model.element[i].isConductor()) continue;
@@ -130,7 +134,7 @@ public class StaticElectricSolver{
 				Ke=this.calc.elemPhiMat(model,i);
 		
 				Ke=Ke.times(conductivity);
-		
+
 				int[] vertNumb=model.element[i].getVertNumb();
 
 				for(int j=0;j<model.nElVert;j++){
@@ -194,8 +198,11 @@ public class StaticElectricSolver{
 				if(network.elems[j].type==ElemType.FEM){
 				if(network.tiesetMat.el[n][j]!=0){
 				t_matrix.row[i].index[jx]=numberOfUnknownPhis-model.phiCoils.length+ic;
+				PhiCoil coil=model.phiCoils[network.elems[j].fem_index];
+	
+				double turns=coil.getNumTurns();
 
-				t_matrix.row[i].el[jx]=-network.tiesetMat.el[n][j];
+				t_matrix.row[i].el[jx]=-network.tiesetMat.el[n][j]*turns;
 				jx++;
 				}
 				ic++;			
@@ -268,29 +275,62 @@ public class StaticElectricSolver{
 		}
 		
 		if(byCPS){
-
-			for(int i=0;i<network.indep_elems.length;i++){
-				if(network.indep_elems[i].type==ElemType.CPS){
 			
-					for(int j=0;j<network.elems.length;j++){
-						if(network.elems[j].type==ElemType.FEM &&network.tiesetMat.el[i][j]!=0){
-					
-							PhiCoil coil=model.phiCoils[network.elems[j].fem_index];
-												
-							rowIndex=this.phiVarIndex[coil.infaceNodes[0]];
+			Vect indepCurrents=new Vect(network.indep_elems.length);
+	
+			for (int j = 0; j<network.indep_elems.length; ++j){
+				if(network.indep_elems[j].type==ElemType.CPS){
+					int time_id=network.indep_elems[j].time_id;
 
-							double turns=coil.getNumTurns();
-					
-							RHS.el[rowIndex]=turns;;
-							
-
-						}
-					}
+					double value=0;
+					if(model.timeFunctions!=null && time_id>0)
+					  value=model.timeFunctions[time_id].getValue(0);
+					indepCurrents.el[j]=value;
 				}
+			}
+			
+			Vect rhsCurrents=network.PRPt.mul(indepCurrents);
+
+			
+			for (int j = 0; j<network.indep_elems.length; ++j){
+				if(network.indep_elems[j].type!=ElemType.CPS){
+					
+					 rowIndex=this.numberOfUnknownPhis+network.indep_elems[j].unknown_seq_no;
+
+
+					RHS.el[rowIndex]+=rhsCurrents.el[j];
+				}
+			}
 		
+
+			
+			Vect allCurrents=network.tiesetMat.transp().mul(indepCurrents);
+			
+			for (int j = 0; j<network.numElements; ++j)
+			{
+				if(network.elems[j].type!=ElemType.CPS) {
+					network.elems[j].I=allCurrents.el[j];
+				}
+			}
+			
+
+			for(int j=0;j<network.elems.length;j++){
+				if(network.elems[j].type==ElemType.FEM){
+			
+					PhiCoil coil=model.phiCoils[network.elems[j].fem_index];
+										
+					rowIndex=this.phiVarIndex[coil.infaceNodes[0]];
+					double current=network.elems[j].I;
+					//double turns=coil.getNumTurns();
+		
+					RHS.el[rowIndex]+=current;
+					
+
+				}
 			}
 		}
 	
+	//	RHS.show();
 
 	}
 
@@ -470,7 +510,7 @@ public class StaticElectricSolver{
 	
 
 	public void setSolution(Model model, Vect x){
-
+		
 		for(int i=1;i<=model.numberOfNodes;i++){
 			int index=phiVarIndex[i];	
 		
@@ -478,6 +518,9 @@ public class StaticElectricSolver{
 				model.node[i].setPhi(x.el[index]);	
 			}
 		}
+		
+		setNetworkSol(model,x);
+
 
 	}
 	
@@ -507,6 +550,43 @@ public class StaticElectricSolver{
 				
 				return result;
 	}
+	
+	
+	
+	public  void setNetworkSol(Model model, Vect x){
+
+		
+		Network network=model.network;
+		Vect indepCurrents=new Vect(network.indep_elems.length);
+		int ix=x.length-nCurrents;
+		for (int j = 0; j<network.indep_elems.length; ++j)
+		{
+			if(network.indep_elems[j].type!=ElemType.CPS) {
+				network.indep_elems[j].I=x.el[ix+network.indep_elems[j].unknown_seq_no];
+			indepCurrents.el[j]=network.indep_elems[j].I;
+			}else{
+				int time_id=network.indep_elems[j].time_id;
+
+				double value=0;
+				if(model.timeFunctions!=null && time_id>0)
+				  value=model.timeFunctions[time_id].getValue(0);
+				indepCurrents.el[j]=value;
+				network.elems[j].I=value;
+			}
+		}
+		
+		Vect allCurrents=network.tiesetMat.transp().mul(indepCurrents);
+
+		for (int j = 0; j<network.numElements; ++j)
+		{
+			if(network.elems[j].type!=ElemType.CPS) {
+				network.elems[j].I=allCurrents.el[j];
+				util.pr(network.elems[j].id+" "+network.elems[j].I);
+			}
+		}
+		
+	}
+
 
 }
 

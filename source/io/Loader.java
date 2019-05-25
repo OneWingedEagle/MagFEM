@@ -27,6 +27,7 @@ import math.util;
 import fem.*;
 import fem.Network.ElemType;
 
+
 /**
  * TODO Put here a description of what this class does.
  *
@@ -498,12 +499,36 @@ public class Loader {
 				}
 			}
 			
-			util.pr("//TIME INTEG MODE  (0,1)");
+			util.pr("// NUM TIME FUNCTIONS");
 			line=getNextDataLine(br);
 			util.pr(line);
-			model.eddyTimeIntegMode=getIntData(line);	
+			int numTimeFuncs=getIntData(line);	
+			if(numTimeFuncs>0){
+				
+			model.timeFunctions=new TimeFunction[numTimeFuncs+1];
+
+			for(int j=0;j<numTimeFuncs;j++){
+				util.pr("// TIME ID // AMPLITUDE // PERIOD // PHASE");
+				line=getNextDataLine(br);
+				util.pr(line);
+				String[] sp=line.split(regex);
+				int ib=0;
+				if(sp[ib].equals("")) ib++;
+				int id=Integer.parseInt(sp[ib++]);
+				
+				double amp= Double.parseDouble(sp[ib++]);
+				
+				double per= Double.parseDouble(sp[ib++]);
+				
+				double phase= Double.parseDouble(sp[ib++]);
+				
+				model.timeFunctions[id]=new TimeFunction(id,amp,per,phase);
 			
-			util.pr("//DELTA_TIME( PERIOD in AC)");
+			}
+			}
+				
+			
+			util.pr("//DELTA_TIME");
 
 			line=getNextDataLine(br);
 			util.pr(line);

@@ -1,29 +1,17 @@
 package fem;
 
-import static java.lang.Math.PI;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.DecimalFormat;
-import java.util.Formatter;
 
-import fem.Network.Elem;
-import fem.Network.Node;
-
-import femSolver.StaticElectricSolver;
-import femSolver.StaticLinearMagSolver;
 import io.Loader;
 import main.Main;
-import math.Complex;
+
 import math.Mat;
-import math.Sort;
-import math.SpMat;
+
 import math.Vect;
-import math.VectComp;
+
 import math.util;
 
 
@@ -46,9 +34,9 @@ public class Network {
 		 private ElemAndSign[] dependent_elements;
 		 public ElemType type;
 		 public double R;
-		 public double V;
+		 public double V,I;
 		 public double L;
-		 public int fem_id;
+		 public int fem_id,time_id;
 		 public int fem_index;
 
 		 public boolean tree;
@@ -68,6 +56,7 @@ public class Network {
 		private ElemAndSign linkFromParent;
 		private ElemAndSign [] linksFromRoot;
 	}
+
 
 	public class ElemAndSign {
 	
@@ -152,9 +141,11 @@ public class Network {
 				}
 				if(sp[0].equals("VPS")){
 					elems1[ie].type=ElemType.VPS;
+					elems1[ie].time_id=Integer.parseInt(sp[4]);
 				}
 				else if(sp[0].equals("CPS")){
 					elems1[ie].type=ElemType.CPS;
+					elems1[ie].time_id=Integer.parseInt(sp[4]);
 				}
 				else if(sp[0].equals("R")){
 					elems1[ie].type=ElemType.R;

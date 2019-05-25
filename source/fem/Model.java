@@ -99,6 +99,7 @@ public class Model{
 	public boolean hasBunif,open_vps;
 	public int nCLNstages;
 	public Network network;
+	public TimeFunction[] timeFunctions;
 	public StaticElectricSolver phiSolver=null;
 	public Main main;
 
@@ -1354,13 +1355,19 @@ public class Model{
 		for(int ir=1;ir<=numberOfRegions;ir++){
 
 			if(coilIndices[ir]<0) continue;
-		//	double conductivity=phiCoils[coilIndices[ir]].conductivity;
+
+			double conductivity=1;//model.phiCoils[coilIndices[ir]].conductivity;
+			if(coilIndices[ir]>0){
+				double conductivity1=phiCoils[0].conductivity;
+				double conductivity2=phiCoils[coilIndices[ir]].conductivity;
+			if(conductivity1>0) conductivity=conductivity2/conductivity1;
+			}
 
 			region[ir].hasJ=true;
 			
 			for(int i=region[ir].getFirstEl();i<=region[ir].getLastEl();i++){
 
-			Vect J=getElementJPhiCoil(i,lc,1.);
+			Vect J=getElementJPhiCoil(i,lc,conductivity);
 					
 			element[i].setJ(J);
 
