@@ -1753,7 +1753,7 @@ public class Writer {
 				pw.println(model.numberOfElements);
 				for(int i=1;i<=model.numberOfElements;i++){
 
-					Vect A=model.getElementA( i);
+					Vect A=model.getElementA(i);
 
 					for(int k=0;k<dim;k++)					
 						pw.format("%E\t",A.el[k]);

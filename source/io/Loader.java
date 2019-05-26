@@ -131,7 +131,7 @@ public class Loader {
 				sp=line.split(regex);
 				int k=0;
 				
-				for(int j=0;j<sp.length;j++)
+				for(int j=0;j<model.dim;j++)
 					if(!sp[j].equals(""))
 						z.el[k++]=Double.parseDouble(sp[j])*factor;
 				
@@ -196,7 +196,7 @@ public class Loader {
 			
 			model.setFemCalc();
 
-						
+		//	util.pr(model.maxDim);			
 				
 		}
 		catch(IOException e){
@@ -470,13 +470,27 @@ public class Loader {
 
 			line=getNextDataLine(br);
 			util.pr("//UNIFORM FIELD (0,1) ");
-			util.pr(line);
 			model.hasBunif=getBooleanData(line);
+			util.pr(line);
 			if(model.hasBunif){
+				
+				util.pr("// TIME_ID ");
 				line=getNextDataLine(br);
+				util.pr(line);
+				model.unifBTimeId=getIntData(line);
+	
+				util.pr("// Bx  By 0 ");
+				line=getNextDataLine(br);
+				util.pr(line);
 				double[] array=getCSV(line);
 				
 				model.unifB=new Vect(array);
+				if(model.unifB.length==3 && model.unifB.el[2]!=0){
+					System.out.println("!!!!!!!!!!! Uniform field in Z direction not available. !!!!!!!!!!");
+					System.out.println("!!!!!!!!!!! Calculation abandoned. !!!!!!!!!!");
+					wait(10000*10000);
+
+				}
 			}
 			line=getNextDataLine(br);
 			line=util.dropLeadingSpaces(line);

@@ -1252,6 +1252,7 @@ public class util {
 	}
 	
 	public static void plot(String dataName,double[] y,Color color ,String panelName){
+		util.pr(y.length);
 		double[] x=new double[y.length];
 		for(int i=0;i<x.length;i++)
 			x[i]=i;

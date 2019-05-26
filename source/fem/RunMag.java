@@ -79,16 +79,18 @@ public class RunMag {
 
 			
 			model.solveCoils();
+			
 
-	
 				for(int i=nBegin;i<=nEnd;i+=inc){
-					
-				double t0=0;
-		
+			
+			
 				
 				main.gui.tfX[0].setText((i)+"/"+nEnd);
 				
-				model.setJ0(t0+i*model.dt);	
+				model.currentTimeStep=i;
+				
+				model.setJ0(model.getCurrentTime());	
+				
 				if(model.phiCoils!=null)
 				model.phiCoils[0].current=Math.cos(2*model.freq*i*model.dt);
 
@@ -145,6 +147,8 @@ public class RunMag {
 									model.writeMesh(fluxFolder+"\\bun"+i+".txt");
 			
 								model.writeB(fluxFile);
+								
+							//	model.writer.writeA_as_flux(model,fluxFolder+"\\fluxA"+i+".txt");
 								
 		
 							}
@@ -231,10 +235,12 @@ public class RunMag {
 			//	T.show();
 				
 				Vect errs=new Vect(model.solver.totalIter);
-				
+			
 				for(int i=0;i<errs.length;i++)
 					errs.el[i]=model.solver.errs.get(i);
-				
+
+				//errs.show();
+
 				util.plot("error",errs.el,"ICCG Convergence");
 
 			//	util.plot(errs);

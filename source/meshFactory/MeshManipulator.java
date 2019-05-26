@@ -50,19 +50,20 @@ public class MeshManipulator {
 
 		//Model model=new Model("D:\\JavaWorks\\FEM problems\\Hamed solver\\bun1elem.txt");
 		//model.setEdge();
-		mf.reRegionb();
+	//	mf.reRegionb();
 	//mf.connectivity(1e-4);	mf.dropUnusedNodes();
 	//	mf.dropUnusedNodes();
 		//mf.deform();
 		//mf.rotate(180*PI/180);
-	//	mf.translate(new Vect(0,0,.001));
+	//	mf.translate(new Vect(-.1,0,0));
 	//	Mat R=util.rotMat(new Vect(0,0,1), new Vect(1,1.4,0));
 	//	Mat R=util.rotEuler(new Vect(0,0,1), 45*PI/180);
 	//	mf.rotate(R);
 	//	mf.pileRotate(10, 1*PI/180);
 
 
-	//Model model=mf.rotExtendNfold(2);
+//	Model model=mf.rotExtendNfold(71);
+//	model.writeMesh("D:\\personal\\Farsi\\2019\\darbareh\\extenRot.txt");
 	//model.writeMesh(new File(model.meshFilePath).getParentFile().getPath()+"\\extenRot.txt");
 		int Nr=10;
 		int[] regs0=new  int[Nr];
@@ -71,13 +72,13 @@ public class MeshManipulator {
 		}
 		//mf.revolveLine(new Vect().linspace(1, 10, Nr+1), regs0, 45, PI/2/45);
 		int[] regs={1};
-		//mf.extractReg(regs);mf.dropUnusedNodes();
+		mf.extractReg(regs);mf.dropUnusedNodes();
 		String stat="D:\\JavaWorks\\FEM problems\\Solver Gaol\\noUnusedNodes.txt";
 		 String rot="D:\\JavaWorks\\FEM problems\\Solver Gaol\\bunTranslated.txt";
 		//mf.assemble(rot,stat);
 
-	//	mf.assemble();
-		//mf.rescale(1.556476989933596);
+		//mf.assemble();
+	//mf.rescale(new Vect(1,1,0.54641016151377545870548926830117));
 	//	mf.extractReg(-0.001,6.2,0,PI,-.5,.5);
 		//mf.copy(new Vect(0,0,2), 9);
 		/*String bun=util.getFile();
@@ -109,7 +110,7 @@ public class MeshManipulator {
 		}*/
 	//	model.writeMesh("D:\\JavaWorks\\FEM problems\\ipm_motor2D\\compacted.txt");*/
 		//	mf.rotate(PI/2);
-	//	mf.pileUpHexa(1, 1);
+	//	mf.pileUpHexa(1, 2);
 		
 	//	mf.pileHelic(6*8, PI/4, .0125*18);
 		
@@ -801,10 +802,10 @@ public class MeshManipulator {
 		Model model=new Model();
 		model.loadMesh(bun);
 
+		String folder=new File(bun).getParentFile().getPath();
+		String sqaledMesh = folder + "//scaled.txt";
 
-		String sqaledMesh = System.getProperty("user.dir") + "//scaled.txt";
 
-;
 		for(int i=1;i<=model.numberOfNodes;i++)
 		{
 			Vect v=model.node[i].getCoord().times(scale);
@@ -832,8 +833,8 @@ public class MeshManipulator {
 		Model model=new Model();
 		model.loadMesh(bun);
 
-
-		String sqaledMesh = System.getProperty("user.dir") + "//scaled.txt";
+		String folder=new File(bun).getParentFile().getPath();
+		String sqaledMesh = folder + "//scaled.txt";
 
 
 
@@ -1088,16 +1089,7 @@ public void hexaToTetra()
 
 			for(int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++){
 				
-				if(i%2==0){
-					int[] vn1=model.element[i].getVertNumb();
-					int[]vn2=new int[vn1.length];
-					vn2[0]=vn1[1];
-					vn2[1]=vn1[3];
-					vn2[2]=vn1[2];
-					vn2[3]=vn1[0];
-					model.element[i].setVertNumb(vn2);
-				}
-
+/**/
 /*				if(ir>7) model.element[i].setRegion(5);
 				else if(ir==7) model.element[i].setRegion(4);
 				else if(ir<4) model.element[i].setRegion(1);
@@ -1124,7 +1116,9 @@ public void hexaToTetra()
 			//	else model.element[i].setRegion(2);
 				double tt=util.getAng(c);
 				double rr=c.norm();
-				//if(ir<4 && tt>PI/6) model.element[i].setRegion(1);
+				if(rr<.05) model.element[i].setRegion(1);
+				else
+					 model.element[i].setRegion(2);
 				//if(rr>1.2 && rr<1.4 && tt>0*PI/18/2 && tt<2*PI/18/2) model.element[i].setRegion(2);
 				//else if(rr>1.2 && rr<1.4 && tt>4*PI/18/2 && tt<6*PI/18/2) model.element[i].setRegion(3);
 			//	}
@@ -1548,15 +1542,25 @@ util.pr(rm);
 					nn[nv[k]]=true;
 				}
 		}
-			
+		double R=Math.sqrt(3)*.2;
 		for(int i=1;i<=1*model.numberOfNodes;i++){
 
 		if(nn[i]){
 			Vect v=model.node[i].getCoord();
 		double r=v.norm();
-		double tt=util.getAng(v)/2;
-		Vect v2=new Vect(r*Math.cos(tt),r*Math.sin(tt));
-		model.node[i].setCoord(v2);
+		if(r>.18 && r<-R){
+			v=v.times(R/r);
+			model.node[i].setCoord(v);
+		}
+		if(v.el[2]>-.19){
+		//	v=v.times(.25/r);
+			v=v.add(new Vect().rand(3, -.001, .001));
+			model.node[i].setCoord(v);
+		}
+		
+		//double tt=util.getAng(v)/2;
+		//Vect v2=new Vect(r*Math.cos(tt),r*Math.sin(tt));
+		//model.node[i].setCoord(v2);
 		//	model.node[i].setCoord(model.node[i].getCoord().times(.9));
 			}
 		}
@@ -2646,6 +2650,7 @@ for(int i=0; i<dh.length; i++){
 		String bun=util.getFile();
 		if(bun==null || bun.equals("") )return;
 		Model model=new Model(bun);
+
 		translate(model,v);
 
 	}

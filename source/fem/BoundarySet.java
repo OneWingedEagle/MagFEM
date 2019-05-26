@@ -362,9 +362,8 @@ public class BoundarySet {
 				}
 			}
 		else if(model.hasBunif){
-			
-			setMagBCUniform(model);
-				
+			model.magMat.setMagBCUniform(model);
+
 			}
 			
 		
@@ -977,114 +976,6 @@ public class BoundarySet {
 
 	}
 
-	private void setMagBCUniform(Model model){
-		
-		if(model.dim==2){
 
-
-			double Au0=model.unifB.el[0]*(model.spaceBoundary[3]-model.spaceBoundary[2]);
-			double Au1=model.unifB.el[1]*(model.spaceBoundary[1]-model.spaceBoundary[0]);	
-
-
-				for(int i=1;i<=model.numberOfEdges;i++){
-					if (model.edge[i].node[0].onBound[3] && 
-							model.edge[i].node[1].onBound[3])
-						model.edge[i].setKnownA(Au0);
-					else if(model.edge[i].node[0].onBound[2] && 
-							model.edge[i].node[1].onBound[2] )
-						model.edge[i].setKnownA(0);
-
-				}
-
-
-			
-				for(int i=1;i<=model.numberOfEdges;i++){
-					if(model.edge[i].node[0].onBound[0] && 
-							model.edge[i].node[1].onBound[0])
-						model.edge[i].setKnownA(Au1);
-					else if(model.edge[i].node[0].onBound[1] && 
-							model.edge[i].node[1].onBound[1])
-						model.edge[i].setKnownA(0);
-
-				}
-
-
-		}
-
-
-		else if(model.dim==3) {
-
-			double Au0=model.unifB.el[0]*(model.spaceBoundary[3]-model.spaceBoundary[2]);
-			double Au2=model.unifB.el[1]*(model.spaceBoundary[5]-model.spaceBoundary[4]);
-			double Au4=model.unifB.el[2]*(model.spaceBoundary[1]-model.spaceBoundary[0]);	
-
-
-			if(model.BCtype[0]==0)
-				for(int i=1;i<=model.numberOfEdges;i++){
-					if(model.edge[i].node[0].onBound[4] && 
-							model.edge[i].node[1].onBound[4]||
-							model.edge[i].node[0].onBound[5] && 
-							model.edge[i].node[1].onBound[5]   )
-
-						model.edge[i].setKnownA(0);
-
-					else if(model.edge[i].node[0].onBound[2] && 
-							model.edge[i].node[1].onBound[2])
-
-						model.edge[i].setKnownA(0);
-
-					else if(model.edge[i].node[0].onBound[3] && 
-							model.edge[i].node[1].onBound[3] && model.edge[i].direction==2)
-					{
-						model.edge[i].setKnownA(Au0*model.edge[i].length);
-					}
-				}
-
-
-			if(model.BCtype[2]==0)
-				for(int i=1;i<=model.numberOfEdges;i++){
-					if((model.edge[i].node[0].onBound[0] && 
-							model.edge[i].node[1].onBound[0]||
-							model.edge[i].node[0].onBound[1] && 
-							model.edge[i].node[1].onBound[1])  )
-						model.edge[i].setKnownA(0);
-
-					else if(model.edge[i].node[0].onBound[4] && 
-							model.edge[i].node[1].onBound[4] )
-
-						model.edge[i].setKnownA(0);
-
-					else if(model.edge[i].node[0].onBound[5] && 
-							model.edge[i].node[1].onBound[5] && model.edge[i].direction==0)
-
-						model.edge[i].setKnownA(Au2*model.edge[i].length);
-				}
-
-			if(model.BCtype[4]==0)
-				for(int i=1;i<=model.numberOfEdges;i++){
-
-					if((model.edge[i].node[0].onBound[2] && 
-							model.edge[i].node[1].onBound[2]||
-							model.edge[i].node[0].onBound[3] && 
-							model.edge[i].node[1].onBound[3])  )
-						model.edge[i].setKnownA(0);
-
-					else if(model.edge[i].node[0].onBound[0] && 
-							model.edge[i].node[1].onBound[0])
-
-						model.edge[i].setKnownA(0);
-
-					else if(model.edge[i].node[0].onBound[1] && 
-							model.edge[i].node[1].onBound[1] && model.edge[i].direction==1)
-					{
-
-						model.edge[i].setKnownA(Au4*model.edge[i].length);
-
-					}
-				}
-
-		}
-		
-	}
 
 }

@@ -34,6 +34,7 @@ public class Model{
 	public int[] BCtype;
 	public String[] blockMaterial;
 	public Vect unifB;
+	public int unifBTimeId;
 	public Region[] region;
 	public PhiCoil[] phiCoils;
 	public Node[] node;
@@ -63,7 +64,7 @@ public class Model{
 	public double nu0=1e7/(4*PI);
 	public double freq=1,dt,errCGmax=1,
 			errNRmax=1e-6,errCG_NR=1e-1,errFluxMax=1e-3;
-	public int nTsteps,nBegin,nEnd,nInc,nRotorElements,tagx;
+	public int nTsteps,nBegin,nEnd,nInc,nRotorElements,currentTimeStep;
 	public int coordCode=0,timeIntegMode=0,eddyTimeIntegMode;
 	public LamBCurve[] lamB;
 	public BHCurve[] BH;
@@ -72,7 +73,7 @@ public class Model{
 	public SpMat Hs,Ms,Ks,Ls,Cs,Ss,Ps,Qs,Fs;
 	public SpMat Rs,Bs,BtBs;
 	public Mat eigVects,bigMat;
-	public Vect lams,RHS,bU,bT,HpAp,HkAk;
+	public Vect lams,RHS,bU,bT,HpAp,HkAk,RHS_boundary;
 	public boolean AC,writeFiles,Tmethod,
 	circuit,stranded,wavePC,loadFlux,loadPotentioal,loadPrevMag,loadForce,saveFlux,saveJe,saveForce,
 	magAnalysis=true,axiSym;
@@ -736,7 +737,7 @@ public class Model{
 			Vect B;
 			Vect[] rotNe=femCalc.rotNe(jac,zero,edgeDir);
 			B=getElementB(i,rotNe);
-	
+
 			element[i].setB(B);
 
 
@@ -1186,6 +1187,12 @@ public class Model{
 
 		this.dt=dt;
 	}
+	public double getCurrentTime(){
+
+		double time =this.currentTimeStep*dt;
+		return time;
+	}
+
 
 	public void setnTsteps(int N){
 
@@ -1653,11 +1660,10 @@ public class Model{
 		}	
 
 	public Vect getElementA(int ie){
-		Vect A=new Vect(3);
-		
+
 		Vect localCo=centerLocalCo();
 		
-		return A;
+		return getElementA(ie,localCo);
 	}
 	
 	public Vect centerLocalCo(){

@@ -1,5 +1,7 @@
 package femSolver;
 
+import static java.lang.Math.log10;
+
 import fem.Model;
 import math.Complex;
 import math.Mat;
@@ -27,13 +29,14 @@ int stepNumb;
 		Vect x=new Vect(model.numberOfUnknowns);
 
 		model.solver.terminate(false);
+		
 
-		model.magMat.setRHS(model);
+
 
 	if(step==0)
 		model.setMagMat();
 
-
+	model.magMat.setRHS(model);
 		//=== known values go to right hand side 
 		
 		model.RHS=model.RHS.sub(model.HkAk);
@@ -83,8 +86,18 @@ int stepNumb;
 				}
 			}
 
-			else
-				x=new Vect(x.length);
+			else{
+				x=new Vect(model.numberOfUnknowns);
+				
+				model.solver.totalIter++;
+				model.solver.errs.add(0.);
+				model.solver.totalIter++;
+				model.solver.errs.add(log10(model.errCGmax));
+				model.solver.errs.add(0.);
+				if(model.hasBunif) model.scaleKnownEdgeAL(0);
+			}
+			
+				
 
 			model.xp=x.deepCopy();
 	

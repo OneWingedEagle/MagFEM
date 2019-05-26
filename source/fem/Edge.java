@@ -46,6 +46,7 @@ public class Edge {
 	}
 	
 	public void setSolvedAL(double A){
+
 		this.A=A;
 		
 	}

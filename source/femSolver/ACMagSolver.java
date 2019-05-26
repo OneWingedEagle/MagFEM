@@ -2,6 +2,7 @@ package femSolver;
 
 
 import static java.lang.Math.PI;
+import static java.lang.Math.log10;
 
 import fem.Model;
 import math.Complex;
@@ -77,8 +78,16 @@ public class ACMagSolver {
 			xc=model.solver.COICCG(Ks,Ls,b,model.errCGmax,model.iterMax,new VectComp(m),1,false);
 			//xc=model.solver.COCG(Ks,b,model.errCGmax,model.iterMax,new VectComp(m),1,false);
 		}
-		else
+		else{
 			xc=new VectComp(m);
+			model.solver.totalIter++;
+			model.solver.errs.add(0.);
+			model.solver.totalIter++;
+			model.solver.errs.add(log10(model.errCGmax));
+			model.solver.errs.add(0.);
+			if(model.hasBunif) model.scaleKnownEdgeAL(0);
+		}
+			
 
 		xc.timesVoid(model.Ci);	
 	

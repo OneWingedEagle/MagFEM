@@ -51,10 +51,12 @@ public class TransientNolinearMagSolver {
 
 		int nonLinIter=0;
 		
-		model.magMat.setRHS(model);
 		
 		if(model.Ss==null)
 			model.magMat.setConductMat(model);
+
+		
+		model.magMat.setRHS(model);
 
 		for( nonLinIter=0; errNR>model.errNRmax && nonLinIter<nonLinIterMax;nonLinIter++)
 

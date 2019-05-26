@@ -643,6 +643,7 @@ public class SpMatSolver {
 				errs.add(log10(error));
 
 				totalIter++;
+				
 
 				v=A.smul(p);
 
@@ -686,6 +687,13 @@ public class SpMatSolver {
 					}
 				}
 		}
+		
+		if(resRef>0)
+			errs.add(log10(error*resIni/resRef));
+		else
+			errs.add(log10(error));
+
+			totalIter++;
 		
 		//if(echo)
 		report("ICCG",k,error, res);
