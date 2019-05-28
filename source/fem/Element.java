@@ -12,11 +12,7 @@ public class Element {
 	private boolean[] edgeReverse;
 	public int[] edgeXYNumb;
 	private Vect nu,sigma,B,J,Je,M;
-	private Vect stress;
-	private double ro,deltaT;
-	private Vect yng,pois,shear;
 	private boolean hasJ,hasM,isConductor,deformable,nonlin,MS,thermal;
-	public boolean rotor;
 	
 
 	public Element(String type){
@@ -174,94 +170,6 @@ public class Element {
 
 	}
 
-	public void setPois(Vect  pois){
-		this.pois=pois;
-
-	}
-
-	public Vect  getPois(){
-		if(this.pois==null) return null;
-		return this.pois.deepCopy();
-
-	}
-
-	public void setYng(Vect  yng){
-		if(yng!=null)
-		this.yng=yng.deepCopy();
-
-	}
-	
-	public Vect getYng(){
-		if(yng==null) return null;
-		return this.yng;
-
-	}
-	
-	public void setShear(Vect  shear){
-		if(shear!=null)
-		this.shear=shear.deepCopy();
-	}
-	
-	public Vect getShear(){
-		
-		if(this.shear==null) return null;
-
-		return this.shear;
-
-	}
-
-	public void setRo(double  ro){
-		this.ro=ro;
-
-	}
-
-	public double getRo(){
-		return this.ro;
-
-	}
-	
-	public void setDeltaT(double  dT){
-		this.deltaT=dT;
-
-	}
-
-	public double getDeltaT(){
-		return this.deltaT;
-
-	}
-
-	public void setStress(Vect  stress){
-		this.stress=stress.deepCopy();
-
-	}
-	
-	public void setStress(Mat  T){
-		for(int i=0;i<dim;i++)
-		this.stress.el[i]=T.el[i][i];
-		stress.el[dim]=T.el[0][1];
-		if(dim==3){
-			stress.el[4]=T.el[1][2];
-			stress.el[5]=T.el[0][2];
-		}
-
-	}
-
-	public Vect getStress(){
-		if(deformable)
-		return this.stress.deepCopy();
-		else
-			return null;
-
-	}
-
-	
-	public Mat getStressTensor(){
-
-		if(stress==null) return null;
-		else
-		return util.tensorize(stress);
-
-	}
 	
 	
 	public int getDim(){
@@ -350,26 +258,11 @@ public class Element {
 	public boolean  isThermal(){
 		return this.thermal;
 	}
-	
-	public void setHasMS(boolean b){
-		this.MS=b;
-	}
-	
+
 	public void setNonlin(boolean b){
 		this.nonlin=b;
 	}
 	
-	public void setDeformable(boolean b){
-
-		this.deformable=b;
-		if(b){
-
-			stress=new Vect(3*(dim-1));
-		}
-		else{
-			stress=null;
-		}
-	}
 	public boolean hasJ(){
 		return this.hasJ;
 	}

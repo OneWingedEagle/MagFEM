@@ -1841,40 +1841,6 @@ public class Writer {
 
 
 
-	public void writeStress(Model model,String stressFile){
-
-		int dim=model.dim;
-		int L=3*(dim-1);
-		try{
-			PrintWriter pw=new PrintWriter(new BufferedWriter(new FileWriter(stressFile)));
-			pw.println("stress");
-			pw.println(dim);
-			pw.println(model.numberOfElements);
-			pw.println(model.stressViewCode);
-			pw.println(0);
-			pw.println(model.stressMin);
-			pw.println(model.stressMax);
-
-			for(int i=1;i<=model.numberOfElements;i++){
-				Vect stress=model.element[i].getStress();
-				
-				if(stress==null) continue;
-				//if(stress.norm()==0) {util.pr(i);continue;}
-				//util.pr(i-model.region[8].getFirstEl());
-				pw.format("%d\t",i);
-
-				for(int k=0;k<L;k++)
-					pw.format("%E\t",stress.el[k]);
-
-				pw.println();
-			}
-
-
-			pw.close();
-		} catch(IOException e){System.out.println("writing flux file failed.");}
-
-		System.out.println(" Structural stress was written to "+stressFile);
-	}
 
 	public void writeNodalField(Model model,String nodalForceFile,int mode){
 		int dim=model.dim;
