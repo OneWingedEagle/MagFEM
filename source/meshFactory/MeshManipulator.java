@@ -51,19 +51,19 @@ public class MeshManipulator {
 		//Model model=new Model("D:\\JavaWorks\\FEM problems\\Hamed solver\\bun1elem.txt");
 		//model.setEdge();
 	//	mf.reRegionb();
-	//mf.connectivity(1e-4);	mf.dropUnusedNodes();
+//	mf.connectivity(1e-5);	mf.dropUnusedNodes();
 	//	mf.dropUnusedNodes();
 		//mf.deform();
-		//mf.rotate(180*PI/180);
+		//mf.rotate(9*PI/180);
 	//	mf.translate(new Vect(-.1,0,0));
 	//	Mat R=util.rotMat(new Vect(0,0,1), new Vect(1,1.4,0));
 	//	Mat R=util.rotEuler(new Vect(0,0,1), 45*PI/180);
 	//	mf.rotate(R);
 	//	mf.pileRotate(10, 1*PI/180);
 
+		//mf.reverseHexa();
 
-//	Model model=mf.rotExtendNfold(71);
-//	model.writeMesh("D:\\personal\\Farsi\\2019\\darbareh\\extenRot.txt");
+	Model model=mf.rotExtendNfold(19);
 	//model.writeMesh(new File(model.meshFilePath).getParentFile().getPath()+"\\extenRot.txt");
 		int Nr=10;
 		int[] regs0=new  int[Nr];
@@ -72,7 +72,7 @@ public class MeshManipulator {
 		}
 		//mf.revolveLine(new Vect().linspace(1, 10, Nr+1), regs0, 45, PI/2/45);
 		int[] regs={1};
-		mf.extractReg(regs);mf.dropUnusedNodes();
+		//mf.extractReg(regs);mf.dropUnusedNodes();
 		String stat="D:\\JavaWorks\\FEM problems\\Solver Gaol\\noUnusedNodes.txt";
 		 String rot="D:\\JavaWorks\\FEM problems\\Solver Gaol\\bunTranslated.txt";
 		//mf.assemble(rot,stat);
@@ -1167,6 +1167,46 @@ public void hexaToTetra()
 			
 			String folder=new File(bun).getParentFile().getPath();
 		String bunFilePath = folder + "//bunReReg.txt";
+
+
+		model.writeMesh(bunFilePath);
+
+
+	}
+	
+	private void reverseHexa(){
+
+
+
+
+		String bun=util.getFile();
+		if(bun==null || bun.equals("") )return;
+		Model model=new Model();
+		model.loadMesh(bun);
+
+		for(int ir=1;ir<=model.numberOfRegions;ir++){
+
+			for(int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++){
+				
+				int[] vn1=model.element[i].getVertNumb();
+				int[] vn2=new int[vn1.length];
+				
+				vn2[0]=vn1[0];
+				vn2[1]=vn1[3];
+				vn2[2]=vn1[2];
+				vn2[3]=vn1[1];
+				vn2[4]=vn1[4];
+				vn2[5]=vn1[7];
+				vn2[6]=vn1[6];
+				vn2[7]=vn1[5];
+				model.element[i].setVertNumb(vn2);
+
+			}
+		}
+
+		
+			String folder=new File(bun).getParentFile().getPath();
+		String bunFilePath = folder + "//bunReversed.txt";
 
 
 		model.writeMesh(bunFilePath);
@@ -5521,7 +5561,8 @@ for(int i=0; i<dh.length; i++){
 		int nElements=nT*slice.numberOfElements;
 		int nNodes=nT*slice.numberOfNodes;
 
-		Model extenSlice=new Model(nRegions,nElements,nNodes,slice.elType);
+		Model extenSlice=new Model();
+		extenSlice.alloc(nRegions,nElements,nNodes,slice.elType);
 
 		for(int i=1;i<=slice.numberOfRegions;i++){
 
@@ -5542,10 +5583,10 @@ for(int i=0; i<dh.length; i++){
 		int[] mapEnd=new int[slice.numberOfNodes+1];
 		int pivot=0;
 		for(int i=0;i<L;i++){
-			map[mapping[i][0]]=mapping[i][1];
+	/*		map[mapping[i][0]]=mapping[i][1];
 			mapEnd[mapping[i][1]]=mapping[i][0];
 			if(mapping[i][0]==mapping[i][1])
-				pivot=mapping[i][0];
+				pivot=mapping[i][0];*/
 		}
 
 
@@ -5585,7 +5626,7 @@ for(int i=0; i<dh.length; i++){
 
 
 		for(int j=0;j<=ns;j++){
-			boolean touch=(abs((j+1)*theta-2*PI)<1e-6);
+			boolean touch=(abs((j+1)*theta-2*PI)<1e-4);
 			
 
 			for(int ir=1;ir<=extenSlice.numberOfRegions;ir++){
@@ -5661,6 +5702,10 @@ for(int i=0; i<dh.length; i++){
 		model.defMode=slice.defMode;
 		model.deform=slice.deform;
 
+		String folder=new File(slice.meshFilePath).getParentFile().getPath();
+		String fout=folder+"\\rotExtended.txt";
+
+		model.writeMesh(fout);
 
 
 		return model;

@@ -606,9 +606,6 @@ public class Loader {
 
 			model.setHasM();
 
-			model.setHasMS();
-
-
 			model.setNonLinToElememts();
 			
 			model.setEdge();

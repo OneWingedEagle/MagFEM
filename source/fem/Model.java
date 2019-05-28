@@ -109,7 +109,8 @@ public class Model{
 
 	public Model(int nRegions, int nElements,int nNodes, String elType){
 
-		this.numberOfRegions=nRegions;
+		this.alloc(nRegions, nElements, nNodes, elType);
+		/*this.numberOfRegions=nRegions;
 		this.numberOfElements=nElements;
 
 		this.numberOfNodes=nNodes;
@@ -126,7 +127,7 @@ public class Model{
 
 		node=new Node[this.numberOfNodes+1];
 		for(int i=1;i<=this.numberOfNodes;i++)
-			node[i]=new Node(dim,i);
+			node[i]=new Node(dim,i);*/
 	}
 
 
@@ -329,17 +330,6 @@ public class Model{
 
 	}
 
-	public void setHasMS(){
-		for(int ir=1;ir<=numberOfRegions;ir++){
-			if(region[ir].isNonLinear){
-				region[ir].MS=true;
-				for(int i=region[ir].getFirstEl();i<=region[ir].getLastEl();i++)
-					this.element[i].setHasMS(true);
-			}
-			else
-				region[ir].MS=false;		
-		}		
-	}
 
 	public void setHasThermal(){		
 
@@ -731,11 +721,13 @@ public class Model{
 			boolean[] edgeDir=element[i].getEdgeReverse();
 
 			Node[] vertexNode=elementNodes(i);
+			
 			Vect zero=new Vect(3);
 
 			Mat jac=femCalc.jacobian(vertexNode,zero);
 			Vect B;
 			Vect[] rotNe=femCalc.rotNe(jac,zero,edgeDir);
+	
 			B=getElementB(i,rotNe);
 
 			element[i].setB(B);
@@ -940,17 +932,6 @@ public class Model{
 			if(this.node[i].F!=null) this.node[i].F=new Vect(dim);
 	}
 
-	public void setMSForce(){
-		forceCalc.setMSForce(this);
-	}
-
-	public void setThermalForce(){
-		forceCalc.setThermalForce(this);
-	}
-
-	public void setStressForce(){
-		forceCalc.setStressForce(this);
-	}
 
 	public double getElementVolume(int i){
 
@@ -1087,26 +1068,6 @@ public class Model{
 		}
 	}
 
-
-	public double getElementMass(int i){
-
-		double elementMass=0;
-		double elementRo=element[i].getRo();
-		if(elCode==0) return el3angArea(i)*elementRo;
-		else if(elCode==1) return elQuadArea(i)*elementRo;
-		Node[] vertexNode=elementNodes(i);
-		Mat jac;
-		double detJac,ws;
-		Vect localCo=new Vect(dim);
-		ws=8;
-		jac=femCalc.jacobian(vertexNode,localCo);
-		detJac=abs(jac.determinant());
-
-		elementMass=elementRo*detJac*ws;
-
-		return elementMass;
-
-	}
 
 
 	public void setJ0(double dt){
@@ -1926,8 +1887,7 @@ public double getElementA3ang(int ie,Vect lc){
 
 			for(int i=region[ir].getFirstEl();i<=region[ir].getLastEl();i++){
 
-				element[i].setRo(region[ir].getRo());
-				element[i].setNu(region[ir].getNu());
+					element[i].setNu(region[ir].getNu());
 				element[i].setSigma(region[ir].getSigma());
 
 				if(regCond)
@@ -1935,20 +1895,11 @@ public double getElementA3ang(int ie,Vect lc){
 
 				element[i].setRegion(ir);
 
-				element[i].setYng(region[ir].getYng());
-
-				element[i].setPois(region[ir].getPois());
-
-				element[i].setShear(region[ir].getShear());
 
 
 			}
 		}
-
-		for(int ir=1;ir<=numberOfRegions;ir++)
-			if(this.region[ir].rotor)
-				for(int i=region[ir].getFirstEl();i<=region[ir].getLastEl();i++)
-					element[i].rotor=true;		
+	
 
 		if(elType.equals("triangle")) elCode=0;
 		else if(elType.equals("quadrangle")) elCode=1;
@@ -1965,21 +1916,12 @@ public double getElementA3ang(int ie,Vect lc){
 
 			for(int i=region[ir].getFirstEl();i<=region[ir].getLastEl();i++){
 
-				element[i].setRo(region[ir].getRo());
-				element[i].setRegion(ir);
-				element[i].setYng(region[ir].getYng());
-				element[i].setPois(region[ir].getPois());
-				element[i].setShear(region[ir].getShear());
 
-				element[i].setDeltaT(region[ir].getDeltaT());
+				element[i].setRegion(ir);
 
 			}
 		}
 
-		for(int ir=1;ir<=numberOfRegions;ir++)
-			if(this.region[ir].rotor)
-				for(int i=region[ir].getFirstEl();i<=region[ir].getLastEl();i++)
-					element[i].rotor=true;		
 
 		if(elType.equals("triangle")) elCode=0;
 		else if(elType.equals("quadrangle")) elCode=1;
@@ -2214,21 +2156,7 @@ public double getElementA3ang(int ie,Vect lc){
 		return femCalc.getApAnAt(this, P);
 	}
 
-	public Vect getStressAt(Vect P){
-		if(this.elCode==3) return new Vect(dim);
-		Vect na=new Vect(3*(this.dim-1));
-		na.el[0]=1e10;
-		na.el[1]=-1e10;
-		int[] m=this.getContainingElement(P);
-		if(m[0]<=0) return na;
 
-		if(this.elCode==0) return this.element[m[0]].getStress();
-
-		Vect lc=this.femCalc.localCo(this,m,P);
-
-		return getStress(m[0]);
-
-	}
 
 	public Vect[] getAllB(){	
 
@@ -2455,12 +2383,6 @@ public double getElementA3ang(int ie,Vect lc){
 	}
 
 
-	public void writeStress(String stressFile){
-
-		writer.writeStress(this, stressFile);
-
-	}
-
 
 	public void rotate(double rad){
 		MeshManipulator mf=new MeshManipulator();
@@ -2534,143 +2456,6 @@ public double getElementA3ang(int ie,Vect lc){
 			this.mapPBC();
 	}
 
-
-	public void setStress(){
-		setStress(true);
-	}
-
-	public void setStress(boolean add){
-		stressMax=0;stressMin=1e40;
-		for(int i=1;i<=this.numberOfElements;i++)
-			if(element[i].isDeformable()){
-				setElementStress(i,add);
-				double sn=element[i].getStress().norm();
-				if(sn<stressMin) stressMin=sn;
-				if(sn>stressMax) stressMax=sn;
-			}
-
-	}
-
-
-
-
-	public void setElementStress(int ie,boolean add){
-
-
-		Vect stress=this.getStress(ie, new Vect(dim));
-
-		if(!add || element[ie].getStress()==null )
-			element[ie].setStress(stress);
-		else
-			element[ie].setStress(stress.add(element[ie].getStress()));
-
-
-	}
-
-
-
-	public Vect getStress(int ie,Vect lc){
-
-		boolean MS=((this.element[ie].hasMS() || this.element[ie].isThermal()) && (this.defMode>1));
-
-		Vect strain= femCalc.getStrain(this,ie,lc);
-
-		Mat D =new Mat();
-		if(this.dim==3)
-			D=femCalc.hook3D(this,ie);
-		else
-			D=femCalc.hook(this,ie);
-
-		Vect stress=D.mul(strain);
-
-		stress=stress.times(1e-6);
-
-
-		if(MS)
-		{
-			stress=stress.add(element[ie].getStress());
-
-		}
-
-		return stress;
-
-
-	}
-
-	public Vect getStress(int ie){
-
-		return element[ie].getStress();
-
-
-	}
-
-	public void setNodalStress(){
-		double c=1.0/nElVert;
-		double eps=1.0;
-		int[] count=new int[this.numberOfNodes+1];
-		double[] str=new double[this.numberOfNodes+1];
-		stressMax=-1e40;
-		stressMin=1e40;
-		Mat S;
-		Vect sv=null;
-		Eigen eg=new Eigen();
-		double se=0;
-		for(int i=1;i<=this.numberOfElements;i++){
-
-			//se=element[i].getStress().norm();
-
-			sv=element[i].getStress();
-
-			if(sv!=null){
-
-
-				S=util.tensorize(sv);
-				double s1,s2,s12,s3;
-				s1=sv.el[0];
-				s2=sv.el[1];
-				s12=sv.el[2];
-				s3=element[i].getPois().el[0]*(s1+s2);
-
-				se=pow(s1-s2,2)+pow(s2-s3,2)+pow(s1-s3,2)+6*s12;
-				se/=2;
-				se=sqrt(se);
-
-			}
-
-			//double se=element[i].getStress().sum();
-			//	double se=element[i].getStress().el[2];
-			if(abs(se)<eps) continue;
-			if(se>stressMax)stressMax=se;
-			if(se<stressMin)stressMin=se;
-			int[] vertNumb=element[i].getVertNumb();
-			for(int j=0;j<nElVert;j++){
-				count[vertNumb[j]]++;
-				str[vertNumb[j]]+=c*se;
-			}
-
-		}
-
-		nodalStressMax=-1e40;
-		nodalStressMin=1e40;
-
-		for(int i=1;i<=this.numberOfNodes;i++)
-		{
-			if(count[i]>0)
-				str[i]/=count[i];
-
-
-			node[i].stress=str[i]*nElVert;
-			if(node[i].stress>nodalStressMax)
-				nodalStressMax=node[i].stress;
-			if(node[i].stress<nodalStressMin)
-				nodalStressMin=node[i].stress;
-		}
-
-		//nodalStressMin=nodalStressMax*.1;
-
-		util.pr("Stress Min: "+this.stressMin+"  Stress Max: "+this.stressMax);
-		util.pr("Nodal Stress Min: "+this.nodalStressMin+"  Nodal Stress Max: "+this.nodalStressMax);
-	}
 
 	public void resultAt(Vect P){
 		System.out.println();

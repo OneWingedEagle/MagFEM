@@ -95,7 +95,7 @@ model.magMat.setRHS(model);
 		
 		//util.pr("|x|="+x.norm());
 
-boolean unif=false;
+boolean unif=true;
 
 if(unif){
 x.zero();
