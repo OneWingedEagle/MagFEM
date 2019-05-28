@@ -94,15 +94,15 @@ model.magMat.setRHS(model);
 		x.timesVoid(Ci);
 		
 		//util.pr("|x|="+x.norm());
-
+x.zero();
 boolean unif=false;
 
 if(unif){
 x.zero();
 Vect u=new Vect(0,0,1);
 
-double Bx=1;
-double By=0;
+double Bx=0;
+double By=1;
 double Bz=0;
 if(model.dim==3)
 	Bz=model.unifB.el[2];

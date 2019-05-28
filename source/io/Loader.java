@@ -468,17 +468,15 @@ public class Loader {
 				
 		
 
+			//	util.pr("//UNIFORM FIELD (0,1) ");
+			util.pr("// UNIFORM FIELD TIME_ID ");
 			line=getNextDataLine(br);
-			util.pr("//UNIFORM FIELD (0,1) ");
-			model.hasBunif=getBooleanData(line);
 			util.pr(line);
-			if(model.hasBunif){
-				
-				util.pr("// TIME_ID ");
-				line=getNextDataLine(br);
-				util.pr(line);
-				model.unifBTimeId=getIntData(line);
-	
+			model.unifBTimeId=getIntData(line);
+
+			if(model.unifBTimeId>0){
+				model.hasBunif=true;
+			
 				util.pr("// Bx  By 0 ");
 				line=getNextDataLine(br);
 				util.pr(line);

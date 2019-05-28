@@ -50,17 +50,20 @@ public class MeshManipulator {
 
 		//Model model=new Model("D:\\JavaWorks\\FEM problems\\Hamed solver\\bun1elem.txt");
 		//model.setEdge();
-	//	mf.reRegionb();
+		//mf.reRegionb();
 	//mf.connectivity(1e-4);	mf.dropUnusedNodes();
 	//	mf.dropUnusedNodes();
 		//mf.deform();
 		//mf.rotate(180*PI/180);
 	//	mf.translate(new Vect(-.1,0,0));
-	//	Mat R=util.rotMat(new Vect(0,0,1), new Vect(1,1.4,0));
+	//Mat R=util.rotMat(new Vect(1,0,0), new Vect(0,0,1));
 	//	Mat R=util.rotEuler(new Vect(0,0,1), 45*PI/180);
 	//	mf.rotate(R);
 	//	mf.pileRotate(10, 1*PI/180);
 
+		mf.reverseHexa();
+		
+//		mf.twist3DNeu(new Vect(0,0,1), 4, 1000);
 
 //	Model model=mf.rotExtendNfold(71);
 //	model.writeMesh("D:\\personal\\Farsi\\2019\\darbareh\\extenRot.txt");
@@ -72,7 +75,7 @@ public class MeshManipulator {
 		}
 		//mf.revolveLine(new Vect().linspace(1, 10, Nr+1), regs0, 45, PI/2/45);
 		int[] regs={1};
-		mf.extractReg(regs);mf.dropUnusedNodes();
+	//	mf.extractReg(regs);mf.dropUnusedNodes();
 		String stat="D:\\JavaWorks\\FEM problems\\Solver Gaol\\noUnusedNodes.txt";
 		 String rot="D:\\JavaWorks\\FEM problems\\Solver Gaol\\bunTranslated.txt";
 		//mf.assemble(rot,stat);
@@ -1075,6 +1078,54 @@ public void hexaToTetra()
 		model.writeMesh(file);
 	}
 
+	
+	private void reverseHexa(){
+		
+
+
+		String bun=util.getFile();
+		if(bun==null || bun.equals("") )return;
+		Model model=new Model();
+		model.loadMesh(bun);
+
+		for(int ir=1;ir<=model.numberOfRegions;ir++){
+
+			for(int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++){
+				
+			int[] vn1=model.element[i].getVertNumb();
+			int[] vn2=new int[vn1.length];
+/*			vn2[0]=vn1[4];
+			vn2[1]=vn1[7];
+			vn2[2]=vn1[6];
+			vn2[3]=vn1[5];
+
+			vn2[4]=vn1[0];
+			vn2[5]=vn1[3];
+			vn2[6]=vn1[2];
+			vn2[7]=vn1[1];*/
+			
+			vn2[0]=vn1[0];
+			vn2[1]=vn1[3];
+			vn2[2]=vn1[2];
+			vn2[3]=vn1[1];
+
+			vn2[4]=vn1[4];
+			vn2[5]=vn1[7];
+			vn2[6]=vn1[6];
+			vn2[7]=vn1[5];
+		
+		model.element[i].setVertNumb(vn2);
+			}
+		}
+			
+			String folder=new File(bun).getParentFile().getPath();
+			String bunFilePath = folder + "//reversed.txt";
+
+
+			model.writeMesh(bunFilePath);
+	}
+		
+		
 	public void reRegionb(){
 
 
@@ -1116,9 +1167,11 @@ public void hexaToTetra()
 			//	else model.element[i].setRegion(2);
 				double tt=util.getAng(c);
 				double rr=c.norm();
-				if(rr<.05) model.element[i].setRegion(1);
+				if(c.el[1]<-.02) model.element[i].setRegion(1);
 				else
-					 model.element[i].setRegion(2);
+					if(c.el[1]<.02) model.element[i].setRegion(2);
+					else
+					 model.element[i].setRegion(3);
 				//if(rr>1.2 && rr<1.4 && tt>0*PI/18/2 && tt<2*PI/18/2) model.element[i].setRegion(2);
 				//else if(rr>1.2 && rr<1.4 && tt>4*PI/18/2 && tt<6*PI/18/2) model.element[i].setRegion(3);
 			//	}
