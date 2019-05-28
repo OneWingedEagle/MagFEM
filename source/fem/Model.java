@@ -990,11 +990,6 @@ public class Model{
 	}
 
 
-
-	public void magBC(){
-		this.bcSet.magBC(this);
-	}
-
 	public void setMagBC(){
 		this.bcSet.setMagBC(this);
 	}
@@ -1025,8 +1020,22 @@ public class Model{
 				spb[2*i+1]=-1e10;
 			}
 
+			
+			boolean[] nc=new boolean[1+this.numberOfNodes];
+			int ix=0;
+			for(int i=1;i<=this.numberOfElements;i++){		
+				int[] vertNumb=this.element[i].getVertNumb();
+				for(int j=0;j<nElVert;j++){
+					int nx=vertNumb[j];
+					if(!nc[nx]){
+
+						nc[nx]=true;
+					}
+				}
+			}
 
 			for(int i=1;i<=this.numberOfNodes;i++){
+				if(!nc[i]) continue;
 
 				if(this.node[i].getCoord(0)<spb[0]) spb[0]=this.node[i].getCoord(0);
 				else if(this.node[i].getCoord(0)>spb[1]) spb[1]=this.node[i].getCoord(0);
@@ -1040,7 +1049,6 @@ public class Model{
 
 
 			}
-
 			this.spaceBoundary=spb;
 
 		}

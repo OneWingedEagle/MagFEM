@@ -50,7 +50,8 @@ public class MeshFactory {
 	public static void main(String[] args){
 		
 		MeshFactory mf=new MeshFactory();
-		mf.meshFromModel();
+	//	mf.meshFromModel();
+
 	//	mf.reRegionz();
 	//	mf.meshDiskQuad();
 	//	mf.meshDiskQuadTri();

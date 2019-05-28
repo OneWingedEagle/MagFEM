@@ -50,12 +50,14 @@ public class MeshManipulator {
 
 		//Model model=new Model("D:\\JavaWorks\\FEM problems\\Hamed solver\\bun1elem.txt");
 		//model.setEdge();
-	//	mf.reRegionb();
+		//mf.reRegionb();
+		//mf.extendFlip(1);
 //	mf.connectivity(1e-5);	mf.dropUnusedNodes();
 	//	mf.dropUnusedNodes();
+		
 		//mf.deform();
-		//mf.rotate(9*PI/180);
-	//	mf.translate(new Vect(-.1,0,0));
+	//	mf.rotate(9*PI/180);
+	//mf.translate(new Vect(-.001,0,.0));
 	//	Mat R=util.rotMat(new Vect(0,0,1), new Vect(1,1.4,0));
 	//	Mat R=util.rotEuler(new Vect(0,0,1), 45*PI/180);
 	//	mf.rotate(R);
@@ -63,7 +65,7 @@ public class MeshManipulator {
 
 		//mf.reverseHexa();
 
-	Model model=mf.rotExtendNfold(19);
+//	Model model=mf.rotExtendNfold(19);
 	//model.writeMesh(new File(model.meshFilePath).getParentFile().getPath()+"\\extenRot.txt");
 		int Nr=10;
 		int[] regs0=new  int[Nr];
@@ -71,8 +73,7 @@ public class MeshManipulator {
 			regs0[i-1]=i;
 		}
 		//mf.revolveLine(new Vect().linspace(1, 10, Nr+1), regs0, 45, PI/2/45);
-		int[] regs={1};
-		//mf.extractReg(regs);mf.dropUnusedNodes();
+	//	int[] regs={1};		mf.extractReg(regs);mf.dropUnusedNodes();
 		String stat="D:\\JavaWorks\\FEM problems\\Solver Gaol\\noUnusedNodes.txt";
 		 String rot="D:\\JavaWorks\\FEM problems\\Solver Gaol\\bunTranslated.txt";
 		//mf.assemble(rot,stat);
@@ -279,7 +280,9 @@ public class MeshManipulator {
 
 
 		md1.scaleFactor=md0.scaleFactor;
-		String file = System.getProperty("user.dir") + "//reflected.txt";
+		
+		String folder=new File(md0.meshFilePath).getParentFile().getPath();
+		String file = folder + "//reflected.txt";
 		md1.writeMesh(file);
 
 	}
@@ -1116,9 +1119,10 @@ public void hexaToTetra()
 			//	else model.element[i].setRegion(2);
 				double tt=util.getAng(c);
 				double rr=c.norm();
-				if(rr<.05) model.element[i].setRegion(1);
+				if(c.el[1]<-.002) model.element[i].setRegion(2);
 				else
-					 model.element[i].setRegion(2);
+					if(c.el[1]>.002)
+					 model.element[i].setRegion(3);
 				//if(rr>1.2 && rr<1.4 && tt>0*PI/18/2 && tt<2*PI/18/2) model.element[i].setRegion(2);
 				//else if(rr>1.2 && rr<1.4 && tt>4*PI/18/2 && tt<6*PI/18/2) model.element[i].setRegion(3);
 			//	}
