@@ -17,7 +17,7 @@ public class BoundarySet {
 
 	public BoundarySet(){	}
 
-	public void magBC(Model model){
+/*	public void magBC(Model model){
 
 		if(model.coordCode==1) {
 			setSliceBounds(model);
@@ -32,7 +32,7 @@ public class BoundarySet {
 
 
 
-	}
+	}*/
 
 	private void mapEdges(Model model){
 
@@ -343,24 +343,32 @@ public class BoundarySet {
 			mapEdges(model);
 		}
 
-		if(model.hasJ || model.hasM || model.stranded)
+		if(model.hasJ || model.hasM || model.stranded){
+			
+			int nNeumann=0;
+			int nDirichlet=0;
 			for(int i=1;i<=model.numberOfEdges;i++){
 				for(int j=0;j<model.nBoundary;j++){
 
 					if(model.BCtype[j]==1 && model.edge[i].node[0].onBound[j] && 
 							model.edge[i].node[1].onBound[j]){
 						model.edge[i].setKnownA(0);
-
+						nDirichlet++;
 						break;					
 					}		
 					else if(model.BCtype[j]==0 && model.edge[i].node[0].onBound[j] && 
 							model.edge[i].node[1].onBound[j]){
 						model.edge[i].edgeKnown=false;
-
+						nNeumann++;
 						break;					
 					}			
 				}
 			}
+			
+			util.pr("Number of edges on Bn0 boundary = "+nDirichlet);
+			util.pr("Number of edges on Ht0 boundary = "+nNeumann);
+
+		}
 		else if(model.hasBunif){
 			model.magMat.setMagBCUniform(model);
 

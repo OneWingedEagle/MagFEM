@@ -54,7 +54,7 @@ public class MeshFormatConverter {
 	//	mfc.getPostHexAtlas();
 		//	mfc.getNeuMeshQ();
 	//	mfc.getNeuMeshHexa();
-		mfc.getPostHexaNeu(4);
+		mfc.getPostHexaNeu(8);
 	//	mfc.get2DFormNeu(4);
 		
 		//mfc.convertTetraNeu();
@@ -2303,15 +2303,19 @@ else 	if(numElemNodes==3 && nz!=5){
 		
 			}
 			if(nz==0){
-			vertNumb[nEl][0]=tmp[0];
-			vertNumb[nEl][1]=tmp[3];
-			vertNumb[nEl][2]=tmp[2];
-			vertNumb[nEl][3]=tmp[1];
+			vertNumb[nEl][0]=tmp[4];
+			vertNumb[nEl][1]=tmp[7];
+			vertNumb[nEl][2]=tmp[6];
+			vertNumb[nEl][3]=tmp[5];
 			
-			vertNumb[nEl][4]=tmp[4];
+/*			vertNumb[nEl][4]=tmp[4];
 			vertNumb[nEl][5]=tmp[7];
 			vertNumb[nEl][6]=tmp[6];
-			vertNumb[nEl][7]=tmp[5];
+			vertNumb[nEl][7]=tmp[5];*/
+			vertNumb[nEl][4]=tmp[0];
+			vertNumb[nEl][5]=tmp[3];
+			vertNumb[nEl][6]=tmp[2];
+			vertNumb[nEl][7]=tmp[1];
 			}
 			else if(nz==2){
 				vertNumb[nEl][0]=tmp[4];
