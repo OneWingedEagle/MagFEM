@@ -52,7 +52,6 @@ public class StaticElectricSolver{
 
 		SpMat L=new SpMat();
 
-
 		model.solver.terminate(false);
 
 	//	RHS.show();
@@ -64,12 +63,9 @@ public class StaticElectricSolver{
 	//	util.pr(Ks.maxAbs());
 	////util.pr("RHS --------------------------> "+RHS.norm());
 
-
 		L=Ks.ichol();
 		
 		double errMax=1e-11;
-		
-		
 
 	//	io.Console.redirectOutput(model.main.gui.iccgArea);
 
@@ -321,8 +317,9 @@ public class StaticElectricSolver{
 										
 					rowIndex=this.phiVarIndex[coil.infaceNodes[0]];
 					double current=network.elems[j].I;
-					//double turns=coil.getNumTurns();
-		
+					double turns=coil.getNumTurns();
+					current*=turns;
+					
 					RHS.el[rowIndex]+=current;
 					
 

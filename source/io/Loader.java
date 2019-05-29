@@ -686,7 +686,8 @@ public class Loader {
 		}
 		
 		
-		
+		model.network.constructNetwork();
+
 		
 		//model.setForceCalc();
 

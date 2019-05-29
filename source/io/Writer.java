@@ -1,6 +1,7 @@
 package io;
 
 import static java.lang.Math.*;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -2244,49 +2245,6 @@ Vect[] v=new Vect[A.length];
 
 		DecimalFormat formatter = new DecimalFormat("0.00E0");
 
-/*		for(int i=1;i<=model.numberOfRegions;i++){
-
-			System.out.println("model.region "+i +": ");
-			System.out.println("Material: "+model.region[i].getMaterial());
-			if(model.region[i].isNonLinear)
-				System.out.println("   Nonlinear BH Curve"); 
-			else{
-				Vect v=model.region[i].getMur();
-				System.out.printf("%10s","mur:"); v.hshow();	
-			}
-			Vect v=model.region[i].getSigma();
-			System.out.printf("%10s","sigma: "); v.hshow();			
-			v=model.region[i].getJ();
-			System.out.printf("%10s","J: "); v.hshow();	
-
-			if(model.region[i].hasM){
-				v=model.region[i].getM();
-				System.out.printf("%10s","M: "); v.hshow();				}
-
-			System.out.println("Young's Moduls: "+formatter.format(model.region[i].getYng()));
-			System.out.println("Posion's Ratio: "+model.region[i].getPois());
-			System.out.println();
-
-		}
-		String method="";
-		if(model.analysisMode==0)
-			method=" Anlysis Type:   Magnetostatic" ;
-		else if(model.analysisMode==1)
-			method=" Anlysis Type:   Eddy current A method" ;
-		else if(model.analysisMode==2)
-			method=" Anlysis Type:   Eddy current A-phi- method" ;
-
-		System.out.println();
-		System.out.println("     "+method);
-		System.out.println();
-
-		for(int ir=1;ir<=model.numberOfRegions;ir++)
-			if(model.region[ir].isNonLinear)
-				System.out.println(" Region "+ir+" : Nonlinear B-H curve cosidered. ");
-		System.out.println();
-		if(model.deform)
-			System.out.println(" Including Structural Alanysis. ");*/
-
 		System.out.println(" Element type: "+model.elType);
 		System.out.println(" Number of regions: "+model.numberOfRegions);
 		System.out.println(" Number of elements: "+model.numberOfElements);
@@ -2299,4 +2257,107 @@ Vect[] v=new Vect[A.length];
 
 	}
 	
+
+	public double outputLoss(Model model,String file,int step,double phase_time){
+		
+		boolean b=(step!=model.nBegin);
+		if(model.AC){
+			 b=b|| ( phase_time!=0);
+		}
+
+		double totalLoss=0;
+		try{
+			PrintWriter pw=new PrintWriter(new BufferedWriter(new FileWriter(file,b)));
+			pw.println("Step: "+step+"\t phase/time: "+phase_time);
+			pw.println();
+			util.pr("step "+step);
+			pw.println(" ****** ============= ******** ==================== ******");
+				pw.println("Joule Losses [W]");
+				pw.println();
+				util.pr("Joule Losses [W]");
+				for(int ir=1;ir<=model.numberOfRegions;ir++){
+					if(model.region[ir].isConductor){
+				double  loss=model.obtainLoss(ir);
+				totalLoss+=loss;
+				pw.format("%5d %12.5e\n",ir,loss);
+				pw.println();
+				System.out.format("%5d %25.12e\n",ir,loss);
+
+					}
+				}
+				pw.format("total %12.5e",totalLoss);
+				pw.println();
+		
+			pw.close();
+		} catch(IOException e){System.err.println("IOException: " + e.getMessage());}
+
+		
+		//System.out.println(" Temperature was written to "+file);
+
+		
+		return totalLoss;
+
+	}
+
+
+	public double outputEnergies(Model model,String file,int step,double phase_time){
+	
+		boolean	 b=true;
+
+		double totalEnergy=0;
+		try{
+			PrintWriter pw=new PrintWriter(new BufferedWriter(new FileWriter(file,b)));
+				
+				pw.println("Energies Losses [W]");
+				pw.println(" ****** -------------------------------------- ******");
+				pw.println();
+				util.pr("Energies ");
+				for(int ir=1;ir<=model.numberOfRegions;ir++){
+
+				double  energy=model.obtainEnergies(ir);
+				totalEnergy+=energy;
+				pw.format("%5d %12.5e",ir,energy);
+				pw.println();
+				System.out.format("%5d %12.5e\n",ir,energy);
+					
+				}
+				pw.format("total %12.5e",totalEnergy);
+				pw.println();
+				pw.println(" ****** -------------------------------------- ******");
+				pw.println();
+			pw.close();
+		} catch(IOException e){System.err.println("IOException: " + e.getMessage());}
+
+
+		
+		return totalEnergy;
+
+	}
+
+
+
+	
+public void writeR_L(Model model,String file,Vect freqs, Vect[] R_L){
+		
+		boolean b=true;
+
+		try{
+			PrintWriter pw=new PrintWriter(new BufferedWriter(new FileWriter(file,b)));
+			pw.println("R and L versus frequency:");
+			pw.println(" ****** -------------------------------------- ******");
+			pw.println();
+			for(int i=0;i<freqs.length;i++){
+				pw.format("%12.5e ",freqs.el[i]);
+				pw.format("%12.5e ",R_L[i].el[0]);
+				pw.format("%12.5e ",R_L[i].el[1]);
+				pw.println();
+			}	
+			pw.println(" ****** -------------------------------------- ******");
+				pw.println();
+			pw.close();
+		} catch(IOException e){System.err.println("IOException: " + e.getMessage());}
+
+	
+
+	}
 }

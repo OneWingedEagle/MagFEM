@@ -709,7 +709,7 @@ public class Model{
 	}
 
 
-	private void setElementB(int i){
+	public Vect getElementB(int i,Vect lc){
 
 		if(elCode==0&& !this.axiSym)set3angElementB(i);
 		else if(elCode==0) set3angElementAxiB(i);
@@ -717,23 +717,18 @@ public class Model{
 		else if(elCode==1) setQuadElementAxiB(i);
 		//else if(elCode==2) setTetraElementB(i);
 	//	else if(elCode==3) setPrismElementB(i);
-		else{
+	
 			boolean[] edgeDir=element[i].getEdgeReverse();
 
 			Node[] vertexNode=elementNodes(i);
 			
-			Vect zero=new Vect(3);
-
-			Mat jac=femCalc.jacobian(vertexNode,zero);
+			Mat jac=femCalc.jacobian(vertexNode,lc);
 			Vect B;
-			Vect[] rotNe=femCalc.rotNe(jac,zero,edgeDir);
+			Vect[] rotNe=femCalc.rotNe(jac,lc,edgeDir);
 	
 			B=getElementB(i,rotNe);
 
-			element[i].setB(B);
-
-
-		}
+		return B;
 	}	
 
 
@@ -2084,12 +2079,13 @@ public double getElementA3ang(int ie,Vect lc){
 	public void setB(){
 
 		double Bn2,Bmax2=0,Bmin2=0;
+		Vect lc=this.centerLocalCo();
 
 		for(int i=1;i<=numberOfElements;i++){
 			
-			setElementB(i);
-			//element[i].getB().hshow();
-			Bn2=element[i].getB().dot(element[i].getB());
+			Vect B=getElementB(i,lc);
+			element[i].setB(B);
+			Bn2=B.dot(B);
 			if(Bn2>Bmax2)
 				Bmax2=Bn2;
 			if(Bn2<Bmin2)
@@ -2383,6 +2379,23 @@ public double getElementA3ang(int ie,Vect lc){
 		
 		
 			return loss;
+	}
+	
+	
+	public double obtainEnergies(int ir){
+
+		
+		double energy=0;
+
+	for(int i=region[ir].getFirstEl();i<=region[ir].getLastEl();i++){
+
+		double elementEnergy=femCalc.obtainElementEnergy(this,i);
+		
+		energy+=elementEnergy;
+			}
+		
+		
+			return energy;
 	}
 
 	public void writeJ0(String j0filr){

@@ -177,9 +177,7 @@ public class Network {
 		numElements=ie;
 		numNodes=in;
 
-		
-		constructNetwork();
-
+	
 	}
 	
 	public void constructNetwork(){

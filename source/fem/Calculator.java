@@ -3684,6 +3684,61 @@ public class Calculator {
 		return loss;
 	}
 	
+	public double obtainElementEnergy(Model model,int ie){
+		if(model.elCode==1) return 0;//obtainElementLossQuad(model,ie);
+		if(model.elCode==2) return 0;//obtainElementLossTet(model,ie);
+		
+		double energy=0;
+		
+		int n;
+
+		n=this.PW[0].length; 
+
+		Node[] vertexNode=model.elementNodes(ie);
+		
+		
+		double detJac,ws=1,wsJ=0;
+
+		Mat jac;
+
+		Vect localCo=new Vect(this.dim);
+
+
+		Vect B=null;
+
+		Vect nu=model.element[ie].getNu();
+
+		
+		for(int p=0;p<n;p++)
+			for(int q=0;q<n;q++)
+				for(int r=0;r<n;r++){
+
+					localCo.el[0]=this.PW[0][p];
+					localCo.el[1]=this.PW[0][q];
+					localCo.el[2]=this.PW[0][r];
+
+					if(n!=2)
+						ws=this.PW[1][p]*this.PW[1][q]*this.PW[1][r];
+					else
+						ws=1;
+					
+					jac=jacobian(vertexNode,localCo);
+
+
+					detJac=abs(jac.determinant());
+
+					wsJ=ws*detJac;
+					B=model.getElementB(ie, localCo);
+
+							
+					energy+=B.dot(nu.times(B))*wsJ;
+				}
+	
+			energy/=2;
+		
+		return energy;
+	}
+	
 	
 	public double obtainElementLossQuad(Model model,int ie){
 		

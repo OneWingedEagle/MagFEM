@@ -5,7 +5,6 @@ import static java.lang.Math.abs;
 
 import java.awt.Color;
 import java.io.File;
-
 import java.text.DecimalFormat;
 
 import femSolver.StaticElectricSolver;
@@ -33,7 +32,8 @@ public class RunMagAC {
 
 			int nTsteps=model.nTsteps;
 		
-			Vect T=new Vect(nTsteps);
+			//Vect T=new Vect(nTsteps);
+			Vect[] R_L=new Vect[nTsteps];
 			Vect freqs=new Vect(nTsteps);
 			int ix=0;
 			
@@ -43,42 +43,46 @@ public class RunMagAC {
 
 			int inc=model.nInc;
 
-			if(model.AC) nEnd=nBegin;
+		//	if(model.AC) nEnd=nBegin;
 
 			
-			String dispFolder=model.resultFolder;
+			
+			String currentFolder=model.resultFolder;
 			String fluxFolder=model.resultFolder;
-
-			if(model.saveForce){
+			String dispFolder=model.resultFolder;
 			
-/*			
+			if(model.saveForce){
+		
+			
 					dispFolder = folder+"\\forces";
 				File dfolder = new File(dispFolder);
 				if(dfolder.exists())
 					util.deleteDir(dfolder);
-				dfolder.mkdir();*/
+				dfolder.mkdir();
 
 			}
 
 			if(model.saveFlux){
-	/*				fluxFolder = folder+"\\fluxes";
+					fluxFolder = folder+"\\fluxes";
 				
 				File dfolder = new File(fluxFolder);
 				if(dfolder.exists())
 					util.deleteDir(dfolder);
-				dfolder.mkdir();*/
+				dfolder.mkdir();
 
 			}
 
-
+			if(model.saveJe){
+				currentFolder = folder+"\\currents";
 			
-			if(nTsteps>1)
-				model.writeFiles=false;
-			else
-				model.writeFiles=true;
+			File dfolder = new File(currentFolder);
+			if(dfolder.exists())
+				util.deleteDir(dfolder);
+			dfolder.mkdir();
 
-			boolean writeFiles=model.writeFiles;
-			
+		}
+
+		
 			
 			VectComp xc=new VectComp();
 
@@ -91,28 +95,27 @@ public class RunMagAC {
 
 
 
-			for(int i=nBegin;i<=nEnd;i+=inc){
+			for(int step=nBegin;step<=nEnd;step+=inc){
 					
 				double t0=0;
 		
-		
-				main.gui.tfX[2].setText((i)+"/"+nEnd);
+				main.gui.tfX[0].setText((step)+"/"+nEnd);
 
 				model.setJ0(t0);	
 				
 				if(ix>0){
-				model.freq/=Math.pow(10, .5);
-				freqs.el[ix]=model.freq;
+				model.freq*=Math.pow(10, 1);	
 				
 				}
+				freqs.el[ix]=model.freq;
 					
 					model.setMagBC();
 							
-							if(i==nBegin){
+							if(step==nBegin){
 								model.writer.reportData(model);
 							}
 
-							xc=model.femSolver.solveMagAC(model, i-nBegin);	
+							xc=model.femSolver.solveMagAC(model, step-nBegin);	
 				
 
 							int m=xc.length;
@@ -136,70 +139,81 @@ public class RunMagAC {
 								
 							}
 							
-							
-							double lossRe=0;
-							double lossIm=0;
+							double totalLossRe=0;
+							double totalLossIm=0;
+							double totalEnergyRe=0;
+							double totalEnergyIm=0;
 
-								if(model.saveFlux){
-									model.setSolution(vr1);	
+						
 
-									String fluxFile = folder+"\\fluxRe"+i+".txt";
-									model.writeB(fluxFile);
-								}
-								
 
 								model.setSolution(vr2);	
 								model.setJe();
 								
 								if(model.saveJe){
-									String JeFile =  folder+"\\JeRe"+i+".txt";
-	
+									String JeFile =  currentFolder+"\\JeRe"+step+".txt";
 				
 									model.writeJe(JeFile);
+									
+									if(step==nBegin)
+										model.writeMesh(currentFolder+"\\bun"+step+".txt");
 						
 								}
-										
-	
-								for(int ir=1;ir<=model.numberOfRegions;ir++){
-									if(model.region[ir].isConductor){
-								lossRe=model.obtainLoss(ir);
-								util.pr("Real Joule Loss of region "+ir+" [Re]=  "+lossRe);
-									}
-								}
+								totalLossRe=model.writer.outputLoss(model,model.resultFolder+"\\outputs.txt",step,0);		
+				
+								
+								model.setSolution(vr1);	
+								
+								totalEnergyRe=model.writer.outputEnergies(model,model.resultFolder+"\\outputs.txt",step,-90);		
+
 
 								if(model.saveFlux){
-									model.setSolution(vm1);	
-									String fluxFile = folder+"\\fluxIm"+i+".txt";
+									String fluxFile = fluxFolder+"\\fluxRe"+step+".txt";
 									model.writeB(fluxFile);
+									
+									if(step==nBegin)
+										model.writeMesh(fluxFolder+"\\bun"+step+".txt");
 								}
+
+					
 								
 								model.setSolution(vm2);	
 								model.setJe();	
+
 								if(model.saveJe){
-										String JeFile =  folder+"\\JeIm"+i+".txt";
+										String JeFile =  currentFolder+"\\JeIm"+step+".txt";
 						
 										model.writeJe(JeFile);
 						
 								}
+								totalLossIm=model.writer.outputLoss(model,model.resultFolder+"\\outputs.txt",step,-90);		
+
+								model.setSolution(vm1);	
 								
-								for(int ir=1;ir<=model.numberOfRegions;ir++){
-									if(model.region[ir].isConductor){
-										lossIm=model.obtainLoss(ir);
-								util.pr("Joule Loss of region "+ir+" [Imag]=  "+lossIm);
-									}
+								totalEnergyIm=model.writer.outputEnergies(model,model.resultFolder+"\\outputs.txt",step,0);			
+
+								if(model.saveFlux){
+						
+									String fluxFile = fluxFolder+"\\fluxIm"+step+".txt";
+									model.writeB(fluxFile);
 								}
+								
+
 							
 			
-						T.el[ix++]=(lossRe+lossIm)/2;
+						R_L[ix]=new Vect((totalLossRe+totalLossIm),2*(totalEnergyRe+totalEnergyIm));
 
-
+		
 
 					main.gui.tfX[1].setText(this.formatter.format(model.TrqZ));
 
 					if(model.solver.terminate) break;
 
+					ix++;
 				}
 			
+			model.writer.writeR_L(model,model.resultFolder+"\\outputs.txt",freqs,R_L);		
+
 			//util.plot(freqs,T);
 			//T.show();
 		
