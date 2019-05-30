@@ -37,6 +37,7 @@ public class Model{
 	public int unifBTimeId;
 	public Region[] region;
 	public PhiCoil[] phiCoils;
+	public int[] coilInicesByRegion;
 	public Node[] node;
 	public Element[] element;
 	public Edge[] edge;
@@ -2369,14 +2370,22 @@ public double getElementA3ang(int ie,Vect lc){
 
 			
 		double loss=0;
-
+		
+	if(region[ir].isConductor){
 	for(int i=region[ir].getFirstEl();i<=region[ir].getLastEl();i++){
 
 		double elementLoss=femCalc.obtainElementLoss(this,i);
 		
 		loss+=elementLoss;
 			}
+	}else if(this.coilInicesByRegion[ir]>=0){
 		
+		int coilIndex=this.coilInicesByRegion[ir];
+		PhiCoil coil=this.phiCoils[coilIndex];
+		double current=coil.current;
+		double res=coil.resistance;
+		loss=res*current*current;
+	}
 		
 			return loss;
 	}

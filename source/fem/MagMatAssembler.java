@@ -475,7 +475,8 @@ public class MagMatAssembler {
 
 		Vect elemV=new Vect(model.nElEdge);
 
-		double heat=0;
+		
+		double[] coilLosses=new double[model.phiCoils.length];
 
 		for(int ir=1;ir<=model.numberOfRegions;ir++){
 
@@ -483,15 +484,15 @@ public class MagMatAssembler {
 
 			double conductivity=model.phiCoils[coilIndices[ir]].getConductivity();
 			double current=model.phiCoils[coilIndices[ir]].getCurrent();
-
+		
 			for(int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++){
 
-
+	
 				elemV=calc.elemVectPhiCoil(model,i,loss, 1.);
 
 				elemV.timesVoid(current);
 
-				heat+=loss[0]*current*current/conductivity;
+				coilLosses[coilIndices[ir]]+=loss[0]*current*current/conductivity;
 
 				int[] edgeNumb=model.element[i].getEdgeNumb();
 
@@ -514,7 +515,16 @@ public class MagMatAssembler {
 		}
 
 		//model.RHS.show();
-		totalLoss[0]=heat;
+		totalLoss[0]=0;
+		for(int ic=0;ic<model.phiCoils.length;ic++){
+			
+			double current=model.phiCoils[ic].getCurrent();
+			double res=coilLosses[ic]/(current*current);
+			model.phiCoils[ic].setResistance(res);
+
+			totalLoss[0]+=coilLosses[ic];
+
+		}
 	}
 
 

@@ -390,7 +390,10 @@ public class Loader {
 				model.hasJ =true;
 
 				model.phiCoils=new PhiCoil[numCoils];
-				
+				model.coilInicesByRegion=new int[model.numberOfRegions+1];
+				for(int i=1;i<=model.numberOfRegions;i++)
+					model.coilInicesByRegion[i]=-1;
+
 				
 				for(int j=0;j<numCoils;j++){
 					util.pr("// * REGION_ID *  TURNS * SIGMA *");
@@ -403,26 +406,18 @@ public class Loader {
 					int nr=Integer.parseInt(sp[ib++]);
 					model.phiCoils[j]=new PhiCoil(nr);
 					model.phiCoils[j].index=j;
-					
+					model.coilInicesByRegion[nr]=j;
 					
 					double turns=Double.parseDouble(sp[ib++]);
 					model.phiCoils[j].setNumTurns(turns);
-					double regSigma=0;
-					if(model.region[nr].getSigma()!=null )
-						regSigma=model.region[nr].getSigma().el[0];
-							
-							
-					if(regSigma>0) model.phiCoils[j].setSigma(regSigma);
+					double sigma=0;
 					
-					else{
 					if(ib<=sp.length){
-					double sigma=Double.parseDouble(sp[ib++]);
-
+					 sigma=Double.parseDouble(sp[ib++]);
+					}
+						
 					model.phiCoils[j].setSigma(sigma);
-					}
-					}
-			
-					
+					model.region[nr].setSigma(new Vect(3));
 					
 					double[][] boxdata=new double[2][6];
 					int[] boxCoordType=new int[2];
@@ -464,6 +459,7 @@ public class Loader {
 					}
 					
 				}	
+	
 			}
 				
 		
@@ -519,7 +515,7 @@ public class Loader {
 				
 			model.timeFunctions=new TimeFunction[numTimeFuncs+1];
 
-			for(int j=0;j<numTimeFuncs;j++){
+	/*		for(int j=0;j<numTimeFuncs;j++){
 				util.pr("// TIME ID // AMPLITUDE // PERIOD // PHASE");
 				line=getNextDataLine(br);
 				util.pr(line);
@@ -537,8 +533,66 @@ public class Loader {
 				model.timeFunctions[id]=new TimeFunction(id,amp,per,phase);
 			
 			}
-			}
+			}*/
 				
+			for(int j=0;j<numTimeFuncs;j++){
+				util.pr("// TIME ID // TYPE");
+				line=getNextDataLine(br);
+				util.pr(line);
+				String[] sp=line.split(regex);
+				int ib=0;
+				if(sp[ib].equals("")) ib++;
+				int id=Integer.parseInt(sp[ib++]);
+				int type=0;
+				if(ib<sp.length)
+				 type=Integer.parseInt(sp[ib++]);
+				if(type==0){
+				util.pr("// AMPLITUDE // PERIOD // PHASE");
+				line=getNextDataLine(br);
+				util.pr(line);
+				
+				sp=line.split(regex);
+				ib=0;
+				if(sp[ib].equals("")) ib++;
+				
+				double amp= Double.parseDouble(sp[ib++]);
+				
+				double per= Double.parseDouble(sp[ib++]);
+				
+				double phase=0;
+				if(ib<sp.length)
+				 phase= Double.parseDouble(sp[ib++]);
+				model.timeFunctions[id]=new TimeFunction(id,amp,per,phase);
+
+				}else if(type==1){
+					util.pr("// C_DC// PERIOD // C_COS // C_SIN // T_EXP // (f(t)= C_DC+exp(T_EXP*t)(C_COS(2*PI*t/PERIOD)+C_SIN(2*PI*t/PERIOD)");
+					line=getNextDataLine(br);
+					util.pr(line);
+					
+					sp=line.split(regex);
+					ib=0;
+					if(sp[ib].equals("")) ib++;
+
+					double a0= Double.parseDouble(sp[ib++]);
+					double period=1;
+					if(ib<sp.length)
+						period= Double.parseDouble(sp[ib++]);
+					double a1=0;
+					if(ib<sp.length)
+						a1= Double.parseDouble(sp[ib++]);
+					
+					double a2=0;
+					if(ib<sp.length)
+						a0= Double.parseDouble(sp[ib++]);
+					double a3=0;
+					if(ib<sp.length)
+					a3= Double.parseDouble(sp[ib++]);
+					model.timeFunctions[id]=new TimeFunction(id,a0,period,a1,a2,a3);
+				}
+				
+			
+			}
+			}
 			
 			util.pr("//DELTA_TIME");
 

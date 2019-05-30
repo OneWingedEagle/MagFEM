@@ -159,12 +159,17 @@ public class RunMagAC {
 										model.writeMesh(currentFolder+"\\bun"+step+".txt");
 						
 								}
-								totalLossRe=model.writer.outputLoss(model,model.resultFolder+"\\outputs.txt",step,0);		
+								
+								boolean append=false;
+								if( step!=nBegin)
+									append=true;
+								
+								totalLossRe=model.writer.outputLoss(model,model.resultFolder+"\\outputs.txt",step,0,append);		
 				
 								
 								model.setSolution(vr1);	
 								
-								totalEnergyRe=model.writer.outputEnergies(model,model.resultFolder+"\\outputs.txt",step,-90);		
+								totalEnergyRe=model.writer.outputEnergies(model,model.resultFolder+"\\outputs.txt",step,-90,true);		
 
 
 								if(model.saveFlux){
@@ -186,11 +191,11 @@ public class RunMagAC {
 										model.writeJe(JeFile);
 						
 								}
-								totalLossIm=model.writer.outputLoss(model,model.resultFolder+"\\outputs.txt",step,-90);		
+								totalLossIm=model.writer.outputLoss(model,model.resultFolder+"\\outputs.txt",step,-90,true);		
 
 								model.setSolution(vm1);	
 								
-								totalEnergyIm=model.writer.outputEnergies(model,model.resultFolder+"\\outputs.txt",step,0);			
+								totalEnergyIm=model.writer.outputEnergies(model,model.resultFolder+"\\outputs.txt",step,0,true);			
 
 								if(model.saveFlux){
 						

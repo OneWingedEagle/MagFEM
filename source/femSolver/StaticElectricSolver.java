@@ -92,17 +92,6 @@ public class StaticElectricSolver{
 	public  void setPhiMat(Model model){
 
 
-		int[] coilIndices=new int[model.numberOfRegions+1];
-
-		for(int ir=1;ir<=model.numberOfRegions;ir++)
-			coilIndices[ir]=-1;
-
-		for(int ic=0;ic<model.phiCoils.length;ic++){
-			int nr=model.phiCoils[ic].regNo;
-			coilIndices[nr]=ic;
-
-		}
-		
 		double eps=1e-12;
 
 		int ext=10;
@@ -114,18 +103,18 @@ public class StaticElectricSolver{
 
 		for(int ir=1;ir<=model.numberOfRegions;ir++){
 
-			if(coilIndices[ir]<0) continue;
-		//	if(!model.region[ir].isConductor) continue;
+			int coilIndex=model.coilInicesByRegion[ir];
+			if(coilIndex<0) continue;
 
-			double conductivity=1;//model.phiCoils[coilIndices[ir]].conductivity;
-			if(coilIndices[ir]>0){
-				double conductivity1=model.phiCoils[0].conductivity;
-				double conductivity2=model.phiCoils[coilIndices[ir]].conductivity;
+			double conductivity=1./model.phiCoils[coilIndex].getNumTurns();
+			
+			if(coilIndex>0){
+		
+				double conductivity1=model.phiCoils[0].conductivity/model.phiCoils[0].getNumTurns();
+				double conductivity2=model.phiCoils[coilIndex].conductivity/model.phiCoils[coilIndex].getNumTurns();
 			if(conductivity1>0) conductivity=conductivity2/conductivity1;
 			}
 			for(int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++){
-
-				//if(!model.element[i].isConductor()) continue;
 
 				Ke=this.calc.elemPhiMat(model,i);
 		
@@ -196,9 +185,8 @@ public class StaticElectricSolver{
 				t_matrix.row[i].index[jx]=numberOfUnknownPhis-model.phiCoils.length+ic;
 				PhiCoil coil=model.phiCoils[network.elems[j].fem_index];
 	
-				double turns=coil.getNumTurns();
 
-				t_matrix.row[i].el[jx]=-network.tiesetMat.el[n][j]*turns;
+				t_matrix.row[i].el[jx]=-network.tiesetMat.el[n][j];
 				jx++;
 				}
 				ic++;			
@@ -206,8 +194,8 @@ public class StaticElectricSolver{
 				
 			}
 			for(int j=0;j<=i;j++){
-		//	if(p>=i || p==-1) continue;
-			t_matrix.row[i].index[model.phiCoils.length+j]=numberOfUnknownPhis+j;
+
+				t_matrix.row[i].index[model.phiCoils.length+j]=numberOfUnknownPhis+j;
 
 			t_matrix.row[i].el[model.phiCoils.length+j]=-network.PRPt.el[n][j];
 			}
@@ -337,26 +325,15 @@ public class StaticElectricSolver{
 
 
 
-
-		int[] coilIndices=new int[model.numberOfRegions+1];
-
-		for(int ir=1;ir<=model.numberOfRegions;ir++)
-			coilIndices[ir]=-1;
-
-		for(int ic=0;ic<model.phiCoils.length;ic++){
-			int nr=model.phiCoils[ic].regNo;
-			coilIndices[nr]=ic;
-
-		}
-
 		for(int ir=1;ir<=model.numberOfRegions;ir++){
 
 			//if(!model.region[ir].isConductor) continue;
+			int coilIndex=model.coilInicesByRegion[ir];
 
-			if(coilIndices[ir]<0) continue;
+			if(coilIndex<0) continue;
 	
 
-			PhiCoil coil=model.phiCoils[coilIndices[ir]];
+			PhiCoil coil=model.phiCoils[coilIndex];
 
 			int[] infaceNodes1=new int[model.numberOfNodes];
 			boolean[] nc=new boolean[model.numberOfNodes];
@@ -430,16 +407,6 @@ public class StaticElectricSolver{
 	public void setPhiIndices(Model model){
 
 
-		int[] coilIndices=new int[model.numberOfRegions+1];
-
-		for(int ir=1;ir<=model.numberOfRegions;ir++)
-			coilIndices[ir]=-1;
-
-		for(int ic=0;ic<model.phiCoils.length;ic++){
-			int nr=model.phiCoils[ic].regNo;
-			coilIndices[nr]=ic;
-		}
-
 		int ix=0;
 		phiVarIndex=new int[model.numberOfNodes+1];
 		
@@ -450,14 +417,13 @@ public class StaticElectricSolver{
 		for(int ir=1;ir<=model.numberOfRegions;ir++){
 
 
-		//	if(!model.region[ir].isConductor) continue;
+			int coilIndex=model.coilInicesByRegion[ir];
 
-			if(coilIndices[ir]<0) continue;
+			if(coilIndex<0) continue;
 
 
 			for(int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++){
 
-				//if(!model.element[i].isConductor()) continue;
 
 				int[] vertNumb=model.element[i].getVertNumb();
 
