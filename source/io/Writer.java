@@ -2258,16 +2258,12 @@ Vect[] v=new Vect[A.length];
 	}
 	
 
-	public double outputLoss(Model model,String file,int step,double phase_time){
+	public double outputLoss(Model model,String file,int step,double phase_time,boolean append){
 		
-		boolean b=(step!=model.nBegin);
-		if(model.AC){
-			 b=b|| ( phase_time!=0);
-		}
 
 		double totalLoss=0;
 		try{
-			PrintWriter pw=new PrintWriter(new BufferedWriter(new FileWriter(file,b)));
+			PrintWriter pw=new PrintWriter(new BufferedWriter(new FileWriter(file,append)));
 			pw.println("Step: "+step+"\t phase/time: "+phase_time);
 			pw.println();
 			util.pr("step "+step);
@@ -2276,8 +2272,11 @@ Vect[] v=new Vect[A.length];
 				pw.println();
 				util.pr("Joule Losses [W]");
 				for(int ir=1;ir<=model.numberOfRegions;ir++){
-					if(model.region[ir].isConductor){
-				double  loss=model.obtainLoss(ir);
+					if(model.region[ir].isConductor || model.coilInicesByRegion[ir]>=0){
+				double  loss=0;
+				
+				loss=model.obtainLoss(ir);
+				
 				totalLoss+=loss;
 				pw.format("%5d %12.5e\n",ir,loss);
 				pw.println();
@@ -2300,15 +2299,15 @@ Vect[] v=new Vect[A.length];
 	}
 
 
-	public double outputEnergies(Model model,String file,int step,double phase_time){
+	public double outputEnergies(Model model,String file,int step,double phase_time,boolean append){
 	
-		boolean	 b=true;
+
 
 		double totalEnergy=0;
 		try{
-			PrintWriter pw=new PrintWriter(new BufferedWriter(new FileWriter(file,b)));
+			PrintWriter pw=new PrintWriter(new BufferedWriter(new FileWriter(file,append)));
 				
-				pw.println("Energies Losses [W]");
+				pw.println("Energies [VAR]");
 				pw.println(" ****** -------------------------------------- ******");
 				pw.println();
 				util.pr("Energies ");

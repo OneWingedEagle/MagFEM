@@ -16,8 +16,7 @@ public class PhiCoil {
 	public double conductivity;
 	private double numTurns;
 	public int constPotIndex;
-	public double volatge;
-	public double current;
+	public double volatge,current,resistance;
 	
 	public double[][] faceBox;
 	public int[] faceCoordType;
@@ -56,10 +55,21 @@ public class PhiCoil {
 	}
 	public void setNumTurns(double nt){
 		numTurns=nt;
-		
+
 
 	}
 	
+	public void setResistance(double res){
+		resistance=res;
+
+
+	}
+	public double getResistance(){
+		return resistance;
+
+
+	}
+
 	public int getRegNo(){return regNo;}
 	
 	public double getNumTurns(){return numTurns;}

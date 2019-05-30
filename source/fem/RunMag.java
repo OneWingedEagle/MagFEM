@@ -20,11 +20,8 @@ public class RunMag {
 	}
 
 	public void runMag(Model model, Main main){
-		
-
-		
-			String folder=model.resultFolder;
-
+	
+		String folder=model.resultFolder;
 
 			int nTsteps=model.nTsteps;
 		
@@ -33,15 +30,13 @@ public class RunMag {
 			
 			int nBegin=model.nBegin;
 			int nEnd=model.nEnd;
-			
-
 			int inc=model.nInc;
-
-
-			
+		
 			String currentFolder=model.resultFolder;
 			String fluxFolder=model.resultFolder;
 			String dispFolder=model.resultFolder;
+			
+			if(model.analysisMode==0) model.saveJe=false;
 			
 			if(model.saveForce){
 		
@@ -63,7 +58,7 @@ public class RunMag {
 				dfolder.mkdir();
 
 			}
-			util.pr(model.saveJe);
+
 			if(model.saveJe){
 				currentFolder = folder+"\\currents";
 			
@@ -80,8 +75,7 @@ public class RunMag {
 			else
 				model.writeFiles=true;
 
-			boolean writeFiles=model.writeFiles;
-			
+		
 			
 			Vect x=new Vect();
 
@@ -105,7 +99,7 @@ public class RunMag {
 				if(model.phiCoils!=null)
 				model.phiCoils[0].current=Math.cos(2*model.freq*step*model.dt);
 
-					if(!model.loadFlux){
+
 						
 						
 							model.setMagBC();
@@ -146,49 +140,15 @@ public class RunMag {
 									x=model.solveNonLinear(x,true,step-nBegin);
 								}
 
-						if(model.analysisMode>0)
-							model.setJe();
+			
 				
 						if(x!=null)
 							this.xp=x.deepCopy();
 
-	/*						if(model.saveFlux){
-								String fluxFile = fluxFolder+"\\fluxes\\flux"+step+".txt";
-								if(step==nBegin)
-									model.writeMesh(fluxFolder+"\\fluxes\\bun"+step+".txt");
-			
-								model.writeB(fluxFile);
-								
-							//	model.writer.writeA_as_flux(model,fluxFolder+"\\fluxA"+i+".txt");
-								
-		
-							}*/
-
-
-					//	model.resetReluctForce();
-					//	model.setReluctForce();
-						//
-						//model.setMSForce();
 						
-						
-				}
+				
 
 
-					
-			
-					/*if(model.dim==2)
-						model.setTorque(0,model.rm,1);
-						else
-							model.setTorque(model.r1,1,1);
-
-					
-					
-					util.pr("torque >>>>>>>"+model.TrqZ);*/
-					
-				//	T.el[ix++]=model.TrqZ;
-					
-								//************************************************
-				//	writeFiles=true;
 
 					if(model.phiCoils==null)
 						model.writeJ0(folder+"\\J"+step+".txt");
@@ -197,9 +157,13 @@ public class RunMag {
 					model.setSolution(x);	
 					
 					double loss=0;
-					model.setJe();
+					if(model.analysisMode>0){
+						model.setJe();
+						boolean append=false;
+						if( step!=nBegin)
+							append=true;
 					
-					loss=model.writer.outputLoss(model,model.resultFolder+"\\outputs.txt",step,model.getCurrentTime());
+					loss=model.writer.outputLoss(model,model.resultFolder+"\\outputs.txt",step,model.getCurrentTime(),append);
 
 					if(model.saveJe){
 						String JeFile =  currentFolder+"\\Je"+step+".txt";
@@ -212,6 +176,7 @@ public class RunMag {
 						
 		
 					}
+					}
 					
 					if(model.saveFlux){
 
@@ -223,8 +188,11 @@ public class RunMag {
 					}
 					
 				
+					boolean append=true;
+					if(model.analysisMode==0 && step==nBegin)
+						append=false;
 					
-					model.writer.outputEnergies(model,model.resultFolder+"\\outputs.txt",step,model.getCurrentTime());
+					model.writer.outputEnergies(model,model.resultFolder+"\\outputs.txt",step,model.getCurrentTime(),append);
 
 					
 					T.el[ix++]=loss;
