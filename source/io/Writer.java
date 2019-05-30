@@ -2272,7 +2272,7 @@ Vect[] v=new Vect[A.length];
 				pw.println();
 				util.pr("Joule Losses [W]");
 				for(int ir=1;ir<=model.numberOfRegions;ir++){
-					if(model.region[ir].isConductor || model.coilInicesByRegion[ir]>=0){
+					if((model.region[ir].isConductor && model.analysisMode>0) || model.coilInicesByRegion[ir]>=0){
 				double  loss=0;
 				
 				loss=model.obtainLoss(ir);

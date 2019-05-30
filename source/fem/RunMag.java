@@ -159,11 +159,7 @@ public class RunMag {
 					double loss=0;
 					if(model.analysisMode>0){
 						model.setJe();
-						boolean append=false;
-						if( step!=nBegin)
-							append=true;
-					
-					loss=model.writer.outputLoss(model,model.resultFolder+"\\outputs.txt",step,model.getCurrentTime(),append);
+						
 
 					if(model.saveJe){
 						String JeFile =  currentFolder+"\\Je"+step+".txt";
@@ -178,6 +174,13 @@ public class RunMag {
 					}
 					}
 					
+					boolean append=false;
+					if( step!=nBegin)
+						append=true;
+				
+					loss=model.writer.outputLoss(model,model.resultFolder+"\\outputs.txt",step,model.getCurrentTime(),append);
+
+					
 					if(model.saveFlux){
 
 						String fluxFile = fluxFolder+"\\flux"+step+".txt";
@@ -188,10 +191,10 @@ public class RunMag {
 					}
 					
 				
-					boolean append=true;
-					if(model.analysisMode==0 && step==nBegin)
+					 append=true;
+	/*				if(model.analysisMode==0 && step==nBegin)
 						append=false;
-					
+					*/
 					model.writer.outputEnergies(model,model.resultFolder+"\\outputs.txt",step,model.getCurrentTime(),append);
 
 					

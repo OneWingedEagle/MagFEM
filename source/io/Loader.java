@@ -565,7 +565,7 @@ public class Loader {
 				model.timeFunctions[id]=new TimeFunction(id,amp,per,phase);
 
 				}else if(type==1){
-					util.pr("// C_DC// PERIOD // C_COS // C_SIN // T_EXP // (f(t)= C_DC+exp(T_EXP*t)(C_COS(2*PI*t/PERIOD)+C_SIN(2*PI*t/PERIOD)");
+					util.pr("// C_DC * PERIOD * C_COS * C_SIN * T_EXP * //(f(t)= C_DC+exp(T_EXP*t)(C_COS(2*PI*t/PERIOD)+C_SIN(2*PI*t/PERIOD)");
 					line=getNextDataLine(br);
 					util.pr(line);
 					
@@ -627,6 +627,20 @@ public class Loader {
 
 				}
 			
+			util.pr("//SAVE_FLUX * SAVE_CURRENT");
+
+			line=getNextDataLine(br);
+			util.pr(line);
+			String sp[]=line.split(regex);
+			int ib=0;
+			if(sp[ib].equals("")) ib++;
+	
+			 model.saveFlux=false;
+			 model.saveJe=false;
+			 if(Integer.parseInt(sp[ib++])==1)  model.saveFlux=true;
+			 if(ib<sp.length)
+			 if(Integer.parseInt(sp[ib++])==1)  model.saveJe=true;
+			
 			util.pr("//NUMBER OF BH_DATA");
 
 			line=getNextDataLine(br);
@@ -638,8 +652,8 @@ public class Loader {
 				util.pr("// * BH_ID * FILE_NAME* ");
 				line=getNextDataLine(br);
 				util.pr(line);
-				String[] sp=line.split(regex);
-				int ib=0;
+				sp=line.split(regex);
+				ib=0;
 				if(sp[ib].equals("")) ib++;
 				int bhID=Integer.parseInt(sp[ib]);
 				for(int ir=1;ir<=model.numberOfRegions;ir++)
@@ -649,8 +663,7 @@ public class Loader {
 				
 			}
 				
-	 model.saveFlux=true;
-	 model.saveJe=true;
+
 
 	if(model.axiSym) model.height=2*Math.PI;
 		

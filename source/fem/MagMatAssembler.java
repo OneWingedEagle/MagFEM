@@ -492,6 +492,7 @@ public class MagMatAssembler {
 
 				elemV.timesVoid(current);
 
+				if(conductivity>0)
 				coilLosses[coilIndices[ir]]+=loss[0]*current*current/conductivity;
 
 				int[] edgeNumb=model.element[i].getEdgeNumb();

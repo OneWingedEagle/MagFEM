@@ -113,6 +113,10 @@ public class StaticElectricSolver{
 				double conductivity1=model.phiCoils[0].conductivity/model.phiCoils[0].getNumTurns();
 				double conductivity2=model.phiCoils[coilIndex].conductivity/model.phiCoils[coilIndex].getNumTurns();
 			if(conductivity1>0) conductivity=conductivity2/conductivity1;
+			else if(conductivity1==0 && conductivity2==0) conductivity=1;
+			else{
+				System.err.println("zero conductiveity only possible if set for all coils.");
+			}
 			}
 			for(int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++){
 
