@@ -50,8 +50,8 @@ public class MeshManipulator {
 
 		//Model model=new Model("D:\\JavaWorks\\FEM problems\\Hamed solver\\bun1elem.txt");
 		//model.setEdge();
-	//	mf.reRegionb();
-//	mf.connectivity(1e-5);	mf.dropUnusedNodes();
+		mf.reRegionb();
+	//mf.connectivity(1e-5);	mf.dropUnusedNodes();
 	//	mf.dropUnusedNodes();
 		//mf.deform();
 		//mf.rotate(9*PI/180);
@@ -63,7 +63,7 @@ public class MeshManipulator {
 
 		//mf.reverseHexa();
 
-	Model model=mf.rotExtendNfold(19);
+	//Model model=mf.rotExtendNfold(29);
 	//model.writeMesh(new File(model.meshFilePath).getParentFile().getPath()+"\\extenRot.txt");
 		int Nr=10;
 		int[] regs0=new  int[Nr];
@@ -110,7 +110,7 @@ public class MeshManipulator {
 		}*/
 	//	model.writeMesh("D:\\JavaWorks\\FEM problems\\ipm_motor2D\\compacted.txt");*/
 		//	mf.rotate(PI/2);
-	//	mf.pileUpHexa(1, 2);
+	//	mf.pileUpHexa(40, .05);
 		
 	//	mf.pileHelic(6*8, PI/4, .0125*18);
 		
@@ -1112,13 +1112,14 @@ public void hexaToTetra()
 				else				
 					 model.element[i].setRegion(3);*/
 				
+				if(c.el[2]>.5) model.element[i].setRegion(3);
 
 			//	else model.element[i].setRegion(2);
 				double tt=util.getAng(c);
 				double rr=c.norm();
-				if(rr<.05) model.element[i].setRegion(1);
-				else
-					 model.element[i].setRegion(2);
+				//if(rr<.05) model.element[i].setRegion(1);
+				//else
+					// model.element[i].setRegion(2);
 				//if(rr>1.2 && rr<1.4 && tt>0*PI/18/2 && tt<2*PI/18/2) model.element[i].setRegion(2);
 				//else if(rr>1.2 && rr<1.4 && tt>4*PI/18/2 && tt<6*PI/18/2) model.element[i].setRegion(3);
 			//	}
@@ -1588,7 +1589,15 @@ util.pr(rm);
 		if(nn[i]){
 			Vect v=model.node[i].getCoord();
 		double r=v.norm();
-		if(r>.18 && r<-R){
+		double tt=util.getAng(v)/2;
+		if(v.el[1]>.001){
+			double t2=3*PI/180;
+			double r2=v.el[0];
+			Vect v2=new Vect(r2*Math.cos(t2),r2*Math.sin(t2));
+			
+			model.node[i].setCoord(v2);
+		}
+/*		if(r>.18 && r<-R){
 			v=v.times(R/r);
 			model.node[i].setCoord(v);
 		}
@@ -1597,7 +1606,7 @@ util.pr(rm);
 			v=v.add(new Vect().rand(3, -.001, .001));
 			model.node[i].setCoord(v);
 		}
-		
+		*/
 		//double tt=util.getAng(v)/2;
 		//Vect v2=new Vect(r*Math.cos(tt),r*Math.sin(tt));
 		//model.node[i].setCoord(v2);
