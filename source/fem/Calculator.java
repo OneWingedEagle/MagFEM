@@ -3632,7 +3632,7 @@ public class Calculator {
 
 	public double obtainElementLoss(Model model,int ie){
 	
-		if(model.elCode==1) return obtainElementLossQuad(model,ie);
+		if(model.elCode==0) return 0;
 		if(model.elCode==2) return obtainElementLossTet(model,ie);
 		
 		double loss=0;
@@ -3655,19 +3655,21 @@ public class Calculator {
 
 		Vect sigmaInv=model.element[ie].getSigma().inv();
 
-		
 		for(int p=0;p<n;p++)
-			for(int q=0;q<n;q++)
+			for(int q=0;q<n;q++){
+				localCo.el[0]=this.PW[0][p];
+				localCo.el[1]=this.PW[0][q];
+				if(n!=2)
+					ws=this.PW[1][p]*this.PW[1][q];
+				else
+					ws=1;
+				if(model.dim==3)
 				for(int r=0;r<n;r++){
 
-					localCo.el[0]=this.PW[0][p];
-					localCo.el[1]=this.PW[0][q];
 					localCo.el[2]=this.PW[0][r];
 
 					if(n!=2)
-						ws=this.PW[1][p]*this.PW[1][q]*this.PW[1][r];
-					else
-						ws=1;
+						ws*=this.PW[1][r];
 					
 					jac=jacobian(vertexNode,localCo);
 
@@ -3680,13 +3682,14 @@ public class Calculator {
 							
 					loss+=Je.dot(sigmaInv.times(Je))*wsJ;
 				}
+			}
 	
 		return loss;
 	}
 	
 	public double obtainElementEnergy(Model model,int ie){
-		if(model.elCode==1) return 0;//obtainElementLossQuad(model,ie);
-		if(model.elCode==2) return 0;//obtainElementLossTet(model,ie);
+		if(model.elCode==0) return 0;
+		if(model.elCode==2) obtainElementEnergyTet(model,ie);
 		
 		double energy=0;
 		
@@ -3710,17 +3713,21 @@ public class Calculator {
 
 		
 		for(int p=0;p<n;p++)
-			for(int q=0;q<n;q++)
+			for(int q=0;q<n;q++){
+				localCo.el[0]=this.PW[0][p];
+				localCo.el[1]=this.PW[0][q];
+				if(n!=2)
+					ws=this.PW[1][p]*this.PW[1][q];
+				else
+					ws=1;
+				if(model.dim==3)
 				for(int r=0;r<n;r++){
 
-					localCo.el[0]=this.PW[0][p];
-					localCo.el[1]=this.PW[0][q];
 					localCo.el[2]=this.PW[0][r];
 
 					if(n!=2)
-						ws=this.PW[1][p]*this.PW[1][q]*this.PW[1][r];
-					else
-						ws=1;
+						ws*=this.PW[1][r];
+			
 					
 					jac=jacobian(vertexNode,localCo);
 
@@ -3733,65 +3740,58 @@ public class Calculator {
 							
 					energy+=B.dot(nu.times(B))*wsJ;
 				}
+	}
 	
 			energy/=2;
 		
 		return energy;
 	}
 	
-	
-	public double obtainElementLossQuad(Model model,int ie){
+	public double obtainElementEnergyTet(Model model,int ie){
+
+
+		double energy=0;
 		
-		
-		double loss=0;
-
-		int n;
-
-		n=this.PW[0].length; 
-
 		Node[] vertexNode=model.elementNodes(ie);
-
-
-		double detJac,ws=1,wsJ=0;
-
-		Mat jac;
-
-		Vect localCo=new Vect(this.dim);
-
-		Vect Je=new Vect(this.dim);
-
-		Vect sigmaInv=model.element[ie].getSigma().inv();
 		
+		Vect lc=new Vect(4);
+
+		double wsJ;
+		
+		Vect B=null;
+
+		Vect nu=model.element[ie].getNu();
+		
+
+		Mat jac=this.jacobianTetra(vertexNode, new Vect(dim));
+
+		double detJac=abs(jac.determinant());
+		
+		int n=this.PWtetra.length; 					
 		for(int p=0;p<n;p++)
-			for(int q=0;q<n;q++){
+		{
+
+			lc.el[0]=this.PWtetra[p][0];
+			lc.el[1]=this.PWtetra[p][1];
+			lc.el[2]=this.PWtetra[p][2];
+			lc.el[3]=this.PWtetra[p][3];
+			wsJ=this.PWtetra[p][4]*detJac;
+			
+			B=model.getElementB(ie, lc);
+
+			
+			energy+=B.dot(nu.times(B))*wsJ;
+
 			
 
-					localCo.el[0]=this.PW[0][p];
-					localCo.el[1]=this.PW[0][q];
-
-					if(n!=2)
-						ws=this.PW[1][p]*this.PW[1][q];
-					else
-						ws=1;
-
-					jac=jacobian(vertexNode,localCo);
-					
-					detJac=abs(jac.determinant());
-
-					wsJ=ws*detJac;
-					
-					Je=model.getElementJe(ie, localCo);
-
-					
-					loss+=Je.dot(sigmaInv.times(Je))*wsJ;
-
-
-				}
-
-		return loss;
-
-
+		}
+		
+		energy/=2;
+		
+		return energy;
+	
 	}
+
 	
 	public double obtainElementLossTet(Model model,int ie){
 
