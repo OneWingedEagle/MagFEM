@@ -74,7 +74,7 @@ public class PhiCoil {
 	
 	public double getNumTurns(){return numTurns;}
 	
-	double  getConductivity(){return conductivity;}
+	public double  getConductivity(){return conductivity;}
 	
 	double  getCurrent(){return current;}
 	

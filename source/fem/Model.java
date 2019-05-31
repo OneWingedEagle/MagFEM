@@ -1309,30 +1309,26 @@ public class Model{
 	public void setJPhiCoil(){
 		
 		double Jn2=0,Jmax2=0,Jmin2=0;
-		
-		int[] coilIndices=new int[numberOfRegions+1];
 
-		for(int ir=1;ir<=numberOfRegions;ir++)
-			coilIndices[ir]=-1;
-
-		for(int ic=0;ic<phiCoils.length;ic++){
-			int nr=phiCoils[ic].regNo;
-			coilIndices[nr]=ic;
-
-		}
 		
 		Vect lc=this.centerLocalCo();
 
 		
 		for(int ir=1;ir<=numberOfRegions;ir++){
-
-			if(coilIndices[ir]<0) continue;
-
-			double conductivity=1;//model.phiCoils[coilIndices[ir]].conductivity;
-			if(coilIndices[ir]>0){
+			
+			int coilIndex=coilInicesByRegion[ir];
+			if(coilIndex<0) continue;
+			
+			double nt=phiCoils[coilIndex].getNumTurns();
+			double conductivity=phiCoils[coilIndex].conductivity;;
+		
+			if(coilIndex>0){
+				double nt1=phiCoils[0].getNumTurns();
 				double conductivity1=phiCoils[0].conductivity;
-				double conductivity2=phiCoils[coilIndices[ir]].conductivity;
-			if(conductivity1>0) conductivity=conductivity2/conductivity1;
+			
+				
+			if(conductivity1>0) conductivity=conductivity/conductivity1*nt1/nt; //?
+			else if(conductivity1==0 && conductivity==0) conductivity=1;
 			}
 
 			region[ir].hasJ=true;
@@ -1340,6 +1336,7 @@ public class Model{
 			for(int i=region[ir].getFirstEl();i<=region[ir].getLastEl();i++){
 
 			Vect J=getElementJPhiCoil(i,lc,conductivity);
+			
 					
 			element[i].setJ(J);
 

@@ -50,7 +50,7 @@ public class MeshManipulator {
 
 		//Model model=new Model("D:\\JavaWorks\\FEM problems\\Hamed solver\\bun1elem.txt");
 		//model.setEdge();
-		mf.reRegionb();
+	//	mf.reRegionb();
 	//mf.connectivity(1e-5);	mf.dropUnusedNodes();
 	//	mf.dropUnusedNodes();
 		//mf.deform();

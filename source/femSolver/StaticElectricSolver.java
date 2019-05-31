@@ -54,7 +54,6 @@ public class StaticElectricSolver{
 
 		model.solver.terminate(false);
 
-	//	RHS.show();
 		SpMat Ks=conductiveMat.deepCopy();
 
 			//Ks.diagSym().show();
@@ -81,9 +80,8 @@ public class StaticElectricSolver{
 
 		x.timesVoid(Ci);
 
-		//x.show();
 		//util.pr("x --------------------------> "+x.norm());
-		
+		//x.show();
 
 		return x;
 
@@ -110,14 +108,17 @@ public class StaticElectricSolver{
 			
 			if(coilIndex>0){
 		
-				double conductivity1=model.phiCoils[0].conductivity/model.phiCoils[0].getNumTurns();
-				double conductivity2=model.phiCoils[coilIndex].conductivity/model.phiCoils[coilIndex].getNumTurns();
+				double n1=model.phiCoils[0].getNumTurns();
+				double n2=model.phiCoils[coilIndex].getNumTurns();
+				double conductivity1=model.phiCoils[0].conductivity/(n1*n1);
+				double conductivity2=model.phiCoils[coilIndex].conductivity/(n2*n2);
 			if(conductivity1>0) conductivity=conductivity2/conductivity1;
 			else if(conductivity1==0 && conductivity2==0) conductivity=1;
 			else{
 				System.err.println("zero conductiveity only possible if set for all coils.");
 			}
 			}
+
 			for(int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++){
 
 				Ke=this.calc.elemPhiMat(model,i);
@@ -244,25 +245,11 @@ public class StaticElectricSolver{
 
 		RHS=new Vect(numberOfUnknowns);
 		Network network=model.network;
-
-		boolean byCPS=true;
-		int rowIndex=-1;
-		for(int j=0;j<network.indep_elems.length;j++){
-			if(network.indep_elems[j].type==ElemType.VPS){
-				 rowIndex=network.indep_elems[j].unknown_seq_no+numberOfUnknownPhis;
-
-				byCPS=false;
-				 break;
-			}
-		}
-			
-		if(!byCPS &&rowIndex>=0){
-
-			double vps_volatge=1;
-			RHS.el[rowIndex]=-vps_volatge;
-		}
 		
-		if(byCPS){
+		double time=model.getCurrentTime();
+
+		int rowIndex=-1;
+	
 			
 			Vect indepCurrents=new Vect(network.indep_elems.length);
 	
@@ -272,13 +259,34 @@ public class StaticElectricSolver{
 
 					double value=0;
 					if(model.timeFunctions!=null && time_id>0)
-					  value=model.timeFunctions[time_id].getValue(0);
+					  value=model.timeFunctions[time_id].getValue(time);
 					indepCurrents.el[j]=value;
 				}
 			}
 			
-			Vect rhsCurrents=network.PRPt.mul(indepCurrents);
+			Vect rhs=network.PRPt.mul(indepCurrents);
+	
+			Vect vsVector=new Vect(network.numElements);
+			for (int j = 0; j<network.numElements; ++j){
+				if(network.elems[j].type==ElemType.VPS){
+					int time_id=network.elems[j].time_id;
 
+					double value=0;
+					if(model.timeFunctions!=null && time_id>0)
+					  value=model.timeFunctions[time_id].getValue(time);
+					
+					if(model.phiCoils!=null){
+						double sig=model.phiCoils[0].getConductivity();
+						double nt=model.phiCoils[0].getNumTurns();
+						value*=sig/nt;
+					}
+					vsVector.el[j]=-value;
+				}
+			}
+			
+			Vect rhsVPS=network.tiesetMat.mul(vsVector);
+
+			rhs=rhs.add(rhsVPS);
 			
 			for (int j = 0; j<network.indep_elems.length; ++j){
 				if(network.indep_elems[j].type!=ElemType.CPS){
@@ -286,7 +294,7 @@ public class StaticElectricSolver{
 					 rowIndex=this.numberOfUnknownPhis+network.indep_elems[j].unknown_seq_no;
 
 
-					RHS.el[rowIndex]+=rhsCurrents.el[j];
+					RHS.el[rowIndex]+=rhs.el[j];
 				}
 			}
 		
@@ -309,6 +317,7 @@ public class StaticElectricSolver{
 										
 					rowIndex=this.phiVarIndex[coil.infaceNodes[0]];
 					double current=network.elems[j].I;
+				//	util.pr("->>>>>>>>>>>>>>>>>>>>>>>>> "+current);
 					double turns=coil.getNumTurns();
 					current*=turns;
 					
@@ -317,7 +326,7 @@ public class StaticElectricSolver{
 
 				}
 			}
-		}
+		//}
 	
 	//	RHS.show();
 
@@ -383,7 +392,7 @@ public class StaticElectricSolver{
 
 						if(nc[nodeNumber]==false){
 						model.node[nodeNumber].setPhiKnown(true);
-						model.node[nodeNumber].setPhi(1e-10);
+						model.node[nodeNumber].setPhi(0);
 					}
 					}
 
@@ -546,10 +555,10 @@ public class StaticElectricSolver{
 
 		for (int j = 0; j<network.numElements; ++j)
 		{
-			if(network.elems[j].type!=ElemType.CPS) {
+			//if(network.elems[j].type!=ElemType.CPS) {
 				network.elems[j].I=allCurrents.el[j];
-				util.pr(network.elems[j].id+" "+network.elems[j].I);
-			}
+				util.pr("element: "+network.elems[j].id+"   current: "+network.elems[j].I);
+			//}
 		}
 		
 	}

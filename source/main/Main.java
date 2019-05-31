@@ -89,9 +89,6 @@ import fem.RunMagAC;
 
 		util.setLogFile(model.logFilePath);
 		
-		
-
-			
 		if(util.getLogFile()!=null){
 		try{
 			DateFormat dateFormat1 = new SimpleDateFormat("YY/MM/dd  HH:mm:ss");
