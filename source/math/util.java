@@ -21,7 +21,6 @@ import java.util.Random;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
-
 import materialData.CurrentWaveForm;
 import triangulation.ConvexHull;
 
@@ -36,6 +35,7 @@ public class util {
 	static DecimalFormat df=new DecimalFormat("0.00000E00");
 	static String regex="[ : ,=\\t]+";
 
+	static String logFile=null;
 	public util(){}
 
 	public static void main7(String[] args) {
@@ -1197,9 +1197,17 @@ public class util {
 
 	}
 
+
 	public static void pr(String a){
 
 		System.out.println(a);
+		if(logFile!=null){
+			try{
+				PrintWriter pw=new PrintWriter(new BufferedWriter(new FileWriter(logFile,true)));
+				pw.println(a);
+				pw.close();
+			} catch(IOException e){System.err.println("IOException: " + e.getMessage());}
+		}
 
 	}
 	public static void pr(int a){
@@ -1841,5 +1849,13 @@ public static Vect loadSpVect(String file,int L){
 
 	}
 
+	public static void setLogFile(String path){
+		
+		logFile=path;
+	}
 	
+	public static String getLogFile(){
+		
+		return logFile;
+	}
 }

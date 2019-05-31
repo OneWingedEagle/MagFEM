@@ -1,12 +1,9 @@
 package main;
 import math.*;
-
 import static java.lang.Math.*;
-
 import io.Console;
 
 import java.awt.Color;
-
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
@@ -33,7 +30,6 @@ import javax.swing.JOptionPane;
 
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
-
 
 import components.GUI;
 import fem.Model;
@@ -78,6 +74,34 @@ import fem.RunMagAC;
 		this.model.meshFilePath=this.gui.tfMeshFile.getText();
 		this.model.dataFilePath=this.gui.tfDataFile.getText();
 	
+		this.model.resultFolder = new File(model.meshFilePath).getParentFile().getAbsolutePath();
+		
+		DateFormat dateFormat = new SimpleDateFormat("MM.dd.HH.mm.ss");
+		
+		Date date = new Date();
+		
+		String suff=dateFormat.format(date);
+
+		if(dated) this.model.resultFolder=this.model.resultFolder+suff;
+
+		
+		model.logFilePath=model.resultFolder+ "\\log.txt";
+
+		util.setLogFile(model.logFilePath);
+		
+		
+
+			
+		if(util.getLogFile()!=null){
+		try{
+			DateFormat dateFormat1 = new SimpleDateFormat("YY/MM/dd  HH:mm:ss");
+
+			PrintWriter pw=new PrintWriter(new BufferedWriter(new FileWriter(util.getLogFile())));
+			pw.println("***  log file *** started at "+ dateFormat1.format(date)+" ****");
+			pw.println("================================================================");
+			pw.close();
+		} catch(IOException e){System.err.println("IOException: " + e.getMessage());}
+		}
 
 		this.errMax=Double.parseDouble(this.gui.tfErrorMax.getText());
 		this.iterMax=Integer.parseInt(this.gui.tfIterMax.getText());
@@ -106,8 +130,7 @@ import fem.RunMagAC;
 			double t_end= System.currentTimeMillis();
 			System.out.format("Total cpu time (s): %10.1f\n",(t_end-t_start)/1000.);	
 
-				String logFilePath = model.resultFolder+ "\\log.txt";
-				gui.writeLog(logFilePath);
+				gui.writeLog(model.logFilePath);
 				gui.Run.setBackground(Color.green);
 				gui.Run.setEnabled(true);
 
@@ -137,15 +160,8 @@ import fem.RunMagAC;
 		public void prepare(){
 		Main.this.model.iterMax=Main.this.iterMax;
 		Main.this.model.errCGmax=Main.this.errMax;
+	
 		
-		DateFormat dateFormat = new SimpleDateFormat("MM.dd.HH.mm.ss");
-		Date date = new Date();
-		String suff=dateFormat.format(date);
-
-		
-		this.model.resultFolder = new File(model.meshFilePath).getParentFile().getAbsolutePath();
-		
-		if(dated) this.model.resultFolder=this.model.resultFolder+suff;
 		
 		try{
 
@@ -177,7 +193,7 @@ import fem.RunMagAC;
 				System.gc();
 				long m1 = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 
-				Main.this.model.loadMesh(Main.this.model.filePath);
+				Main.this.model.loadMesh(Main.this.model.meshFilePath);
 
 				long m2 = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 				System.out.println("Used memory for  model setup: "+(m2-m1)/(1024*1024)+"MB");

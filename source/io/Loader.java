@@ -39,12 +39,13 @@ public class Loader {
 	private String regex="[:; ,=\\t]+";
 	public String regex2="[\\[\\]\\s: )(,=\\t]+";
 
-
+	private String logFile;
 	
 
 	public void loadMesh(Model model, String bunFilePath){
 
 		model.meshFilePath=bunFilePath;
+		
 		
 		try{
 			FileReader fr=new FileReader(bunFilePath);
@@ -207,38 +208,37 @@ public class Loader {
 	}	
 
 	public void loadData(Model model,String dataFilePath){
+		
 		int dim0=model.dim;
+		
+		//logFile=model.logFilePath;
+
 
 		try{
 			BufferedReader br = new BufferedReader(new FileReader(dataFilePath));
 			String line;
-			line=getNextDataLine(br);
-			util.pr("// DATA TYPE (0: Magnetic)");
-			util.pr(line);
+			line=getNextDataLine(br,"// DATA TYPE (0: Magnetic)");
+
 			int dataType =getIntData(line);
 			model.dataType=dataType;
 			
-			line=getNextDataLine(br);
-			util.pr("// DIMENSION (2: 2D, 3: 3D, 4: Axisymmetric 2D)");
-			util.pr(line);
+			line=getNextDataLine(br,"// DIMENSION (2: 2D, 3: 3D, 4: Axisymmetric 2D)");
+
 			int dim =getIntData(line);
 			if(dim==4){
 				dim=2;
 				model.axiSym=true;
 			}
 
-			line=getNextDataLine(br);
-			util.pr("// COORDINATE (0: Cartesian, 1: Cylindrical)");
-			util.pr(line);
+			line=getNextDataLine(br,"// COORDINATE (0: Cartesian, 1: Cylindrical)");
+
 			int coordCode =getIntData(line);
 			model.coordCode=coordCode;
 			
 			if(dim!=dim0){
 				System.err.println("Mesh and Data do not match in dimension: "+dim0+" and "+dim);
 			}
-		
-		
-		//	if(dataType==0)
+
 				setDataMag( model,br);
 		
 				br.close();
@@ -250,6 +250,8 @@ public class Loader {
 
 		System.out.println();
 		System.out.println("Loading data file completed.");
+		
+		util.setLogFile(null);
 
 	}
 	
@@ -261,27 +263,21 @@ public class Loader {
 		try {
 
 	
-			util.pr("// ANALYSIS MODE (0: Magnetostatic, 1:  A-method,  2: A-fi-method ");
-
-			line=getNextDataLine(br);
+			line=getNextDataLine(br,"// ANALYSIS MODE (0: Magnetostatic, 1:  A-method,  2: A-fi-method ");
 			
-			util.pr(line);
+
 			int am =getIntData(line);
 			model.analysisMode=am;
-			util.pr("// NONLINEAR (0: Linear , 1: Nonliear ");
 
-			line=getNextDataLine(br);
-			util.pr(line);
+			line=getNextDataLine(br,"// NONLINEAR (0: Linear , 1: Nonliear ");
 			
 			boolean nonlin=getBooleanData(line);;
 			
 			model.setNonLin(nonlin);
 
-			util.pr("// AC (1: AC , 0: Time domain) // FREQ (if AC =1) ");
 
-			line=getNextDataLine(br);
+			line=getNextDataLine(br,"// AC (1: AC , 0: Time domain) // FREQ (if AC =1) ");
 			
-			util.pr(line);
 			
 			String[] sp0=line.split(this.regex);	
 
@@ -295,28 +291,18 @@ public class Loader {
 			
 			model.setFreq(f0);
 			}
-		
 
-		
-		
-			
-			util.pr("// NUMBER OF REGIONS ");
+			line=getNextDataLine(br,"// NUMBER OF REGIONS ");
 
-			line=getNextDataLine(br);;
-			util.pr(line);
 			int nRegions =getIntData(line);		
 			if(nRegions!=model.numberOfRegions){
 				System.out.println("Mesh and Data do not match in the number of regions: "+model.numberOfRegions+" and "+nRegions);
 			}
-	
-
 		
-			
 			for(int ir=1;ir<=model.numberOfRegions;ir++){
 		
-				util.pr("// *REGION_ID * BH_ID * MU * SIGMA , MAGNETIZATION [Mx, My, Mz] ");
-				line=getNextDataLine(br);
-				util.pr(line);
+			line=getNextDataLine(br,"// *REGION_ID * BH_ID * MU * SIGMA , MAGNETIZATION [Mx, My, Mz] ");
+
 			readAndSetRegMagPropery(model,ir,line);
 			}
 			
@@ -330,10 +316,8 @@ public class Loader {
 			int[] bcData=new int[2];
 			
 			for(int j=0;j<model.nBoundary;j++){
-				util.pr("// * BOUNDRAY CONDITION (D: Drichlet, N: Neumann) *");
 
-				line=getNextDataLine(br);
-				util.pr(line);
+				line=getNextDataLine(br,"// * BOUNDRAY CONDITION (D: Drichlet, N: Neumann) *");
 
 				if(model.BCtype[j]>-1) continue;
 				bcData=getBCdata(line);
@@ -352,18 +336,14 @@ public class Loader {
 								
 			}
 			
-			util.pr("// *NUMBER OF GIVEN CURRENT DENSITY * ");
-			line=getNextDataLine(br);
-			util.pr(line);
+			line=getNextDataLine(br,"// *NUMBER OF GIVEN CURRENT DENSITY * ");
 
 			int numbRegsWithJ=Integer.parseInt(line);
 			for(int j=0;j<numbRegsWithJ;j++){
 				if(model.axiSym)
-					util.pr("// * COIL_ID * 0. *  0. * Jy *");
+					line=getNextDataLine(br,"// * COIL_ID * 0. *  0. * Jy *");
 				else
-					util.pr("// * COIL_ID * Jx *  Jy * Jz *");
-					line=getNextDataLine(br);
-				util.pr(line);
+					line=getNextDataLine(br,"// * COIL_ID * Jx *  Jy * Jz *");
 		
 				String[] sp=line.split(this.regex);	
 
@@ -379,10 +359,8 @@ public class Loader {
 
 				
 			}
-			util.pr("//NUMBER OF COILS ");
 
-			line=getNextDataLine(br);
-			util.pr(line);
+			line=getNextDataLine(br,"//NUMBER OF COILS ");
 			
 			int numCoils=Integer.parseInt(line);
 			
@@ -396,9 +374,7 @@ public class Loader {
 
 				
 				for(int j=0;j<numCoils;j++){
-					util.pr("// * REGION_ID *  TURNS * SIGMA *");
-					line=getNextDataLine(br);
-					util.pr(line);
+					line=getNextDataLine(br,"// * REGION_ID *  TURNS * SIGMA *");
 					String[] sp=line.split(this.regex);	
 
 					int ib=0;
@@ -424,11 +400,10 @@ public class Loader {
 					
 					for(int k=0;k<2;k++){
 					if(k==0)
-						util.pr("//BOX OF COIL INPUT FACE NODES ");
+						line=getNextDataLine(br,"//BOX OF COIL INPUT FACE NODES ");
 					else
-						util.pr("//BOX OF COIL OUTPUT FACE NODES ");
-					line=getNextDataLine(br);
-					util.pr(line);
+						line=getNextDataLine(br,"//BOX OF COIL OUTPUT FACE NODES ");
+
 					ib=0;
 					if(sp[0].equals("")) ib=1;
 					sp=line.split(this.regex);	
@@ -461,21 +436,16 @@ public class Loader {
 				}	
 	
 			}
-				
-		
 
-			//	util.pr("//UNIFORM FIELD (0,1) ");
-			util.pr("// UNIFORM FIELD TIME_ID ");
-			line=getNextDataLine(br);
-			util.pr(line);
+			line=getNextDataLine(br,"// UNIFORM FIELD TIME_ID ");
+
 			model.unifBTimeId=getIntData(line);
 
 			if(model.unifBTimeId>0){
 				model.hasBunif=true;
-			
-				util.pr("// Bx  By 0 ");
-				line=getNextDataLine(br);
-				util.pr(line);
+
+				line=getNextDataLine(br,"// Bx  By 0 ");
+
 				double[] array=getCSV(line);
 				
 				model.unifB=new Vect(array);
@@ -486,10 +456,8 @@ public class Loader {
 
 				}
 			}
-			line=getNextDataLine(br);
-			line=util.dropLeadingSpaces(line);
-			util.pr("//NETWORK (CIRCUT) ");
-			util.pr(line);
+			line=getNextDataLine(br,"//NETWORK (CIRCUT) ");
+
 			if(line.equals("NETWORK")){
 				Network network=new Network();
 				network.read(this, br);
@@ -507,38 +475,18 @@ public class Loader {
 				}
 			}
 			
-			util.pr("// NUM TIME FUNCTIONS");
-			line=getNextDataLine(br);
-			util.pr(line);
+			line=getNextDataLine(br,"// NUM TIME FUNCTIONS");
+
 			int numTimeFuncs=getIntData(line);	
 			if(numTimeFuncs>0){
 				
 			model.timeFunctions=new TimeFunction[numTimeFuncs+1];
 
-	/*		for(int j=0;j<numTimeFuncs;j++){
-				util.pr("// TIME ID // AMPLITUDE // PERIOD // PHASE");
-				line=getNextDataLine(br);
-				util.pr(line);
-				String[] sp=line.split(regex);
-				int ib=0;
-				if(sp[ib].equals("")) ib++;
-				int id=Integer.parseInt(sp[ib++]);
-				
-				double amp= Double.parseDouble(sp[ib++]);
-				
-				double per= Double.parseDouble(sp[ib++]);
-				
-				double phase= Double.parseDouble(sp[ib++]);
-				
-				model.timeFunctions[id]=new TimeFunction(id,amp,per,phase);
-			
-			}
-			}*/
 				
 			for(int j=0;j<numTimeFuncs;j++){
-				util.pr("// TIME ID // TYPE");
-				line=getNextDataLine(br);
-				util.pr(line);
+
+				line=getNextDataLine(br,"// TIME ID // TYPE");
+
 				String[] sp=line.split(regex);
 				int ib=0;
 				if(sp[ib].equals("")) ib++;
@@ -547,9 +495,9 @@ public class Loader {
 				if(ib<sp.length)
 				 type=Integer.parseInt(sp[ib++]);
 				if(type==0){
-				util.pr("// AMPLITUDE // PERIOD // PHASE");
-				line=getNextDataLine(br);
-				util.pr(line);
+
+				line=getNextDataLine(br,"// AMPLITUDE // PERIOD // PHASE");
+			
 				
 				sp=line.split(regex);
 				ib=0;
@@ -565,9 +513,7 @@ public class Loader {
 				model.timeFunctions[id]=new TimeFunction(id,amp,per,phase);
 
 				}else if(type==1){
-					util.pr("// C_DC * PERIOD * C_COS * C_SIN * T_EXP * //(f(t)= C_DC+exp(T_EXP*t)(C_COS(2*PI*t/PERIOD)+C_SIN(2*PI*t/PERIOD)");
-					line=getNextDataLine(br);
-					util.pr(line);
+					line=getNextDataLine(br,"// C_DC * PERIOD * C_COS * C_SIN * T_EXP * //(f(t)= C_DC+exp(T_EXP*t)(C_COS(2*PI*t/PERIOD)+C_SIN(2*PI*t/PERIOD)");
 					
 					sp=line.split(regex);
 					ib=0;
@@ -593,16 +539,12 @@ public class Loader {
 			
 			}
 			}
-			
-			util.pr("//DELTA_TIME");
 
-			line=getNextDataLine(br);
-			util.pr(line);
+
+			line=getNextDataLine(br,"//DELTA_TIME");
 			model.dt=getScalarData(line);	
 
-			util.pr("//STEP_BEGIN  *  STEP_END * INTERVAL");
-			line=getNextDataLine(br);
-			util.pr(line);
+			line=getNextDataLine(br,"//STEP_BEGIN  *  STEP_END * INTERVAL");
 			if(line!=null){
 				int nSteps=1;
 				String sp[]=line.split(regex);
@@ -626,11 +568,10 @@ public class Loader {
 
 
 				}
-			
-			util.pr("//SAVE_FLUX * SAVE_CURRENT");
 
-			line=getNextDataLine(br);
-			util.pr(line);
+
+			line=getNextDataLine(br,"//SAVE_FLUX * SAVE_CURRENT");
+
 			String sp[]=line.split(regex);
 			int ib=0;
 			if(sp[ib].equals("")) ib++;
@@ -640,18 +581,17 @@ public class Loader {
 			 if(Integer.parseInt(sp[ib++])==1)  model.saveFlux=true;
 			 if(ib<sp.length)
 			 if(Integer.parseInt(sp[ib++])==1)  model.saveJe=true;
-			
-			util.pr("//NUMBER OF BH_DATA");
 
-			line=getNextDataLine(br);
-			util.pr(line);
+
+			line=getNextDataLine(br,"//NUMBER OF BH_DATA");
+
 			int numBHdata=getIntData(line);	
 			
-			int jx=0;
+
 			for(int j=0;j<numBHdata;j++){
-				util.pr("// * BH_ID * FILE_NAME* ");
-				line=getNextDataLine(br);
-				util.pr(line);
+
+				line=getNextDataLine(br,"// * H * B* ");
+
 				sp=line.split(regex);
 				ib=0;
 				if(sp[ib].equals("")) ib++;
@@ -1127,6 +1067,66 @@ return line;
 }
 
 
+public String getNextDataLine(BufferedReader br,String title) throws IOException{
+	String line="";
+	//try{
+		//PrintWriter pw=new PrintWriter(new BufferedWriter(new FileWriter(logFile,true)));
+	util.pr(title);
+	//pw.println(title);
+	
+	while(true){
+		line=br.readLine();
+		if(line==null) break;
+		if(!line.startsWith("/")) break;
+	}
+	util.pr(line);
+	
+
+	//	pw.println(line);
+	//	pw.close();
+	//} catch(IOException e){System.err.println("IOException: " + e.getMessage());}
+
+return line;
+}
+public double outputLoss(Model model,String file,int step,double phase_time,boolean append){
+	
+
+	double totalLoss=0;
+	try{
+		PrintWriter pw=new PrintWriter(new BufferedWriter(new FileWriter(file,append)));
+		pw.println("Step: "+step+"\t phase/time: "+phase_time);
+		pw.println();
+		util.pr("step "+step);
+		pw.println(" ****** ============= ******** ==================== ******");
+			pw.println("Joule Losses [W]");
+			pw.println();
+			util.pr("Joule Losses [W]");
+			for(int ir=1;ir<=model.numberOfRegions;ir++){
+				if((model.region[ir].isConductor && model.analysisMode>0) || model.coilInicesByRegion[ir]>=0){
+			double  loss=0;
+			
+			loss=model.obtainLoss(ir);
+			
+			totalLoss+=loss;
+			pw.format("%5d %12.5e\n",ir,loss);
+			pw.println();
+			System.out.format("%5d %25.12e\n",ir,loss);
+
+				}
+			}
+			pw.format("total %12.5e",totalLoss);
+			pw.println();
+	
+		pw.close();
+	} catch(IOException e){System.err.println("IOException: " + e.getMessage());}
+
+	
+	//System.out.println(" Temperature was written to "+file);
+
+	
+	return totalLoss;
+
+}
 
 
 public void wait(int ms){

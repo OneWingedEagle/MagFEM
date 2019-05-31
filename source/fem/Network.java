@@ -92,9 +92,9 @@ public class Network {
 		line=" ";
 		
 		while(line!=null && line.length()>0){
-			util.pr("// TYPE ID  NODE1 NODE2 VALUE ");
-			line=loader.getNextDataLine(br);
-			util.pr(line);
+
+			line=loader.getNextDataLine(br,"// TYPE ID  NODE1 NODE2 VALUE ");
+
 			line=util.dropLeadingSpaces(line);
 			
 			if(line.equals("END")) break;
@@ -120,7 +120,6 @@ public class Network {
 					elems1[ie].nodes[0]=nodes1[in];
 					in++;
 
-				//	util.pr(ie+"  "+elems1[ie].nodes[0].id);
 
 				}
 				

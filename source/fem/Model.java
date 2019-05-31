@@ -87,7 +87,7 @@ public class Model{
 	FEMsolver femSolver=new FEMsolver();;
 
 	public Vect up,upp,xp,Ci,ud,udd,hp;
-	public String eddyFolderxx,filePath,meshFilePath,dataFilePath,eddyFilePathxx,fluxFilePathxx,resultFolder,fluxFolderIn;
+	public String meshFilePath,dataFilePath,logFilePath,resultFolder;
 	public double[][] H2,H3;
 	public double[] C,Cj2d;
 	public Vect[] Cj;
