@@ -1,0 +1,255 @@
+
+Loading mesh file completed.
+// DATA TYPE (0: Magnetic)
+0
+// DIMENSION (2: 2D, 3: 3D, 4: Axisymmetric 2D)
+3
+// COORDINATE (0: Cartesian, 1: Cylindrical)
+0
+// ANALYSIS MODE (0: Magnetostatic, 1:  A-method,  2: A-fi-method 
+2
+// NONLINEAR (0: Linear , 1: Nonliear 
+0
+// AC (1: AC , 0: Time domain) // FREQ (if AC =1) 
+1		100
+// NUMBER OF REGIONS 
+3
+// *REGION_ID * BH_ID * MU * SIGMA , MAGNETIZATION [Mx, My, Mz] 
+1,0,1.,0
+// *REGION_ID * BH_ID * MU * SIGMA , MAGNETIZATION [Mx, My, Mz] 
+2,0,1.0,1e6
+// *REGION_ID * BH_ID * MU * SIGMA , MAGNETIZATION [Mx, My, Mz] 
+3,0,1.0,0
+// * BOUNDRAY CONDITION (D: Drichlet, N: Neumann) *
+D
+// * BOUNDRAY CONDITION (D: Drichlet, N: Neumann) *
+D
+// * BOUNDRAY CONDITION (D: Drichlet, N: Neumann) *
+D
+// * BOUNDRAY CONDITION (D: Drichlet, N: Neumann) *
+D
+// * BOUNDRAY CONDITION (D: Drichlet, N: Neumann) *
+D
+// * BOUNDRAY CONDITION (D: Drichlet, N: Neumann) *
+D
+// *NUMBER OF GIVEN CURRENT DENSITY * 
+0
+//NUMBER OF COILS 
+1
+// * REGION_ID *  TURNS * SIGMA *
+1,1,1e7
+//BOX OF COIL INPUT FACE NODES 
+x,-10,10,y,-10,.0002,z,-10,10
+//BOX OF COIL OUTPUT FACE NODES 
+x,-10,.0002,y,-10,10,z,-10,10
+// UNIFORM FIELD TIME_ID 
+0
+//NETWORK (CIRCUT) 
+NETWORK
+// TYPE ID  NODE1 NODE2 VALUE 
+VPS 1	1	2	1
+// TYPE ID  NODE1 NODE2 VALUE 
+R 	2	2	3	0
+// TYPE ID  NODE1 NODE2 VALUE 
+FEM	3	3	1	1
+// TYPE ID  NODE1 NODE2 VALUE 
+END
+// NUM TIME FUNCTIONS
+1
+// TIME ID // TYPE
+1	0
+// AMPLITUDE // PERIOD // PHASE
+1	1
+//DELTA_TIME
+1e-2
+//STEP_BEGIN  *  STEP_END * INTERVAL
+0,4,1
+//SAVE_FLUX * SAVE_CURRENT
+0		0
+//NUMBER OF BH_DATA
+1
+// * H * B* 
+1	50H400
+Dependent Network Elements:
+0 :  1
+
+ Tieset Matrix:
+
+1 	1 	1 	
+
+0.00e+00 	
+
+
+Loading data file completed.
+Computing Preconditioner..
+
+femSolver.StaticElectricSolver starts...
+
+ICCG iteration:     0	 error : 1.00E00	 res max: 1.00E07
+ICCG iteration:    19	 error : 1.35E-12	 res max: 1.35E-05
+
+femSolver.StaticElectricSolver ends.
+
+element: 1   current: 8857.417091985672
+element: 2   current: 8857.417091985672
+element: 3   current: 8857.417091985672
+ J0 density was written to D:\JavaWorks\FEM problems\Solver Gao\module and data\data\data AC\J0.txt
+Number of edges on far boundary = 4800
+Number of edges on Bn0 boundary = 4800
+Number of edges on Ht0 boundary = 0
+
+ Element type: hexahedron
+ Number of regions: 3
+ Number of elements: 8000
+ Number of nodes   : 9261    known: 0 , unknown: 208
+ Number of edges   : 26460    known: 4800 , unknown: 21660
+ Total number of unknows   : 21868
+
+
+femSolver.ACMagSolver starts...
+
+frequency =100.0
+Computing Symmetric Complex Preconditioner..
+COICCG iteration:     0	 error : 1.00E00	 res max: 1.74E-01
+COICCG iteration:    35	 error : 7.67E-07	 res max: 1.34E-07
+
+femSolver.ACMagSolver ends.
+
+Bmax ( linear analysis): 0.0
+step 0
+Joule Losses [W]
+    1        8.857417091986e+03
+    2        1.018224427843e-07
+Energies 
+    1  2.51660e-02
+    2  1.67949e-02
+    3  1.21136e-01
+step 0
+Joule Losses [W]
+    1        8.857417091986e+03
+    2        3.405049500317e-02
+Energies 
+    1  3.95776e-10
+    2  3.52638e-08
+    3  9.18088e-09
+Number of edges on far boundary = 4800
+Number of edges on Bn0 boundary = 4800
+Number of edges on Ht0 boundary = 0
+
+femSolver.ACMagSolver starts...
+
+frequency =1000.0
+Computing Symmetric Complex Preconditioner..
+COICCG iteration:     0	 error : 1.00E00	 res max: 1.74E-01
+COICCG iteration:    35	 error : 7.67E-07	 res max: 1.34E-07
+
+femSolver.ACMagSolver ends.
+
+Bmax ( linear analysis): 0.001600187997765004
+step 1
+Joule Losses [W]
+    1        8.857417091986e+03
+    2        1.017524249863e-03
+Energies 
+    1  2.51662e-02
+    2  1.67886e-02
+    3  1.21134e-01
+step 1
+Joule Losses [W]
+    1        8.857417091986e+03
+    2        3.403034462256e+00
+Energies 
+    1  3.95546e-08
+    2  3.52397e-06
+    3  9.17554e-07
+Number of edges on far boundary = 4800
+Number of edges on Bn0 boundary = 4800
+Number of edges on Ht0 boundary = 0
+
+femSolver.ACMagSolver starts...
+
+frequency =10000.0
+Computing Symmetric Complex Preconditioner..
+COICCG iteration:     0	 error : 1.00E00	 res max: 1.74E-01
+COICCG iteration:    35	 error : 7.79E-07	 res max: 1.36E-07
+
+femSolver.ACMagSolver ends.
+
+Bmax ( linear analysis): 0.015995837843681363
+step 2
+Joule Losses [W]
+    1        8.857417091986e+03
+    2        9.510804536497e+00
+Energies 
+    1  2.51876e-02
+    2  1.61951e-02
+    3  1.20861e-01
+step 2
+Joule Losses [W]
+    1        8.857417091986e+03
+    2        3.211554950774e+02
+Energies 
+    1  3.73588e-06
+    2  3.29473e-04
+    3  8.66737e-05
+Number of edges on far boundary = 4800
+Number of edges on Bn0 boundary = 4800
+Number of edges on Ht0 boundary = 0
+
+femSolver.ACMagSolver starts...
+
+frequency =100000.0
+Computing Symmetric Complex Preconditioner..
+COICCG iteration:     0	 error : 1.00E00	 res max: 1.74E-01
+COICCG iteration:    40	 error : 7.95E-07	 res max: 1.39E-07
+
+femSolver.ACMagSolver ends.
+
+Bmax ( linear analysis): 0.1541187666687951
+step 3
+Joule Losses [W]
+    1        8.857417091986e+03
+    2        5.833446060655e+03
+Energies 
+    1  2.58127e-02
+    2  7.70716e-03
+    3  1.15195e-01
+step 3
+Joule Losses [W]
+    1        8.857417091986e+03
+    2        4.702323917882e+03
+Energies 
+    1  4.02116e-05
+    2  2.30136e-03
+    3  9.28503e-04
+Number of edges on far boundary = 4800
+Number of edges on Bn0 boundary = 4800
+Number of edges on Ht0 boundary = 0
+
+femSolver.ACMagSolver starts...
+
+frequency =1000000.0
+Computing Symmetric Complex Preconditioner..
+COICCG iteration:     0	 error : 1.00E00	 res max: 1.74E-01
+COICCG iteration:    42	 error : 8.20E-07	 res max: 1.43E-07
+
+femSolver.ACMagSolver ends.
+
+Bmax ( linear analysis): 0.3362255520568335
+step 4
+Joule Losses [W]
+    1        8.857417091986e+03
+    2        4.167982932028e+04
+Energies 
+    1  2.66142e-02
+    2  1.49220e-03
+    3  1.11730e-01
+step 4
+Joule Losses [W]
+    1        8.857417091986e+03
+    2        1.843281990869e+04
+Energies 
+    1  1.41991e-05
+    2  1.24580e-03
+    3  3.35647e-04
+201

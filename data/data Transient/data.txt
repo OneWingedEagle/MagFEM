@@ -1,0 +1,55 @@
+//data file format code  (0. Magnetic, 1. Mechanical, 2. coupled) : 
+0
+//dimension : 
+3
+//coordinate system  (0. Cartesian 1. Cylindrical, 2. Spherical): 
+0
+//Analysis mode  (0. static1   1. eddy-A. 2. eddy-A-phi):
+2
+//nonlinear
+0
+// AC (1: AC , 0: Time domain) // FREQ (if AC =1) 
+0
+//Number_of_Regions:
+3
+//REG_ID,BH_ID,mu,sigma,M
+1,0,1.,0
+2,0,1.0,1e6
+3,0,1.0,0
+// numboundary condition:
+D
+D
+D
+D
+D
+D
+//numb of regs with current
+0
+//numb of COILS
+1
+1,1,1e7
+x,-10,10,y,-10,.0002,z,-10,10
+x,-10,.0002,y,-10,10,z,-10,10
+// unif
+0
+// Connections
+NETWORK
+VPS 1	1	2	1
+R 	2	2	3	0
+FEM	3	3	1	1
+END
+// NUM TIME FUNCTIONS
+1
+1	0
+1	1
+//dt:
+1e-2
+//temporal:
+0,4,1
+//SAVE_FLUX * SAVE_CURRENT
+0		0
+//No. BH Data
+1
+//Mat ID, Mat name(file)
+1	50H400
+

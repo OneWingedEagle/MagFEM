@@ -1,0 +1,215 @@
+
+Loading mesh file completed.
+// DATA TYPE (0: Magnetic)
+0
+// DIMENSION (2: 2D, 3: 3D, 4: Axisymmetric 2D)
+3
+// COORDINATE (0: Cartesian, 1: Cylindrical)
+0
+// ANALYSIS MODE (0: Magnetostatic, 1:  A-method,  2: A-fi-method 
+2
+// NONLINEAR (0: Linear , 1: Nonliear 
+0
+// AC (1: AC , 0: Time domain) // FREQ (if AC =1) 
+0
+// NUMBER OF REGIONS 
+3
+// *REGION_ID * BH_ID * MU * SIGMA , MAGNETIZATION [Mx, My, Mz] 
+1,0,1.,0
+// *REGION_ID * BH_ID * MU * SIGMA , MAGNETIZATION [Mx, My, Mz] 
+2,0,1.0,1e6
+// *REGION_ID * BH_ID * MU * SIGMA , MAGNETIZATION [Mx, My, Mz] 
+3,0,1.0,0
+// * BOUNDRAY CONDITION (D: Drichlet, N: Neumann) *
+D
+// * BOUNDRAY CONDITION (D: Drichlet, N: Neumann) *
+D
+// * BOUNDRAY CONDITION (D: Drichlet, N: Neumann) *
+D
+// * BOUNDRAY CONDITION (D: Drichlet, N: Neumann) *
+D
+// * BOUNDRAY CONDITION (D: Drichlet, N: Neumann) *
+D
+// * BOUNDRAY CONDITION (D: Drichlet, N: Neumann) *
+D
+// *NUMBER OF GIVEN CURRENT DENSITY * 
+0
+//NUMBER OF COILS 
+1
+// * REGION_ID *  TURNS * SIGMA *
+1,1,1e7
+//BOX OF COIL INPUT FACE NODES 
+x,-10,10,y,-10,.0002,z,-10,10
+//BOX OF COIL OUTPUT FACE NODES 
+x,-10,.0002,y,-10,10,z,-10,10
+// UNIFORM FIELD TIME_ID 
+0
+//NETWORK (CIRCUT) 
+NETWORK
+// TYPE ID  NODE1 NODE2 VALUE 
+VPS 1	1	2	1
+// TYPE ID  NODE1 NODE2 VALUE 
+R 	2	2	3	0
+// TYPE ID  NODE1 NODE2 VALUE 
+FEM	3	3	1	1
+// TYPE ID  NODE1 NODE2 VALUE 
+END
+// NUM TIME FUNCTIONS
+1
+// TIME ID // TYPE
+1	0
+// AMPLITUDE // PERIOD // PHASE
+1	1
+//DELTA_TIME
+1e-2
+//STEP_BEGIN  *  STEP_END * INTERVAL
+0,4,1
+//SAVE_FLUX * SAVE_CURRENT
+0		0
+//NUMBER OF BH_DATA
+1
+// * H * B* 
+1	50H400
+Dependent Network Elements:
+0 :  1
+
+ Tieset Matrix:
+
+1 	1 	1 	
+
+0.00e+00 	
+
+
+Loading data file completed.
+Computing Preconditioner..
+
+femSolver.StaticElectricSolver starts...
+
+ICCG iteration:     0	 error : 1.00E00	 res max: 1.00E07
+ICCG iteration:    19	 error : 1.35E-12	 res max: 1.35E-05
+
+femSolver.StaticElectricSolver ends.
+
+element: 1   current: 8857.417091985672
+element: 2   current: 8857.417091985672
+element: 3   current: 8857.417091985672
+ J0 density was written to D:\JavaWorks\FEM problems\Solver Gao\module and data\data\data Transient\J0.txt
+Number of edges on far boundary = 4800
+Number of edges on Bn0 boundary = 4800
+Number of edges on Ht0 boundary = 0
+
+ Element type: hexahedron
+ Number of regions: 3
+ Number of elements: 8000
+ Number of nodes   : 9261    known: 0 , unknown: 208
+ Number of edges   : 26460    known: 4800 , unknown: 21660
+ Total number of unknows   : 21868
+
+
+femSolver.TransientLinearMagSolver starts...
+
+Computing Preconditioner..
+ICCG iteration:     0	 error : 1.00E00	 res max: 1.74E-01
+ICCG iteration:    29	 error : 8.93E-07	 res max: 1.56E-07
+Bmax ( linear analysis): 1.3178617927368839
+
+femSolver.TransientLinearMagSolver ends.
+
+Bmax ( linear analysis): 1.3178617927368839
+step 0
+Joule Losses [W]
+    1        8.857417091986e+03
+    2        8.620603563497e-04
+Energies 
+    1  2.51662e-02
+    2  1.67890e-02
+    3  1.21134e-01
+Number of edges on far boundary = 4800
+Number of edges on Bn0 boundary = 4800
+Number of edges on Ht0 boundary = 0
+
+femSolver.TransientLinearMagSolver starts...
+
+Computing Preconditioner..
+ICCG iteration:     0	 error : 1.00E00	 res max: 1.74E-01
+ICCG iteration:    14	 error : 6.20E-07	 res max: 1.08E-07
+Bmax ( linear analysis): 1.3175877885195946
+
+femSolver.TransientLinearMagSolver ends.
+
+Bmax ( linear analysis): 1.3175877885195946
+step 1
+Joule Losses [W]
+    1        8.853874597519e+03
+    2        9.259840850172e-12
+Energies 
+    1  2.51559e-02
+    2  1.67882e-02
+    3  1.21088e-01
+Number of edges on far boundary = 4800
+Number of edges on Bn0 boundary = 4800
+Number of edges on Ht0 boundary = 0
+
+femSolver.TransientLinearMagSolver starts...
+
+Computing Preconditioner..
+ICCG iteration:     0	 error : 1.00E00	 res max: 1.74E-01
+ICCG iteration:    16	 error : 7.67E-07	 res max: 1.34E-07
+Bmax ( linear analysis): 1.3167972413840476
+
+femSolver.TransientLinearMagSolver ends.
+
+Bmax ( linear analysis): 1.3167972413840476
+step 2
+Joule Losses [W]
+    1        8.843252781356e+03
+    2        3.101711635983e-10
+Energies 
+    1  2.51257e-02
+    2  1.67681e-02
+    3  1.20943e-01
+Number of edges on far boundary = 4800
+Number of edges on Bn0 boundary = 4800
+Number of edges on Ht0 boundary = 0
+
+femSolver.TransientLinearMagSolver starts...
+
+Computing Preconditioner..
+ICCG iteration:     0	 error : 1.00E00	 res max: 1.74E-01
+ICCG iteration:    17	 error : 8.99E-07	 res max: 1.56E-07
+Bmax ( linear analysis): 1.3154798597734005
+
+femSolver.TransientLinearMagSolver ends.
+
+Bmax ( linear analysis): 1.3154798597734005
+step 3
+Joule Losses [W]
+    1        8.825568636134e+03
+    2        8.616602715090e-10
+Energies 
+    1  2.50755e-02
+    2  1.67346e-02
+    3  1.20701e-01
+Number of edges on far boundary = 4800
+Number of edges on Bn0 boundary = 4800
+Number of edges on Ht0 boundary = 0
+
+femSolver.TransientLinearMagSolver starts...
+
+Computing Preconditioner..
+ICCG iteration:     0	 error : 1.00E00	 res max: 1.74E-01
+ICCG iteration:    18	 error : 7.85E-07	 res max: 1.36E-07
+Bmax ( linear analysis): 1.313636384731497
+
+femSolver.TransientLinearMagSolver ends.
+
+Bmax ( linear analysis): 1.313636384731497
+step 4
+Joule Losses [W]
+    1        8.800850452716e+03
+    2        1.687520669453e-09
+Energies 
+    1  2.50053e-02
+    2  1.66877e-02
+    3  1.20363e-01
+113
