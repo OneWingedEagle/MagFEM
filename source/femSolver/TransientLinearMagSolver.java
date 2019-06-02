@@ -50,7 +50,7 @@ int stepNumb;
 				
 				if(model.analysisMode==2){
 					Vect v=model.Ps.amul(v1);
-					
+				
 					if(model.RHS!=null)
 					for( int i=0;i<v.length;i++){
 						model.RHS.el[model.numberOfUnknownEdges+i]+=v.el[i];
@@ -70,7 +70,7 @@ int stepNumb;
 
 			L=Ks.ichol();
 
-			if(b.abs().max()>1e-8){
+			if(b.abs().max()>1e-12){
 
 				if(model.xp==null){
 					x=model.solver.ICCG(Ks,L,b,model.errCGmax,model.iterMax);

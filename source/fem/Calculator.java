@@ -290,7 +290,6 @@ public class Calculator {
 		n=this.PW[0].length; 
 
 		Node[] vertexNode=model.elementNodes(ie);
-		Edge[] elemEdges=model.elementEdges(ie);
 		
 		boolean[] edgeDir=model.element[ie].getEdgeReverse();
 		
@@ -313,12 +312,7 @@ public class Calculator {
 		for(int j=0;j<model.nElVert;j++){
 			nodePhi[j]=vertexNode[j].getPhi();
 		}
-		
-		double[] A=new double[this.nElEdge];
-		for(int j=0;j<this.nElEdge;j++)	{
-			A[j]=elemEdges[j].getA();
-		}
-		
+
 		for(int p=0;p<n;p++)
 			for(int q=0;q<n;q++)
 				for(int r=0;r<n;r++){
@@ -3629,7 +3623,8 @@ public class Calculator {
 			for(int j=i+1;j<H[0].length;j++)
 				H[i][j]= H[j][i];
 	}
-
+	
+	
 	public double obtainElementLoss(Model model,int ie){
 	
 		if(model.elCode==0) return 0;
@@ -3663,6 +3658,7 @@ public class Calculator {
 					ws=this.PW[1][p]*this.PW[1][q];
 				else
 					ws=1;
+				
 				if(model.dim==3)
 				for(int r=0;r<n;r++){
 
@@ -3673,12 +3669,11 @@ public class Calculator {
 					
 					jac=jacobian(vertexNode,localCo);
 
-
 					detJac=abs(jac.determinant());
 
 					wsJ=ws*detJac;
+					
 					Je=model.getElementJe(ie, localCo);
-
 							
 					loss+=Je.dot(sigmaInv.times(Je))*wsJ;
 				}

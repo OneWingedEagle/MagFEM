@@ -17,22 +17,7 @@ public class BoundarySet {
 
 	public BoundarySet(){	}
 
-/*	public void magBC(Model model){
 
-		if(model.coordCode==1) {
-			setSliceBounds(model);
-		}
-
-		setNodeOnBound(model);
-
-		if(model.hasPBC) mapPBC(model);
-
-		
-		setMagBC(model);
-
-
-
-	}*/
 
 	private void mapEdges(Model model){
 
@@ -305,7 +290,7 @@ public class BoundarySet {
 
 
 		model.numberOfUnknowns=model.numberOfUnknownEdges+
-		model.numberOfVarNodes+model.numberOfUnknownCurrents+model.nNeutral;
+		model.numberOfVarNodes+model.network.no_unknown_currents;
 
 		model.unknownEdgeNumber=new int[model.numberOfUnknownEdges+1];
 		model.knownEdgeNumber=new int[model.numberOfKnownEdges+1];

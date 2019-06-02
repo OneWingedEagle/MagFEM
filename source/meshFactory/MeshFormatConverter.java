@@ -44,7 +44,7 @@ public class MeshFormatConverter {
 		MeshFormatConverter mfc=new MeshFormatConverter();
 		//mfc.getPreHexAtlasOrig();
 		
-	mfc.convertToNeu();
+	//mfc.convertToNeu();
 
 		//String file=System.getProperty("user.dir")+"\\ladder_current";
 	//	String file=System.getProperty("user.dir")+"\\magnetic";

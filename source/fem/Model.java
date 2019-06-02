@@ -37,6 +37,7 @@ public class Model{
 	public int unifBTimeId;
 	public Region[] region;
 	public PhiCoil[] phiCoils;
+	public boolean seperateCoil=true;
 	public int[] coilInicesByRegion;
 	public Node[] node;
 	public Element[] element;
@@ -55,7 +56,7 @@ public class Model{
 			FmsMin,FmsMax=0,FreluctMax=0,FreluctMin=0,uMax=0,AuMax,defScale;
 	public int numberOfUnknownEdges,numberOfMappedEdges,numberOfKnownEdges,numberOfVarNodes
 	,numberOfKnownPhis,numberOfUnknowns,analysisMode,stressViewCode=-1
-	,numberOfUnknownU,numberOfUnknownUcomp,numberOfCurrents,numberOfUnknownCurrents,nNeutral,defMode=1,numberOfUnknownT;
+	,numberOfUnknownU,numberOfUnknownUcomp,defMode=1,numberOfUnknownT;
 	public boolean deform,thermal,hasJ,hasM,forceLoaded,fluxLoaded,potentialLoaded,
 	stressLoaded,forceCalcLoaded,coupled,cpvms,calCurve,nonLin,hasPBC,hasMechPBC=true,rotIndex;
 	public int nEdEd=34,nNodNod=27,nEdNod=18,nNodEd=54,nEdgeHasJ;
@@ -63,13 +64,12 @@ public class Model{
 
 	public byte elCode=4;
 	public double nu0=1e7/(4*PI);
-	public double freq=1,dt,errCGmax=1,
+	public double freq=1,dt,initialTime=0,errCGmax=1,
 			errNRmax=1e-6,errCG_NR=1e-1,errFluxMax=1e-3;
 	public int nTsteps,nBegin,nEnd,nInc,nRotorElements,currentTimeStep;
 	public int coordCode=0,timeIntegMode=0,eddyTimeIntegMode;
 	public LamBCurve[] lamB;
 	public BHCurve[] BH;
-	public CurrentWaveForm ia,ib,ic,va,vb,vc;
 	public String elType="hexahedron";
 	public SpMat Hs,Ms,Ks,Ls,Cs,Ss,Ps,Qs,Fs;
 	public SpMat Rs,Bs,BtBs;
@@ -94,9 +94,6 @@ public class Model{
 
 	public String[] forceFile;
 	public String forceFolder;
-	public SpVect[] lastRows,lastRowsAll;
-	public Model m2d;
-	public Vect[][] forceLamin;
 	public int[] mapnr;
 	public boolean hasBunif,open_vps;
 	public int nCLNstages;
@@ -1154,7 +1151,7 @@ public class Model{
 	}
 	public double getCurrentTime(){
 
-		double time =this.currentTimeStep*dt;
+		double time =this.initialTime+this.currentTimeStep*dt;
 		return time;
 	}
 
@@ -1304,6 +1301,7 @@ public class Model{
 
 		Jmax=sqrt(Jmax2);
 		Jmin=sqrt(Jmin2);
+	
 	}
 	
 	public void setJPhiCoil(){
@@ -1398,9 +1396,7 @@ public class Model{
 		
 		if(this.AC) rdt=this.freq;
 		
-		Vect Je=new Vect(3);
-			
-			Je=dA.times(rdt);
+		Vect Je=dA.times(rdt);
 
 			if(analysisMode==2){
 			double[] nodePhi=new double[nElVert];
@@ -1702,6 +1698,7 @@ public class Model{
 		for(int j=0;j<nElEdge;j++)	{		
 			dA= dA.add(Ne[j].times(Ae[j]));
 		}
+
 		return  dA;	
 
 	}
@@ -2511,8 +2508,24 @@ public double getElementA3ang(int ie,Vect lc){
 public void solveCoils(){
 	
 	if(phiCoils==null) return;
-						
+					
+	boolean old=!this.seperateCoil;
+	if(!old){
+	for(int ic=0;ic<phiCoils.length;ic++){
+		phiCoils[ic].makeLoadVector(this);
 
+	//fi.show();
+	}
+	this.setJPhiCoil();
+	this.writeJ0(this.resultFolder+"\\J"+0+".txt");
+	//writePhi(this.resultFolder+"\\phi"+0+".txt");
+
+	for(int i=1;i<=this.numberOfNodes;i++){
+	this.node[i].setPhiVar(false);
+	this.node[i].setPhiKnown(false);
+	}
+	return;
+	}
 	phiSolver= new StaticElectricSolver();
 
 	phiSolver.setBoundaryCondition(this);
@@ -2520,7 +2533,7 @@ public void solveCoils(){
 	phiSolver.setRHS0(this);
 
 	Vect fi=phiSolver.solve(this);
-
+	//fi.show();
 	phiSolver.setSolution(this,fi);
 	this.setJPhiCoil();
 	this.writeJ0(this.resultFolder+"\\J"+0+".txt");

@@ -114,117 +114,6 @@ public class TransientNolinearMagSolver {
 
 				}
 
-				else  if(model.eddyTimeIntegMode<=-2){
-
-
-					 Ks=getCircuitHs(model,step);
-
-
-					int nNeut=model.nNeutral;
-					int nUnCur=model.numberOfUnknownCurrents;
-
-
-					Vect vk=model.getUnknownA();
-
-					Vect vk2=new Vect(model.numberOfUnknowns);
-
-					for(int j=0;j<vk.length;j++)
-						vk2.el[j]=vk.el[j];
-
-					
-					Vect vp=model.getUnknownAp();
-
-					Vect vp2=new Vect(model.numberOfUnknowns);
-
-					for(int j=0;j<vp.length;j++)
-						vp2.el[j]=vp.el[j];
-
-					dv=vp2.sub(vk2);
-
-					model.RHS=model.RHS.add(model.Ss.smul(dv));
-
-
-					
-					for(int i=0;i<nUnCur;i++){
-						int nr=model.unCurRegNumb[i];
-
-						double vprev=model.region[nr].terminalVoltagep;
-						if(	this.stpNumb==0)
-							vprev=model.region[nr].terminalVoltage;
-						
-				
-						double ip=model.region[nr].currentp;
-
-		
-						if(model.eddyTimeIntegMode==-3){
-														
-							double cf=this.theta;
-							
-							if(model.HpAp!=null){
-								model.RHS=model.RHS.sub(model.HpAp.times(1-cf));
-									}
-			
-					
-						model.RHS.el[model.Hs.nRow-nUnCur+i-nNeut]=cf*(model.lastRows[i].dot(vp2)
-						+(((1-cf)*model.region[nr].getWireRes()*ip
-								+(1-cf)*model.vNeutral
-								-(cf*model.region[nr].terminalVoltage+(1-cf)*vprev)))*model.dt			
-						-this.coilInduct*ip)/model.height;
-											
-
-						model.RHS=model.RHS.sub(model.lastRows[i].times((1-cf)*model.region[nr].currentp).vectForm());
-
-						}
-						else{
-				
-							model.RHS.el[model.Hs.nRow-nUnCur+i-nNeut]=model.lastRows[i].dot(vp2)
-							+((model.vNeutral-model.region[nr].terminalVoltage)*model.dt
-							-this.coilInduct*ip)/model.height;
-
-						}
-
-					}
-
-					SpMat Q=new SpMat(model.RHS.length,model.RHS.length);
-					for(int i=0;i<model.RHS.length;i++){
-						if(i<vk.length)
-							Q.row[i]=null;
-						else
-							Q.row[i]=Ks.row[i].deepCopy();
-					}
-
-			
-					Vect v3=new Vect(model.numberOfUnknowns);
-					for(int j=0;j<vk.length;j++){
-						v3.el[j]=vk.el[j];
-					}
-
-					for(int i=0;i<nUnCur;i++){
-						int nr=model.unCurRegNumb[i];
-						v3.el[vk.length+i]=model.region[nr].current;
-
-					}
-					if(model.nNeutral>0)
-					v3.el[vk.length+nUnCur]=model.vNeutral;
-					
-			
-			
-					model.RHS=model.RHS.sub(Q.smul(v3));
-
-
-					if(model.eddyTimeIntegMode==-3){
-				
-						b=model.RHS.sub(model.HkAk.times((this.theta)));
-
-					}
-					else{
-
-						b=model.RHS.sub(model.HkAk);
-						
-					}
-			
-
-				}
 	
 
 
@@ -255,49 +144,11 @@ public class TransientNolinearMagSolver {
 			dA.timesVoid(Ci);
 			
 			
-
-			int nUnCur=model.numberOfUnknownCurrents;
-			int nNeut=model.nNeutral;
-
-
 			x=x.add(dA);
 			
 
 			model.up=x.deepCopy();
 
-
-			if(model.eddyTimeIntegMode<=-2){
-
-				
-				Vect vk=model.getUnknownA();
-
-				Vect vk2=new Vect(model.numberOfUnknowns);
-
-				for(int j=0;j<vk.length;j++)
-					vk2.el[j]=vk.el[j];
-
-				Vect vp=model.getUnknownAp();
-
-				Vect vp2=new Vect(model.numberOfUnknowns);
-
-				for(int j=0;j<vp.length;j++)
-					vp2.el[j]=vp.el[j];
-
-				dv=vp2.sub(vk2);
-
-				if(nNeut>0)
-					model.vNeutral=x.el[x.length-nNeut];
-
-				for(int k=0;k<nUnCur;k++){
-					int nr=model.unCurRegNumb[k];
-					model.region[nr].inducedVoltage=model.lastRows[k].dot(dv)/model.dt*model.height;
-
-					model.region[nr].current=x.el[x.length-nUnCur-nNeut+k];
-
-				}
-			}
-			
-			
 			
 			
 			B1=model.getAllB();
@@ -315,15 +166,6 @@ public class TransientNolinearMagSolver {
 
 		}
 		
-
-		int nUnCur=model.numberOfUnknownCurrents;
-
-
-		for(int k=0;k<nUnCur;k++){
-			int nr=model.unCurRegNumb[k];
-
-	 model.region[nr].currentp=model.region[nr].current;
-		}
 
 
 		model.HpAp=model.HkAk.deepCopy();
@@ -360,59 +202,13 @@ public class TransientNolinearMagSolver {
 
 		SpMat Hs=model.Hs.deepCopy();
 
-		int nUnCur=model.numberOfUnknownCurrents;
 
-		int nNeut=model.nNeutral;
 		
 	double cf=1;
 	
 		if(model.eddyTimeIntegMode==-3) cf=this.theta;
-		
-		
-		int nr=Hs.nRow-nUnCur-nNeut;
-		
-
-		for(int i=0;i<nr;i++)
-		 Hs.row[i]=Hs.row[i].times(cf);
-		
-		
-
-		for(int i=0;i<nUnCur;i++){
-
-
-			int jr=Hs.nRow-nUnCur-nNeut+i;
-
-			Hs.row[jr]=model.lastRows[i].times(cf);
-			int nz=Hs.row[jr].nzLength;
-			Hs.row[jr].extend(1);
-
-	
-			double R=model.region[model.unCurRegNumb[i]].getWireRes();
-
-			Hs.row[jr].el[nz]=-cf*(cf*model.dt*R+this.coilInduct)/model.height;
-
-			Hs.row[jr].index[nz]=jr;
-		}
-
-		int jr=Hs.nRow-1;
 
 		
-		if(nNeut>0){
-			Hs.row[jr]=new SpVect(Hs.nRow,1+nUnCur);		
-
-			for(int i=0;i<nUnCur;i++){
-
-				Hs.row[jr].el[i]=-cf*model.dt/model.height;
-
-				Hs.row[jr].index[i]=jr-nUnCur+i;
-			}
-
-			Hs.row[jr].el[nUnCur]=cf*model.dt/model.Rg/model.height;
-
-			Hs.row[jr].index[nUnCur]=jr;
-
-		}
-
 		if(model.analysisMode>0){
 			Hs.addSmaller(model.Ss);
 

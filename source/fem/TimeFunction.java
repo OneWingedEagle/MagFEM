@@ -13,20 +13,21 @@ public class TimeFunction {
 		type=0;
 	}
 
-	public TimeFunction(int id1, double a0,double per,double a1, double a2,double a3){
+	public TimeFunction(int id1, double a0,double a1,double per,double a2, double a3,double a4){
 		id=id1;
 		Cdc=a0;
+		Cramp=a1;
 		period=per;
-		Ccos=a1;
-		Csin=a2;
-		Texp=a3;
+		Ccos=a2;
+		Csin=a3;
+		Texp=a4;
 		type=1;
 	}
 
 	
 	public int id,type;
 	public double amplitude,period,phase;
-	public double Cdc,Ccos,Csin,Cexp,Texp;
+	public double Cdc,Cramp,Ccos,Csin,Cexp,Texp;
 	
 	public double getValue(double t){
 		
@@ -36,7 +37,7 @@ public class TimeFunction {
 			val=amplitude*Math.cos(2*Math.PI/period*t+phase*Math.PI/180);
 		else if(type==1){
 			double wt=2*Math.PI/period*t;
-			val=Cdc+Math.exp(Texp*t)*(Ccos*Math.cos(wt)+Csin*Math.sin(wt));
+			val=Cdc+Cramp*t+Math.exp(Texp*t)*(Ccos*Math.cos(wt)+Csin*Math.sin(wt));
 		}
 
 		return val;

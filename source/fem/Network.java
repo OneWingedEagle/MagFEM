@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 
 import java.io.IOException;
 
+import fem.Network.ElemType;
 import io.Loader;
 import main.Main;
 
@@ -139,6 +140,14 @@ public class Network {
 					in++;
 				}
 				if(sp[0].equals("VPS")){
+					System.out.println("!!!!!!!!!!! VPS not available! Job sopps!!!!!!!!!!");
+					
+					try {
+						wait(10000*10000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					elems1[ie].type=ElemType.VPS;
 					elems1[ie].time_id=Integer.parseInt(sp[4]);
 				}
@@ -405,8 +414,41 @@ void TraceNodesToRoot() {
 		node.linksFromRoot[j]=links[j];
 		
 	}
-
+	
 }
+	public  void solveStatic(Model model){
+
+		double time=model.getCurrentTime();
+		
+		Vect indepCurrents=new Vect(indep_elems.length);
+		for (int j = 0; j<indep_elems.length; ++j)
+		{
+			if(indep_elems[j].type==ElemType.CPS){
+				int time_id=indep_elems[j].time_id;
+
+				double value=0;
+				if(model.timeFunctions!=null && time_id>0)
+				  value=model.timeFunctions[time_id].getValue(time);
+				indepCurrents.el[j]=value;
+				elems[j].I=value;
+			}
+		}
+		
+		Vect allCurrents=tiesetMat.transp().mul(indepCurrents);
+
+		for (int j = 0; j<numElements; ++j)
+		{
+			//if(network.elems[j].type!=ElemType.CPS) {
+				elems[j].I=allCurrents.el[j];
+				if(elems[j].type==ElemType.FEM) {
+					int femIndex=elems[j].fem_index;
+					model.phiCoils[femIndex].current=elems[j].I;
+				}
+				util.pr("element: "+elems[j].id+"   current: "+elems[j].I);
+			//}
+		}
+		
+	}
 
 
 
@@ -627,7 +669,7 @@ for (int k = 0; k < numElements; k++)
 
 
 PRPt =tiesetMat.mul(R.mul(tiesetMat.transp()));
-PRPt.show("%2.2e");
+//PRPt.show("%2.2e");
 
 }
 

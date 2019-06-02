@@ -363,6 +363,10 @@ public class Loader {
 			line=getNextDataLine(br,"//NUMBER OF COILS ");
 			
 			int numCoils=Integer.parseInt(line);
+			if(numCoils<0){
+				numCoils=-numCoils;
+				model.seperateCoil=false;
+			}
 			
 			if(numCoils>0){
 				model.hasJ =true;
@@ -513,27 +517,32 @@ public class Loader {
 				model.timeFunctions[id]=new TimeFunction(id,amp,per,phase);
 
 				}else if(type==1){
-					line=getNextDataLine(br,"// C_DC * PERIOD * C_COS * C_SIN * T_EXP * //(f(t)= C_DC+exp(T_EXP*t)(C_COS(2*PI*t/PERIOD)+C_SIN(2*PI*t/PERIOD)");
+					line=getNextDataLine(br,"// C_DC * C_RAMP * PERIOD * C_COS * C_SIN * T_EXP * //(f(t)= C_DC+exp(T_EXP*t)(C_COS(2*PI*t/PERIOD)+C_SIN(2*PI*t/PERIOD)");
 					
 					sp=line.split(regex);
 					ib=0;
 					if(sp[ib].equals("")) ib++;
 
 					double a0= Double.parseDouble(sp[ib++]);
-					double period=1;
-					if(ib<sp.length)
-						period= Double.parseDouble(sp[ib++]);
+					
 					double a1=0;
 					if(ib<sp.length)
 						a1= Double.parseDouble(sp[ib++]);
 					
+					double period=1;
+					if(ib<sp.length)
+						period= Double.parseDouble(sp[ib++]);
 					double a2=0;
 					if(ib<sp.length)
-						a0= Double.parseDouble(sp[ib++]);
+						a2= Double.parseDouble(sp[ib++]);
+					
 					double a3=0;
 					if(ib<sp.length)
-					a3= Double.parseDouble(sp[ib++]);
-					model.timeFunctions[id]=new TimeFunction(id,a0,period,a1,a2,a3);
+						a3= Double.parseDouble(sp[ib++]);
+					double a4=0;
+					if(ib<sp.length)
+					a4= Double.parseDouble(sp[ib++]);
+					model.timeFunctions[id]=new TimeFunction(id,a0,a1,period,a2,a3,a4);
 				}
 				
 			
@@ -542,7 +551,17 @@ public class Loader {
 
 
 			line=getNextDataLine(br,"//DELTA_TIME");
-			model.dt=getScalarData(line);	
+			{
+				String sp[]=line.split(regex);
+				int ib=0;
+				if(sp[ib].equals("")) ib++;
+				model.dt=Double.parseDouble(sp[ib++]);	
+				if(ib<sp.length)
+					model.initialTime=Double.parseDouble(sp[ib++]);	
+				else
+					model.initialTime=0;
+
+			}
 
 			line=getNextDataLine(br,"//STEP_BEGIN  *  STEP_END * INTERVAL");
 			if(line!=null){
@@ -648,44 +667,7 @@ public class Loader {
 				
 			}
 
-		
-			int ix=0;
-			int iy=0;
-
-			for(int ir=1;ir<=model.numberOfRegions;ir++){
-				if(model.region[ir].circuit ) {
-					model.region[ir].currentIndex=ix;
-			ix++;
-			}
-
-			}
-			
-			for(int ir=1;ir<=model.numberOfRegions;ir++){
-				if(model.region[ir].circuit && model.region[ir].curMap1==0)
-				{
-				model.region[ir].unknownCurrentIndex=iy;
-			iy++;
-			}
-
-			}
-			
-			
-			model.numberOfCurrents=ix;
-			
-			model.numberOfUnknownCurrents=iy;
-			
-
-
-		
-			int nCur=model.numberOfUnknownCurrents;
-			
-			model.unCurRegNumb=new int[nCur];
-		
-			for(int ir=1;ir<=model.numberOfRegions;ir++)
-				if(model.region[ir].circuit && model.region[ir].curMap1==0)
-					model.unCurRegNumb[model.region[ir].unknownCurrentIndex]=ir;
-			
-		
+				
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

@@ -2250,6 +2250,7 @@ Vect[] v=new Vect[A.length];
 		System.out.println(" Number of elements: "+model.numberOfElements);
 		System.out.println(" Number of nodes   : "+model.numberOfNodes+"    known: "+model.numberOfKnownPhis+" , unknown: "+model.numberOfVarNodes);
 		System.out.println(" Number of edges   : "+model.numberOfEdges+"    known: "+model.numberOfKnownEdges+" , unknown: "+model.numberOfUnknownEdges);	
+		System.out.println(" Number of unknown currents   : "+model.network.no_unknown_currents);	
 		System.out.println(" Total number of unknows   : "+model.numberOfUnknowns);	
 		System.out.println();
 
@@ -2278,7 +2279,7 @@ Vect[] v=new Vect[A.length];
 				loss=model.obtainLoss(ir);
 				
 				totalLoss+=loss;
-				pw.format("%5d %12.5e\n",ir,loss);
+				pw.format("%5d %12.5e",ir,loss);
 				pw.println();
 				System.out.format("%5d %25.12e\n",ir,loss);
 

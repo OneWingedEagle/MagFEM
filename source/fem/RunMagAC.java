@@ -91,8 +91,10 @@ public class RunMagAC {
 
 
 		
-			model.solveCoils();
+			
+			model.setMagBC();
 
+			model.solveCoils();
 
 
 			for(int step=nBegin;step<=nEnd;step+=inc){
@@ -109,7 +111,6 @@ public class RunMagAC {
 				}
 				freqs.el[ix]=model.freq;
 					
-					model.setMagBC();
 							
 							if(step==nBegin){
 								model.writer.reportData(model);

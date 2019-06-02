@@ -83,6 +83,8 @@ public class RunMag {
 			main.gui.lbX[1].setText("Trq. ");
 
 			
+			model.setMagBC();
+
 			model.solveCoils();
 			
 
@@ -98,12 +100,7 @@ public class RunMag {
 				
 				if(model.phiCoils!=null)
 				model.phiCoils[0].current=Math.cos(2*model.freq*step*model.dt);
-
-
-						
-						
-							model.setMagBC();
-							
+	
 						
 							if(step==nBegin){
 								model.writer.reportData(model);
@@ -114,7 +111,9 @@ public class RunMag {
 								
 							
 									if(!model.loadPrevMag){
-										model.saveAp();		
+										
+										model.saveAp();	
+										
 										x=model.solveMagLin(step-nBegin,x);	
 									
 
@@ -192,9 +191,7 @@ public class RunMag {
 					
 				
 					 append=true;
-	/*				if(model.analysisMode==0 && step==nBegin)
-						append=false;
-					*/
+
 					model.writer.outputEnergies(model,model.resultFolder+"\\outputs.txt",step,model.getCurrentTime(),append);
 
 					
