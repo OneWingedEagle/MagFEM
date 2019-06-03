@@ -357,6 +357,8 @@ public class Loader {
 				
 				model.region[nr].setJ(J);
 
+				int timeId=Integer.parseInt(sp[ib++]);
+				model.region[nr].setTimeId(timeId);
 				
 			}
 
