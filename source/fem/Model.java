@@ -1071,25 +1071,32 @@ public class Model{
 
 
 
-	public void setJ0(double dt){
+	public void setJ0(){
 
 
+		double time=this.getCurrentTime();
 
 		double Jn2=0,Jmax2=0,Jmin2=0;
 
 
 		Vect regJ=new Vect(3);
+		Vect elemJ=new Vect(3);
 		for(int ir=1;ir<=numberOfRegions;ir++){
 			if(!region[ir].hasJ) continue;
+			
 			regJ=region[ir].getJ();
+			
+			double timeFactor=this.timeFunctions[region[ir].getTimeId()].getValue(time);
+
+			regJ=regJ.times(timeFactor);
+			
 			for(int i=region[ir].getFirstEl();i<=region[ir].getLastEl();i++){
+				
+				
 
 				if(this.coordCode==1 && this.dim==3)
 				{
-
 					Mat R=new Mat();
-
-
 					Mat R2D=util.rotMat2D(util.getAng(this.getElementCenter(i).v2()));
 					R=new Mat(dim,dim);
 					for(int m=0;m<2;m++)
@@ -1097,16 +1104,16 @@ public class Model{
 							R.el[m][n]=R2D.el[m][n];
 
 					R.el[2][2]=1;
+					
+					elemJ=R.mul(regJ);
 
-					element[i].setJ(R.mul(regJ));
-
-
+				}else
+				{
+					elemJ=regJ.deepCopy();
 				}
 
-				else{
-		
-					element[i].setJ(regJ);
-				}
+
+				element[i].setJ(elemJ);
 
 				Jn2=regJ.dot(regJ);
 				if(Jn2>Jmax2)
@@ -1151,7 +1158,7 @@ public class Model{
 	}
 	public double getCurrentTime(){
 
-		double time =this.initialTime+this.currentTimeStep*dt;
+		double time =this.initialTime+(this.currentTimeStep-1)*dt;
 		return time;
 	}
 

@@ -11,12 +11,12 @@ public class Region {
 	private String material,name;
 	private double mu0=PI*4e-7;
 	private Vect mur,sigma,nu,J,M,er;
-	public double phase0,freq,omega,ro,thermalCoef,deltaT,beta=0,wireRes,nloop;
+	public double phase0,freq,omega,ro,thermalCoef,deltaT,wireRes,nloop;
 	public Vect pois,yng,shear;
 	private int firstElement,lastElement;
 	public  boolean hasJ,stranded,circuit, hasM,isConductor,isNonLinear,deformable,MS,rotor,thermal,isotElast;
 	public double Jz,windingSurf,NtS,current,currentp,currCoef1,terminalVoltage0,terminalVoltage,terminalVoltagep,inducedVoltage;
-	
+	private int time_id;
 	public Region(int dim)
 	{
 		this.dim=dim;
@@ -225,9 +225,14 @@ public class Region {
 			
 		}
 	
-	public void setBeta(double beta){
+	public void setTimeId(int id){
 
-		 this.beta=beta;
+		 this.time_id=id;
+	
+	}
+	public int getTimeId(){
+
+		return this.time_id;
 	
 	}
 
@@ -236,35 +241,7 @@ public class Region {
 			
 		}
 	
-/*	public void setFactJx(double fj){
-		
-		this.factJ=fj;
 
-	}
-	public void setFactJcosx(double dt){
-	
-		//this.factJ=1*signum(cos(phase0+beta+elAng)-1.1*util.saw(70*(elAng)/PI/2));
-		
-		//this.factJ=signum(phase0+1);
-		//this.factJ=1.05*util.saw(70*elAng/PI/2);
-	this.factJ=1*cos(phase0+beta+omega*dt);//-.2*sin(2*(phase0+beta+elAng))+.1*cos(4*(phase0+beta+elAng))-.05*sin(6*(phase0+beta+elAng))+.03*cos(8*(phase0+beta+elAng));
-	
-	}
-	
-	public double getFactJx(){
-		return	this.factJ;
-
-		}*/
-	
-/*	public void setJAt(double d){
-		
-		//this.factJ=1*signum(cos(phase0+beta+elAng)-1.1*util.saw(70*(elAng)/PI/2));
-		
-		//this.factJ=signum(phase0+1);
-		//this.factJ=1.05*util.saw(70*elAng/PI/2);
-	this.factJ=J0.times*cos(phase0+beta+omega*dt);//-.2*sin(2*(phase0+beta+elAng))+.1*cos(4*(phase0+beta+elAng))-.05*sin(6*(phase0+beta+elAng))+.03*cos(8*(phase0+beta+elAng));
-	
-	}*/
 	public void setDeformable(boolean b){
 		this.deformable=b;
 	}
