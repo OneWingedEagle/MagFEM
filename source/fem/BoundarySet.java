@@ -600,6 +600,9 @@ public class BoundarySet {
 			double t;
 			if(s==0) t=0;
 			else t=util.getAng(z);
+					
+		if(t>PI) t=t-2*PI;
+		
 			if(Math.abs(t-p2)<epsAng) t=0;
 
 			if(t>tmax) tmax=t;
@@ -828,6 +831,7 @@ public class BoundarySet {
 			double alpha=0;
 			if(!closed) {
 				alpha=util.getAng(v.v2());
+				if(alpha>PI)  alpha=alpha-2*PI;
 				if(abs(alpha-p2)<epsAng) alpha=0;
 			}
 

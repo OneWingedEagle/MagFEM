@@ -51,17 +51,17 @@ public class MeshManipulator {
 		//Model model=new Model("D:\\JavaWorks\\FEM problems\\Hamed solver\\bun1elem.txt");
 		//model.setEdge();
 	//	mf.reRegionb();
-	//mf.connectivity(1e-4);	mf.dropUnusedNodes();
+	//mf.connectivity(1e-6);	mf.dropUnusedNodes();
 	//	mf.dropUnusedNodes();
 		//mf.deform();
-		//mf.rotate(9*PI/180);
+		mf.rotate(9*PI/180);
 	//	mf.translate(new Vect(-.1,0,0));
 	//	Mat R=util.rotMat(new Vect(0,0,1), new Vect(1,1.4,0));
 	//	Mat R=util.rotEuler(new Vect(0,0,1), 45*PI/180);
 	//	mf.rotate(R);
 	//	mf.pileRotate(10, 1*PI/180);
 
-	mf.reverseHexa();
+	//mf.reverseHexa();
 
 	//Model model=mf.rotExtendNfold(29);
 	//model.writeMesh(new File(model.meshFilePath).getParentFile().getPath()+"\\extenRot.txt");
@@ -72,7 +72,7 @@ public class MeshManipulator {
 		}
 		//mf.revolveLine(new Vect().linspace(1, 10, Nr+1), regs0, 45, PI/2/45);
 		int[] regs={1};
-		//mf.extractReg(regs);mf.dropUnusedNodes();
+	//	mf.extractReg(regs);mf.dropUnusedNodes();
 		String stat="D:\\JavaWorks\\FEM problems\\Solver Gaol\\noUnusedNodes.txt";
 		 String rot="D:\\JavaWorks\\FEM problems\\Solver Gaol\\bunTranslated.txt";
 		//mf.assemble(rot,stat);
@@ -1114,7 +1114,7 @@ public void hexaToTetra()
 				
 				double r=c.v2().norm();
 				
-				if(r<.45) model.element[i].setRegion(2);
+				if(r<.49) model.element[i].setRegion(2);
 
 			//	else model.element[i].setRegion(2);
 				double tt=util.getAng(c);
@@ -1590,15 +1590,20 @@ util.pr(rm);
 
 		if(nn[i]){
 			Vect v=model.node[i].getCoord();
-		double r=v.norm();
-		double tt=util.getAng(v)/2;
-		if(v.el[1]>.001){
-			double t2=3*PI/180;
+		
+		double r=v.v2().norm();
+
+		double tt=util.getAng(v);
+		if(v.el[2]>.1 && v.el[2]<.45 && r<.8 ){
+			double t2=tt;
 			double r2=v.el[0];
-			Vect v2=new Vect(r2*Math.cos(t2),r2*Math.sin(t2));
+			r2=r*(1-.3*Math.random());
 			
+			Vect v2=new Vect(r2*Math.cos(t2),r2*Math.sin(t2),v.el[2]);
+			v2.hshow();
 			model.node[i].setCoord(v2);
 		}
+		
 /*		if(r>.18 && r<-R){
 			v=v.times(R/r);
 			model.node[i].setCoord(v);

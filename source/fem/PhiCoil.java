@@ -292,13 +292,14 @@ model.solver.terminate(false);
 
 	SpMat Ks=matrix.deepCopy();
 
+
 	Vect b=new Vect(numberOfUnknownPhis);
 
 	b.el[b.length-1]=current;
 
 	Vect Ci=Ks.scale(b);
 
-	L=Ks.ichol(1.);
+	L=Ks.ichol();
 
 	x=model.solver.ICCG(Ks,L, b,model.errCGmax*1e-3,model.iterMax);
 

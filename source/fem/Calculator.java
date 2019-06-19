@@ -146,6 +146,7 @@ public class Calculator {
 
 		Mat jac;
 
+		
 
 		Vect[] rotNe=new Vect[model.nElEdge];
 
@@ -210,19 +211,22 @@ public class Calculator {
 					jac=jacobian(vertexNode,localCo);
 
 					detJac=abs(jac.determinant());
+		
 
 					wsJ=ws*detJac;
 
 
 					rotNe=rotNe(jac,localCo,edgeDir);
 					
+	
+					
 					if(hasJ || eddy)
 						Ne=Ne(jac,localCo,edgeDir);
 					
 					for(int i=0;i<model.nElEdge;i++){
 						
-//if(ie==1 && localCo.el[0]+localCo.el[1]+localCo.el[2]<-1.5) rotNe[i].hshow();
-						if(hasJ){
+						
+				if(hasJ){
 
 							Cj[i]=Cj[i].add(Ne[i].times(wsJ));
 						}
@@ -269,7 +273,13 @@ public class Calculator {
 		model.Cj=Cj;
 
 
-
+/*		if(ie==1 ||model.element[ie].getRegion()==-1){
+		//	util.pr("elem "+ie);
+		//	util.hshow(model.element[ie].getEdgeNumb());
+		//	util.show(H1);
+		//	new Mat(H1).diagonal().show();
+		}
+*/
 		return H1;
 
 

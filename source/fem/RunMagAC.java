@@ -103,7 +103,7 @@ public class RunMagAC {
 		
 				main.gui.tfX[0].setText((step)+"/"+nEnd);
 
-				model.setJ0(t0);	
+				model.setJ0();	
 				
 				if(ix>0){
 				model.freq*=Math.pow(10, 1);	

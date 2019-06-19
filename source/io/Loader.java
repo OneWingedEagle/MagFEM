@@ -341,9 +341,9 @@ public class Loader {
 			int numbRegsWithJ=Integer.parseInt(line);
 			for(int j=0;j<numbRegsWithJ;j++){
 				if(model.axiSym)
-					line=getNextDataLine(br,"// * COIL_ID * 0. *  0. * Jy *");
+					line=getNextDataLine(br,"// * COIL_ID * 0. *  0. * Jy * TIME_ID *");
 				else
-					line=getNextDataLine(br,"// * COIL_ID * Jx *  Jy * Jz *");
+					line=getNextDataLine(br,"// * COIL_ID * Jx *  Jy * Jz * TIME_ID *");
 		
 				String[] sp=line.split(this.regex);	
 

@@ -57,6 +57,7 @@ public class MeshFormatConverter {
 	//	mfc.getPostHexaNeu(8);
 	//	mfc.get2DFormNeu(4);
 		
+		mfc.getFromIr3(8);
 		//mfc.convertTetraNeu();
 /*int K=1000000;
 double dr=.1/K;
@@ -3250,4 +3251,113 @@ public void convertToNeu(){
 	model.writer.writeMeshNeu(model, fileNeu);
 }
 	
+
+
+
+public void getFromIr3(int numElemNodes){
+
+
+	String file=util.getFile();
+	
+	String line;
+
+	
+	int nRegions=100;
+	int nNodes=0;
+	int nVolElems=0;
+	int nQuads;
+	String type="hexahedron";
+	if(numElemNodes==6) type="prism";
+	else if(numElemNodes==4) type="tetrahedron";
+	
+	try{
+		File f=new File(file);
+		FileReader fr=new FileReader(f);
+		BufferedReader br = new BufferedReader(fr);
+
+		line=br.readLine();
+		int nx=Integer.parseInt(line);
+		
+		line=br.readLine();
+		String[] sp=line.split(regex);
+		nNodes=Integer.parseInt(sp[0]);
+		nQuads=Integer.parseInt(sp[1]);
+		 nVolElems=Integer.parseInt(sp[2]);
+		 
+			
+			Model model=new Model();
+			model.alloc(nRegions,nVolElems,nNodes,type);
+			
+			model.region[1].setFirstEl(1);
+			model.region[1].setLastEl(nVolElems);
+			for(int ir=2;ir<=model.numberOfRegions;ir++){
+				model.region[ir].setFirstEl(1);
+				model.region[ir].setLastEl(0);
+			}
+
+			double unit=1;
+			
+			int dim=model.dim;
+			for(int i=1;i<=model.numberOfNodes;i++){
+	
+					line=br.readLine();
+					sp=line.split(regex);
+					int nn=Integer.parseInt(sp[0]);
+					Vect v=new Vect(dim);
+					v.el[0]=Double.parseDouble(sp[1]);
+					v.el[1]=Double.parseDouble(sp[2]);
+					v.el[2]=Double.parseDouble(sp[3]);
+				model.node[i].setCoord(v.times(unit));
+				}
+			
+			for(int i=0;i<nQuads;i++){
+				line=br.readLine();
+			}
+			
+			for(int i=1;i<=model.numberOfElements;i++){
+				
+				line=br.readLine();
+				sp=line.split(regex);
+				int ne=Integer.parseInt(sp[0]);
+				int nReg=Integer.parseInt(sp[1]);
+				int nVerts=Integer.parseInt(sp[2]);
+				int[] nv1=new int[nVerts];
+				for(int j=0;j<nVerts;j++){
+					nv1[j]=Integer.parseInt(sp[3+j]);
+				}
+				int[] nv=new int[nVerts];	
+				nv[0]=nv1[0];
+				nv[1]=nv1[3];
+				nv[2]=nv1[2];
+				nv[3]=nv1[1];
+				nv[4]=nv1[4];
+				nv[5]=nv1[7];
+				nv[6]=nv1[6];
+				nv[7]=nv1[5];
+				
+				model.element[i].setVertNumb(nv);
+				model.element[i].setRegion(nReg);
+
+			}
+		
+		int[] elMapReorderd=reRegionGroupEls(model);
+			
+			String folder=new File(file).getParentFile().getPath();
+			String fout=folder+"\\hexa.txt";
+
+			model.writeMesh(fout);
+	
+
+	}
+		catch(Exception e){System.err.println("error");	e.printStackTrace(); }
+
+		
+
+
+
+
+
+
+}
+
 }

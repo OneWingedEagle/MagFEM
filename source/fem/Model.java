@@ -1085,10 +1085,11 @@ public class Model{
 			if(!region[ir].hasJ) continue;
 			
 			regJ=region[ir].getJ();
-			
+
 			double timeFactor=this.timeFunctions[region[ir].getTimeId()].getValue(time);
 
 			regJ=regJ.times(timeFactor);
+	
 			
 			for(int i=region[ir].getFirstEl();i<=region[ir].getLastEl();i++){
 				
@@ -1112,7 +1113,7 @@ public class Model{
 					elemJ=regJ.deepCopy();
 				}
 
-
+	
 				element[i].setJ(elemJ);
 
 				Jn2=regJ.dot(regJ);
@@ -1325,7 +1326,7 @@ public class Model{
 			if(coilIndex<0) continue;
 			
 			double nt=phiCoils[coilIndex].getNumTurns();
-			double conductivity=phiCoils[coilIndex].conductivity;;
+			double conductivity=phiCoils[coilIndex].conductivity;
 		
 			if(coilIndex>0){
 				double nt1=phiCoils[0].getNumTurns();
@@ -1334,7 +1335,10 @@ public class Model{
 				
 			if(conductivity1>0) conductivity=conductivity/conductivity1*nt1/nt; //?
 			else if(conductivity1==0 && conductivity==0) conductivity=1;
+			}else{
+				conductivity=1;
 			}
+	
 
 			region[ir].hasJ=true;
 			
@@ -1342,7 +1346,6 @@ public class Model{
 
 			Vect J=getElementJPhiCoil(i,lc,conductivity);
 			
-					
 			element[i].setJ(J);
 
 				Jn2=J.dot(J);
