@@ -38,14 +38,42 @@ public class util {
 	static String logFile=null;
 	public util(){}
 
-	public static void main7(String[] args) {
+	public static void main(String[] args) {
 
 		String fileMat="C:\\Users\\Hassan\\Desktop\\Km3.txt";
-		SpMat Ms=loadSpMat(fileMat);
-		Ms.lower=true;
+		
+		int N=50;
+		int P=50;
+		double sum=0;
+		for(int k=-(N*P);k<=N*P;k++){
+		for(int i=-N;i<=N;i++)
+			for(int j=-N;j<=N;j++){
+				//int r21=i*i+j*j;
+				//if(r21>N*N) continue;
+				double ir=1.*i;
+				double jr=1.*j;
+				double kr=1.*k;
+				double r2=ir*ir+jr*jr+kr*kr;
+				if(r2==0) continue;
+			
+				double rx=r2*sqrt(r2);
+				if(rx==0)continue;
+				sum+=(1.-3.*(i*i)/r2)/rx;
+						
+			}
+		//if(k%P==0)
+		//util.pr(sum);
+		}
+	
+	
+	double Ref=2*PI/3;
+	double err=100*abs(Ref-sum)/Ref;
+	util.pr("sum= "+sum+"  2*PI/3 ="+Ref+"  err (%) ="+err);
+		//SpMat Ms=loadSpMat(fileMat);
+		//Ms.lower=true;
 	//	Ms.showcl();
 	
-		String fileV="C:\\Users\\Hassan\\Desktop\\Fe3.txt";
+		//String fileV="C:\\Users\\Hassan\\Desktop\\Fe3.txt";
 	//	String fileMat2="C:\\Users\\Hassan\\Desktop\\Km2.txt";
 		//Mat M=Ms.matForm(false);
 		//for(int k=0;k<Ms.nRow;k++) M.el[k][k]*=0.5;
@@ -59,7 +87,7 @@ public class util {
 //wr.writeArray(M.el, "C:\\Users\\Hassan\\Desktop\\Km_hassan2.txt");
 
 	//	Loader loader=new Loader();
-		Vect b1=loadSpVect(fileV,Ms.nRow);
+	//	Vect b1=loadSpVect(fileV,Ms.nRow);
 		//b1.show();
 		//String fileV2="C:\\Users\\Hassan\\Desktop\\Fe2.txt";
 
@@ -73,7 +101,7 @@ public class util {
 		//Ms.lower=true;
 		//Ms.diagSym().show();
 		
-		Vect x=Ms.solveICCG(b1);
+		//Vect x=Ms.solveICCG(b1);
 
 
 

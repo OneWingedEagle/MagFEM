@@ -51,11 +51,13 @@ public class MeshManipulator {
 		//Model model=new Model("D:\\JavaWorks\\FEM problems\\Hamed solver\\bun1elem.txt");
 		//model.setEdge();
 	//	mf.reRegionb();
-	//mf.connectivity(1e-6);	mf.dropUnusedNodes();
+	mf.connectivity(1e-5);	mf.dropUnusedNodes();
 	//	mf.dropUnusedNodes();
 		//mf.deform();
-		mf.rotate(9*PI/180);
-	//	mf.translate(new Vect(-.1,0,0));
+	//	mf.rescale(2);
+	//	mf.rotate(9*PI/180);
+		
+	//	mf.translate(new Vect(.2,0,0));
 	//	Mat R=util.rotMat(new Vect(0,0,1), new Vect(1,1.4,0));
 	//	Mat R=util.rotEuler(new Vect(0,0,1), 45*PI/180);
 	//	mf.rotate(R);

@@ -319,7 +319,7 @@ public class BoundarySet {
 	public void setMagBC(Model model){
 		
 
-		detectFarboundaryEdges(model);
+		//detectFarboundaryEdges(model);
 		
 	//===========
 
@@ -339,13 +339,13 @@ public class BoundarySet {
 							model.edge[i].node[1].onBound[j]){
 						model.edge[i].setKnownA(0);
 						nDirichlet++;
-						break;					
+					//	break;					
 					}		
 					else if(model.BCtype[j]==0 && model.edge[i].node[0].onBound[j] && 
 							model.edge[i].node[1].onBound[j]){
 						model.edge[i].edgeKnown=false;
 						nNeumann++;
-						break;					
+						//break;					
 					}			
 				}
 			}

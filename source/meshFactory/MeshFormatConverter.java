@@ -355,8 +355,6 @@ double dr=.1/K;
 
 			int nRegions=regNumbs.size();
 
-			util.pr(nRegions);
-
 
 			int[] regNumber=new int[nRegions+1];
 			for(int ir=1;ir<=nRegions;ir++)
@@ -3175,72 +3173,7 @@ public void convertTetraNeu(){
 	String tetFile=folder+"\\tet_from_neu.txt";
 	model.writeMesh(tetFile);
 
-/*
 
-	DecimalFormat formatter;
-
-	if(model.scaleFactor==1)
-		formatter= new DecimalFormat("0.0000000");
-	else 
-		formatter= new DecimalFormat("0.0000");
-
-	try{
-		PrintWriter pwBun = new PrintWriter(new BufferedWriter(new FileWriter(bunFilePath)));		
-
-		pwBun.println("tetrahedron");
-		pwBun.println("//Number_of_Node");
-		pwBun.println(model.numberOfNodes);
-
-		pwBun.println("//Number_of_Element");
-		pwBun.println(nElems);
-
-		pwBun.println("//Number_of_Region");
-		pwBun.println(model.numberOfRegions);
-		pwBun.println("//Factor");
-		pwBun.println(model.scaleFactor);
-
-		for(int i=1;i<=nElems;i++){ 
-			for(int j=0;j<4;j++)
-				pwBun.print(mo[i][j]+",");
-			pwBun.println();
-		}
-		for(int i=1;i<=model.numberOfNodes;i++){ 
-			Vect v=model.node[i].getCoord();
-			for(int j=0;j<3;j++){
-
-				pwBun.print(formatter.format((v.el[j])*model.scaleFactor)+" ,");
-			}
-			pwBun.println();	
-
-		}
-
-		int[][] regEnds=new int[model.numberOfRegions+1][2];
-		regEnds[1][0]=1;
-		regEnds[1][1]=nSubEl*model.region[1].getLastEl();
-		for(int i=2;i<=model.numberOfRegions;i++){
-			regEnds[i][0]=regEnds[i-1][1]+1;
-			regEnds[i][1]=regEnds[i][0]-1+nSubEl*model.region[i].getNumbElements();
-
-		}
-
-		for(int i=1;i<=model.numberOfRegions;i++){ 
-
-			pwBun.println(regEnds[i][0]+","+regEnds[i][1]+","+model.region[i].getName());
-
-		}
-
-
-
-		System.out.println();
-		System.out.println(" Bun data was written to:");
-		System.out.println("    "+bunFilePath);
-		System.out.println();
-
-
-		pwBun.close();
-	}
-	catch(IOException e){}
-}*/
 }
 
 public void convertToNeu(){
@@ -3262,13 +3195,14 @@ public void getFromIr3(int numElemNodes){
 	String line;
 
 	
-	int nRegions=100;
+	int nRegions=1000;
 	int nNodes=0;
 	int nVolElems=0;
 	int nQuads;
 	String type="hexahedron";
 	if(numElemNodes==6) type="prism";
 	else if(numElemNodes==4) type="tetrahedron";
+
 	
 	try{
 		File f=new File(file);
@@ -3283,22 +3217,21 @@ public void getFromIr3(int numElemNodes){
 		nNodes=Integer.parseInt(sp[0]);
 		nQuads=Integer.parseInt(sp[1]);
 		 nVolElems=Integer.parseInt(sp[2]);
-		 
+		 			
+			Model model1=new Model();
+			model1.alloc(nRegions,nVolElems,nNodes,type);
 			
-			Model model=new Model();
-			model.alloc(nRegions,nVolElems,nNodes,type);
-			
-			model.region[1].setFirstEl(1);
-			model.region[1].setLastEl(nVolElems);
-			for(int ir=2;ir<=model.numberOfRegions;ir++){
-				model.region[ir].setFirstEl(1);
-				model.region[ir].setLastEl(0);
+			model1.region[1].setFirstEl(1);
+			model1.region[1].setLastEl(nVolElems);
+			for(int ir=2;ir<=model1.numberOfRegions;ir++){
+				model1.region[ir].setFirstEl(1);
+				model1.region[ir].setLastEl(0);
 			}
 
 			double unit=1;
 			
-			int dim=model.dim;
-			for(int i=1;i<=model.numberOfNodes;i++){
+			int dim=model1.dim;
+			for(int i=1;i<=model1.numberOfNodes;i++){
 	
 					line=br.readLine();
 					sp=line.split(regex);
@@ -3307,14 +3240,14 @@ public void getFromIr3(int numElemNodes){
 					v.el[0]=Double.parseDouble(sp[1]);
 					v.el[1]=Double.parseDouble(sp[2]);
 					v.el[2]=Double.parseDouble(sp[3]);
-				model.node[i].setCoord(v.times(unit));
+				model1.node[i].setCoord(v.times(unit));
 				}
 			
 			for(int i=0;i<nQuads;i++){
 				line=br.readLine();
 			}
 			
-			for(int i=1;i<=model.numberOfElements;i++){
+			for(int i=1;i<=model1.numberOfElements;i++){
 				
 				line=br.readLine();
 				sp=line.split(regex);
@@ -3335,12 +3268,49 @@ public void getFromIr3(int numElemNodes){
 				nv[6]=nv1[6];
 				nv[7]=nv1[5];
 				
-				model.element[i].setVertNumb(nv);
-				model.element[i].setRegion(nReg);
+				model1.element[i].setVertNumb(nv);
+				model1.element[i].setRegion(nReg);
 
 			}
+			
+			reRegionGroupEls(model1);
+			
+			int nrx=0;
+			
+			int regMap[]=new int[model1.numberOfRegions+1];
+	
+			for(int ir=1;ir<=model1.numberOfRegions;ir++){
 		
-		int[] elMapReorderd=reRegionGroupEls(model);
+				if(model1.region[ir].getNumbElements()>0){
+					
+					regMap[ir]=++nrx;
+				}
+			}
+			
+
+			
+			int nRegions2=nrx;
+			
+			Model model=new Model();
+			model.alloc(nRegions2,nVolElems,nNodes,type);
+			
+			for(int i=1;i<=model1.numberOfNodes;i++){
+
+			model.node[i].setCoord(model1.node[i].getCoord());
+			}
+			
+			for(int i=1;i<=model.numberOfElements;i++){
+
+			model.element[i].setVertNumb(model1.element[i].getVertNumb());
+			int ir1=model1.element[i].getRegion();
+			int ir=regMap[ir1];
+			model.element[i].setRegion(ir);
+			model.region[ir].setFirstEl(model1.region[ir1].getFirstEl());
+			model.region[ir].setLastEl(model1.region[ir1].getLastEl());
+			}
+
+		
+			reRegionGroupEls(model);
 			
 			String folder=new File(file).getParentFile().getPath();
 			String fout=folder+"\\hexa.txt";
