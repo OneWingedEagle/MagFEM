@@ -217,10 +217,16 @@ public class Loader {
 		try{
 			BufferedReader br = new BufferedReader(new FileReader(dataFilePath));
 			String line;
-			line=getNextDataLine(br,"// DATA TYPE (0: Magnetic)");
+			line=getNextDataLine(br,"// DATA TYPE (0: Magnetic FEM, 1: Magnetic CLN)");
 
 			int dataType =getIntData(line);
 			model.dataType=dataType;
+			
+			if(	model.dataType==1){
+				line=getNextDataLine(br,"// * NUMBER OF STAGES * ");
+				int nStage=getIntData(line);
+				model.nCLNstages=nStage;
+			}
 			
 			line=getNextDataLine(br,"// DIMENSION (2: 2D, 3: 3D, 4: Axisymmetric 2D)");
 
@@ -263,7 +269,7 @@ public class Loader {
 		try {
 
 	
-			line=getNextDataLine(br,"// ANALYSIS MODE (0: Magnetostatic, 1:  A-method,  2: A-fi-method ");
+			line=getNextDataLine(br,"// ANALYSIS MODE (0: Magnetostatic, 1:  A-method,  2: A-fi-method, 3: CLN");
 			
 
 			int am =getIntData(line);
@@ -399,6 +405,7 @@ public class Loader {
 					}
 						
 					model.phiCoils[j].setSigma(sigma);
+					if(model.nCLNstages==0)
 					model.region[nr].setSigma(new Vect(3));
 					
 					double[][] boxdata=new double[2][6];
@@ -685,6 +692,7 @@ public class Loader {
 }
 
 	
+
 		
 	public void loadBH(BHCurve BH,String mateName) throws Exception{
 		double[][] BH1=new double[200][2];

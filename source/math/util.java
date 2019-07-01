@@ -42,8 +42,8 @@ public class util {
 
 		String fileMat="C:\\Users\\Hassan\\Desktop\\Km3.txt";
 		
-		int N=50;
-		int P=50;
+		int N=51;
+		int P=1000;
 		double sum=0;
 		for(int k=-(N*P);k<=N*P;k++){
 		for(int i=-N;i<=N;i++)
@@ -57,7 +57,7 @@ public class util {
 				if(r2==0) continue;
 			
 				double rx=r2*sqrt(r2);
-				if(rx==0)continue;
+
 				sum+=(1.-3.*(i*i)/r2)/rx;
 						
 			}

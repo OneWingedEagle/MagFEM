@@ -51,13 +51,13 @@ public class MeshManipulator {
 		//Model model=new Model("D:\\JavaWorks\\FEM problems\\Hamed solver\\bun1elem.txt");
 		//model.setEdge();
 	//	mf.reRegionb();
-	mf.connectivity(1e-5);	mf.dropUnusedNodes();
+	mf.connectivity(1e-6);	mf.dropUnusedNodes();
 	//	mf.dropUnusedNodes();
-		//mf.deform();
-	//	mf.rescale(2);
+	//mf.deform();
+	//mf.rescale(1e-1);
 	//	mf.rotate(9*PI/180);
 		
-	//	mf.translate(new Vect(.2,0,0));
+	//	mf.translate(new Vect(0.,.0,0.1));
 	//	Mat R=util.rotMat(new Vect(0,0,1), new Vect(1,1.4,0));
 	//	Mat R=util.rotEuler(new Vect(0,0,1), 45*PI/180);
 	//	mf.rotate(R);
@@ -73,7 +73,7 @@ public class MeshManipulator {
 			regs0[i-1]=i;
 		}
 		//mf.revolveLine(new Vect().linspace(1, 10, Nr+1), regs0, 45, PI/2/45);
-		int[] regs={1};
+		int[] regs={1,2,3};
 	//	mf.extractReg(regs);mf.dropUnusedNodes();
 		String stat="D:\\JavaWorks\\FEM problems\\Solver Gaol\\noUnusedNodes.txt";
 		 String rot="D:\\JavaWorks\\FEM problems\\Solver Gaol\\bunTranslated.txt";
@@ -81,7 +81,7 @@ public class MeshManipulator {
 
 		//mf.assemble();
 	//mf.rescale(new Vect(1,1,0.54641016151377545870548926830117));
-	//	mf.extractReg(-0.001,6.2,0,PI,-.5,.5);
+	//	mf.extractReg(-0.001,6.2,0,2*PI,0,.19e-3);
 		//mf.copy(new Vect(0,0,2), 9);
 		/*String bun=util.getFile();
 		Model model1=new Model(bun);
@@ -1596,7 +1596,15 @@ util.pr(rm);
 		double r=v.v2().norm();
 
 		double tt=util.getAng(v);
-		if(v.el[2]>.1 && v.el[2]<.45 && r<.8 ){
+		if(tt>PI) tt-=2*PI;
+		
+		//double r2=v.el[0];
+		//double t2=(v.el[1]/0.08)*9.*PI/180;
+	//	Vect v2=new Vect(r2*Math.cos(t2),r2*Math.sin(t2),v.el[2]);
+		Vect v2=new Vect(r*Math.cos(22.5/9*tt),r*Math.sin(22.5/9*tt),v.el[2]);
+		model.node[i].setCoord(v2);
+		
+/*		if(v.el[2]>.1 && v.el[2]<.45 && r<.8 ){
 			double t2=tt;
 			double r2=v.el[0];
 			r2=r*(1-.3*Math.random());
@@ -1604,7 +1612,7 @@ util.pr(rm);
 			Vect v2=new Vect(r2*Math.cos(t2),r2*Math.sin(t2),v.el[2]);
 			v2.hshow();
 			model.node[i].setCoord(v2);
-		}
+		}*/
 		
 /*		if(r>.18 && r<-R){
 			v=v.times(R/r);
@@ -6601,6 +6609,8 @@ for(int i=0; i<dh.length; i++){
 			
 			
 			for(int j=0;j<model.nElVert;j++){
+				Vect v=model.node[vn[j]].getCoord();
+				if(abs(v.el[0])>1e-4)continue;
 					nnc[vn[j]]=true;
 			}
 		}
@@ -6608,7 +6618,10 @@ for(int i=0; i<dh.length; i++){
 		
 		for(int i=1;i<=model.numberOfNodes;i++){
 			
-			if(!nnc[i]) continue;
+			if(!nnc[i]) {
+			
+				continue;
+			}
 			    
 			Vect v1=model.node[i].getCoord();
 			for(int j=i+1;j<=model.numberOfNodes;j++){
@@ -6616,17 +6629,17 @@ for(int i=0; i<dh.length; i++){
 				if(!nnc[j]) continue;
 				
 				Vect v2=model.node[j].getCoord();
-				
-				if(map[j]==0 && v1.sub(v2).norm()<eps) 
+				double dist=v1.sub(v2).norm();
+
+				if(map[j]==0 && dist<eps){
 
 					map[j]=i;
 					ix++;
 				}
+				}
 			}
-		
-		
 
-		
+
 		for(int i=1;i<=1*model.numberOfElements;i++){
 			int[] vn=model.element[i].getVertNumb();
 			int[] vn2=new int[vn.length];

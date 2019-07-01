@@ -3287,7 +3287,7 @@ public void getFromIr3(int numElemNodes){
 				}
 			}
 			
-
+util.pr(nrx);
 			
 			int nRegions2=nrx;
 			

@@ -1896,8 +1896,7 @@ public double getElementA3ang(int ie,Vect lc){
 			for(int i=region[ir].getFirstEl();i<=region[ir].getLastEl();i++){
 
 					element[i].setNu(region[ir].getNu());
-				element[i].setSigma(region[ir].getSigma());
-
+				
 				if(regCond)
 					element[i].setSigma(region[ir].getSigma());
 

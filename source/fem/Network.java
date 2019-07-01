@@ -140,7 +140,7 @@ public class Network {
 					in++;
 				}
 				if(sp[0].equals("VPS")){
-					System.out.println("!!!!!!!!!!! VPS not available! Job sopps!!!!!!!!!!");
+					System.out.println("!!!!!!!!!!! VPS not available! Job stops.!!!!!!!!!!");
 					
 					try {
 						wait(10000*10000);

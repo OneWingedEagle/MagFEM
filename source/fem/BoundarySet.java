@@ -319,7 +319,7 @@ public class BoundarySet {
 	public void setMagBC(Model model){
 		
 
-		//detectFarboundaryEdges(model);
+		detectFarboundaryEdges(model);
 		
 	//===========
 

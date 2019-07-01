@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 
 import components.GUI;
 import fem.Model;
+import fem.RunCLN;
 import fem.RunMag;
 import fem.RunMagAC;
 
@@ -133,15 +134,21 @@ import fem.RunMagAC;
 
 
 			if(model.AC){
-				 RunMagAC mt=new RunMagAC();
+				 RunMagAC module=new RunMagAC();
 
-				 mt.runMag(model, this);
+				 module.runMag(model, this);
 				
 			}
-			else{
-			 RunMag mt=new RunMag();
+			else if(model.nCLNstages>0){
+				 RunCLN module=new RunCLN();
 
-			 mt.runMag(model, this);
+				 module.run(model, this);
+			
+				}
+			else{
+			 RunMag module=new RunMag();
+
+			 module.runMag(model, this);
 		
 			}
 		

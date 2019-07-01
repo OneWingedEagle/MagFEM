@@ -104,25 +104,14 @@ public class StaticElectricSolver{
 			int coilIndex=model.coilInicesByRegion[ir];
 			if(coilIndex<0) continue;
 
-			double conductivity=1./model.phiCoils[coilIndex].getNumTurns();
+			double conductivity=model.phiCoils[coilIndex].getConductivity()/model.phiCoils[coilIndex].getNumTurns();
 			
-			if(coilIndex>0){
-		
-				double n1=model.phiCoils[0].getNumTurns();
-				double n2=model.phiCoils[coilIndex].getNumTurns();
-				double conductivity1=model.phiCoils[0].conductivity/(n1*n1);
-				double conductivity2=model.phiCoils[coilIndex].conductivity/(n2*n2);
-			if(conductivity1>0) conductivity=conductivity2/conductivity1;
-			else if(conductivity1==0 && conductivity2==0) conductivity=1;
-			else{
-				System.err.println("zero conductiveity only possible if set for all coils.");
-			}
-			}
+
 
 			for(int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++){
 
 				Ke=this.calc.elemPhiMat(model,i);
-		
+	
 				Ke=Ke.times(conductivity);
 
 				int[] vertNumb=model.element[i].getVertNumb();
@@ -168,7 +157,7 @@ public class StaticElectricSolver{
 		}
 
 		phi_matrix.sortAndTrim(nz);
-		//phi_matrix.show();
+	//	phi_matrix.show();
 	}
 	
 	public  void setTmat(Model model){
@@ -285,14 +274,13 @@ public class StaticElectricSolver{
 			}
 			
 			Vect rhsVPS=network.tiesetMat.mul(vsVector);
-
+	
 			rhs=rhs.add(rhsVPS);
 			
 			for (int j = 0; j<network.indep_elems.length; ++j){
 				if(network.indep_elems[j].type!=ElemType.CPS){
 					
 					 rowIndex=this.numberOfUnknownPhis+network.indep_elems[j].unknown_seq_no;
-
 
 					RHS.el[rowIndex]+=rhs.el[j];
 				}
@@ -317,16 +305,16 @@ public class StaticElectricSolver{
 										
 					rowIndex=this.phiVarIndex[coil.infaceNodes[0]];
 					double current=network.elems[j].I;
-				//	util.pr("->>>>>>>>>>>>>>>>>>>>>>>>> "+current);
 					double turns=coil.getNumTurns();
 					current*=turns;
-					
+				
 					RHS.el[rowIndex]+=current;
 					
 
 				}
 			}
 		//}
+
 	
 	//	RHS.show();
 
@@ -561,6 +549,73 @@ public class StaticElectricSolver{
 			//}
 		}
 		
+	}
+
+	
+
+	public void setRHS(Model model){		
+
+
+
+		RHS=new Vect(numberOfUnknowns);
+
+		Vect elemRHS=new Vect(model.nElVert);
+
+		int matrixRow=0;
+
+		boolean isConductive;
+		double conductivity;
+
+		for(int ir=1;ir<=model.numberOfRegions;ir++){
+
+			if(!model.region[ir].isConductor) continue;
+
+			conductivity=model.region[ir].getSigma().el[0];
+
+			for(int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++){
+
+				isConductive=model.element[i].isConductor();
+
+
+				if(!isConductive) continue;
+
+				int[] vertNumb=model.element[i].getVertNumb();
+
+
+				boolean elemHasPhiVar=false;
+				for(int k=0;k<model.nElVert;k++){
+					int nodeNumber=vertNumb[k];
+
+					if(model.node[nodeNumber].isPhiVar() && !model.node[nodeNumber].isPhiKnown() ){
+						elemHasPhiVar=true;
+						break;
+					}
+				}
+
+				if(!elemHasPhiVar) continue;
+
+				elemRHS=this.calc.elemPhiVect(model,i);
+
+				elemRHS=elemRHS.times(conductivity);
+
+
+				for(int k=0;k<model.nElVert;k++){
+					int nodeNumber=vertNumb[k];
+
+					if(model.node[nodeNumber].isPhiVar() && !model.node[nodeNumber].isPhiKnown() ){
+						matrixRow=phiVarIndex[nodeNumber];
+						RHS.el[matrixRow]+=-elemRHS.el[k];
+					}
+				}
+
+
+
+			}
+
+
+		}
+
+
 	}
 
 

@@ -140,7 +140,7 @@ public class Element {
 	}
 
 	public void setSigma(Vect sigma){
-	
+
 		if(sigma.norm()>0) {
 			this.sigma=sigma.deepCopy();
 			this.isConductor=true;

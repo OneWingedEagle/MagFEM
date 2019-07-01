@@ -533,6 +533,210 @@ public class Calculator {
 
 
 	}
+	
+	public Vect elemVectCLN(Model model,int ie, double[] loss){
+		
+		if(this.elCode==1) return elemVectCLNQuad(model, ie,loss);
+
+		Vect elemV=new Vect(model.nElEdge);
+		
+		double heat=0;
+
+		int n;
+
+		n=this.PW[0].length; 
+
+		Node[] vertexNode=model.elementNodes(ie);
+		Edge[] elemEdges=model.elementEdges(ie);
+		
+		boolean[] edgeDir=model.element[ie].getEdgeReverse();
+		
+		double sigma=model.element[ie].getSigma().el[0];
+
+		double detJac,ws=1,wsJ=0;
+
+		Mat jac;
+
+		Vect localCo=new Vect(this.dim);
+
+		Vect[] Ne=new Vect[model.nElEdge];
+
+		Mat G;
+		Vect Ee=new Vect(this.dim);
+		Vect[] localGradsN=new Vect[model.nElVert];;
+		Vect[] gradN=new Vect[model.nElVert];
+		Vect[] gradPhi=new Vect[model.nElVert];;
+	
+
+		double[] nodePhi=new double[this.nElVert];
+		for(int j=0;j<model.nElVert;j++){
+			nodePhi[j]=vertexNode[j].getPhi();
+		}
+		
+		double[] A=new double[this.nElEdge];
+		for(int j=0;j<this.nElEdge;j++)	{
+			A[j]=elemEdges[j].getA();
+		}
+		
+		for(int p=0;p<n;p++)
+			for(int q=0;q<n;q++)
+				for(int r=0;r<n;r++){
+
+					localCo.el[0]=this.PW[0][p];
+					localCo.el[1]=this.PW[0][q];
+					localCo.el[2]=this.PW[0][r];
+
+					if(n!=2)
+						ws=this.PW[1][p]*this.PW[1][q]*this.PW[1][r];
+					else
+						ws=1;
+
+					jac=jacobian(vertexNode,localCo);
+
+					G=jac.inv3();
+
+					localGradsN=localGradN(localCo);
+
+					detJac=abs(jac.determinant());
+
+					wsJ=ws*detJac;
+
+					Ne=Ne(jac,localCo,edgeDir);
+
+					for(int j=0;j<model.nElVert;j++){
+						gradN[j]=G.mul(localGradsN[j]);
+						gradPhi[j]= gradN[j].times(nodePhi[j]);
+					}
+
+					
+					Ee.zero();
+					for(int j=0;j<model.nElEdge;j++){
+						Ee=Ee.add(Ne[j].times(A[j]));
+					
+					}
+
+					for(int j=0;j<model.nElVert;j++){
+
+						Ee=Ee.add(gradPhi[j]);
+					}
+
+					for(int i=0;i<model.nElEdge;i++){
+
+												
+						elemV.el[i]+=Ne[i].dot(Ee)*wsJ;
+
+						}
+					
+					heat+=Ee.dot(Ee)*wsJ;
+	
+				}
+				
+		elemV=elemV.times(sigma);
+
+		
+		loss[0]=heat*sigma;
+
+		return elemV;
+
+
+	}
+
+	
+
+	public Vect elemVectCLNQuad(Model model,int ie, double[] loss){
+		
+		Vect elemV=new Vect(model.nElEdge);
+		
+		double heat=0;
+
+		int n;
+
+		n=this.PW[0].length; 
+
+		Node[] vertexNode=model.elementNodes(ie);
+		Edge[] elemEdges=model.elementEdges(ie);
+		Vect[] localGradsN=new Vect[model.nElVert];;
+
+		double sigma=model.element[ie].getSigma().el[0];
+
+		double detJac,ws=1,wsJ=0;
+
+		Mat jac;
+
+		Vect localCo=new Vect(this.dim);
+
+		double[] Ne=new double[model.nElEdge];
+
+		Mat G;
+		double Jez=0;
+
+
+
+		double[] nodePhi=new double[this.nElVert];
+		for(int j=0;j<model.nElVert;j++){
+			nodePhi[j]=vertexNode[j].getPhi();
+		}
+		
+		double jezphi=0;
+		for(int j=0;j<model.nElVert;j++){
+			jezphi+=nodePhi[j]/model.height;
+		}
+
+		
+		double[] A=new double[this.nElEdge];
+		for(int j=0;j<this.nElEdge;j++)	{
+			A[j]=elemEdges[j].getA();
+		}
+		
+		for(int p=0;p<n;p++)
+			for(int q=0;q<n;q++){
+			
+
+					localCo.el[0]=this.PW[0][p];
+					localCo.el[1]=this.PW[0][q];
+
+					if(n!=2)
+						ws=this.PW[1][p]*this.PW[1][q];
+					else
+						ws=1;
+
+					jac=jacobian(vertexNode,localCo);
+					
+					detJac=abs(jac.determinant());
+
+					wsJ=ws*detJac;
+
+					Ne=NeQuad(localCo);
+				
+					Jez=0;
+					for(int j=0;j<model.nElEdge;j++){
+						Jez+=Ne[j]*A[j];
+					
+					}
+					
+					Jez+=jezphi/(n*n);
+
+			
+
+					for(int i=0;i<model.nElEdge;i++){
+
+												
+						elemV.el[i]+=Ne[i]*Jez*wsJ;
+
+						}
+					
+					heat+=Jez*Jez*wsJ;
+
+				}
+				
+		elemV=elemV.times(sigma);
+
+		
+		loss[0]=heat*sigma;
+		return elemV;
+
+
+	}
 
 	public double[][] HeQuad(Model model,int nBH,int ie, boolean nonLinear,boolean eddy,boolean hasJ,boolean hasM){
 
@@ -2685,6 +2889,7 @@ public class Calculator {
 		return M;
 
 	}
+	
 	public Mat elemPhiMatTet(Model model,int ie){
 
 		Node[] vertexNode=model.elementNodes(ie);
