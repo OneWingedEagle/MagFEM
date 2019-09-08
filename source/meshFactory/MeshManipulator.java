@@ -50,14 +50,14 @@ public class MeshManipulator {
 
 		//Model model=new Model("D:\\JavaWorks\\FEM problems\\Hamed solver\\bun1elem.txt");
 		//model.setEdge();
-	//	mf.reRegionb();
-	mf.connectivity(1e-6);	mf.dropUnusedNodes();
+		//mf.reRegionb();
+	//mf.connectivity(1e-6);	mf.dropUnusedNodes();
 	//	mf.dropUnusedNodes();
 	//mf.deform();
-	//mf.rescale(1e-1);
+	//mf.rescale(1./500);
 	//	mf.rotate(9*PI/180);
 		
-	//	mf.translate(new Vect(0.,.0,0.1));
+	//	mf.translate(new Vect(1,.0,1));
 	//	Mat R=util.rotMat(new Vect(0,0,1), new Vect(1,1.4,0));
 	//	Mat R=util.rotEuler(new Vect(0,0,1), 45*PI/180);
 	//	mf.rotate(R);
@@ -73,8 +73,8 @@ public class MeshManipulator {
 			regs0[i-1]=i;
 		}
 		//mf.revolveLine(new Vect().linspace(1, 10, Nr+1), regs0, 45, PI/2/45);
-		int[] regs={1,2,3};
-	//	mf.extractReg(regs);mf.dropUnusedNodes();
+		int[] regs={1,2};
+		mf.extractReg(regs);mf.dropUnusedNodes();
 		String stat="D:\\JavaWorks\\FEM problems\\Solver Gaol\\noUnusedNodes.txt";
 		 String rot="D:\\JavaWorks\\FEM problems\\Solver Gaol\\bunTranslated.txt";
 		//mf.assemble(rot,stat);
@@ -1114,9 +1114,28 @@ public void hexaToTetra()
 				else				
 					 model.element[i].setRegion(3);*/
 				
+	/*			int[][] regs ={ {24, 26, 31, 25, 27, 10, 8, 7, 9, 6, 3, 2, 4, 5, 1, 39, 41, 40, 43, 37},
+						{33, 30, 29, 11, 12, 13, 35, 34},
+						{23, 32, 28, 22, 18, 17, 14, 20, 21, 19, 16, 15, 44, 42, 38, 36}};*/
+				
+				int[][] regs ={ {6},
+						{2},
+						{1,3,4,5,7}};
+				int ix=0;
+				
+				for(int j=0;j<regs.length;j++)
+					for(int k=0;k<regs[j].length;k++){
+						if(ir==regs[j][k]){
+							ix=j+1;
+							break;
+						}
+					}
+				if(ix>0)
+				model.element[i].setRegion(ix);
+				
 				double r=c.v2().norm();
 				
-				if(r<.49) model.element[i].setRegion(2);
+				if(r<-.49) model.element[i].setRegion(2);
 
 			//	else model.element[i].setRegion(2);
 				double tt=util.getAng(c);

@@ -537,6 +537,7 @@ public class Calculator {
 	public Vect elemVectCLN(Model model,int ie, double[] loss){
 		
 		if(this.elCode==1) return elemVectCLNQuad(model, ie,loss);
+		if(this.elCode==2) return elemVectCLNTetra(model, ie,loss);
 
 		Vect elemV=new Vect(model.nElEdge);
 		
@@ -641,6 +642,73 @@ public class Calculator {
 
 	}
 
+	public Vect elemVectCLNTetra(Model model,int ie, double[] loss){
+		Vect elemV=new Vect(model.nElEdge);
+			
+			Vect[] Ne=new Vect[model.nElEdge];
+			
+			double sigma=model.element[ie].getSigma().el[0];
+
+			double heat=0;
+			
+			Node[] vertexNode=model.elementNodes(ie);
+
+			boolean[] edgeDir=model.element[ie].getEdgeReverse();
+			
+			double[] nodePhi=new double[this.nElVert];
+			for(int j=0;j<model.nElVert;j++){
+				nodePhi[j]=vertexNode[j].getPhi();
+			}
+
+			Mat jac=this.jacobianTetra(vertexNode, new Vect(dim));
+
+			Vect[] gradN=this.gradNTet(jac);
+			Vect[] gradPhi=new Vect[this.nElVert];
+			double detJac=abs(jac.determinant());
+			double ws0=detJac/6;
+			
+			Vect Je=new Vect(3);
+			for(int j=0;j<model.nElVert;j++){
+
+				gradPhi[j]= gradN[j].times(nodePhi[j]);
+				Je=Je.add(gradPhi[j]);
+			}
+
+			heat=Je.dot(Je)*ws0;
+
+			
+			Vect lc=new Vect(4);
+
+			double ws;
+			
+			int n=this.PWtetra.length; 					
+			for(int p=0;p<n;p++)
+			{
+
+				lc.el[0]=this.PWtetra[p][0];
+				lc.el[1]=this.PWtetra[p][1];
+				lc.el[2]=this.PWtetra[p][2];
+				lc.el[3]=this.PWtetra[p][3];
+				
+				Ne=NeTetra(jac,lc,edgeDir);
+
+				ws=this.PWtetra[p][4]*detJac;
+		
+				for(int i=0;i<model.nElEdge;i++){
+										
+				elemV.el[i]+=Ne[i].dot(Je)*ws;
+
+				}
+			}
+			
+			
+			elemV=elemV.times(sigma);
+
+			
+			loss[0]=heat*sigma;
+			return elemV;
+		
+		}
 	
 
 	public Vect elemVectCLNQuad(Model model,int ie, double[] loss){
@@ -3019,7 +3087,6 @@ public class Calculator {
 						for(int j=0;j<this.nElEdge;j++)	
 							elemVec.el[i]+=ws*gradN[i].dot(Ne[j].times(A[j]));
 				}	
-
 
 		return elemVec;
 

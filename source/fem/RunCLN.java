@@ -161,15 +161,15 @@ public class RunCLN {
 
 			model.setSolution(elecAtemp);
 			
-			model.setJStatic();
-			model.writeJe(model.resultFolder+"\\Je"+kstage+".txt");
+			//model.setJStatic();
+			//model.writeJe(model.resultFolder+"\\Je"+kstage+".txt");
 
 			phiSolver.setRHS(model);
 
 			//phiSolver.RHS.show();
 			//phiSolver.conductiveMat.show();
 			x=phiSolver.solve(model);
-		//	x.show();
+			//x.show();
 
 			ii=new Vect(model.network.indep_elems.length);
 			
@@ -192,8 +192,8 @@ public class RunCLN {
 
 			//model.setSolution(elecAtemp);
 
-		//	model.setJStatic();
-		//	model.writeJe(model.resultFolder+"\\Je"+kstage+".txt");
+			model.setJStatic();
+			model.writeJe(model.resultFolder+"\\Je"+kstage+".txt");
 		//	model.writePhi(model.resultFolder+"\\phi"+kstage+".txt");
 
 

@@ -57,7 +57,7 @@ public class MeshFormatConverter {
 	//	mfc.getPostHexaNeu(8);
 	//	mfc.get2DFormNeu(4);
 		
-		mfc.getFromIr3(8);
+		mfc.getFromIr3(4);
 		//mfc.convertTetraNeu();
 /*int K=1000000;
 double dr=.1/K;
@@ -3198,7 +3198,7 @@ public void getFromIr3(int numElemNodes){
 	int nRegions=1000;
 	int nNodes=0;
 	int nVolElems=0;
-	int nQuads;
+	int nQuads=0;
 	String type="hexahedron";
 	if(numElemNodes==6) type="prism";
 	else if(numElemNodes==4) type="tetrahedron";
@@ -3213,10 +3213,13 @@ public void getFromIr3(int numElemNodes){
 		int nx=Integer.parseInt(line);
 		
 		line=br.readLine();
+		util.pr(line);
 		String[] sp=line.split(regex);
-		nNodes=Integer.parseInt(sp[0]);
-		nQuads=Integer.parseInt(sp[1]);
-		 nVolElems=Integer.parseInt(sp[2]);
+		int kx=0;
+		nNodes=Integer.parseInt(sp[kx++]);
+		if(numElemNodes!=4)
+		nQuads=Integer.parseInt(sp[kx++]);
+		 nVolElems=Integer.parseInt(sp[kx++]);
 		 			
 			Model model1=new Model();
 			model1.alloc(nRegions,nVolElems,nNodes,type);
@@ -3250,6 +3253,7 @@ public void getFromIr3(int numElemNodes){
 			for(int i=1;i<=model1.numberOfElements;i++){
 				
 				line=br.readLine();
+
 				sp=line.split(regex);
 				int ne=Integer.parseInt(sp[0]);
 				int nReg=Integer.parseInt(sp[1]);
@@ -3259,6 +3263,7 @@ public void getFromIr3(int numElemNodes){
 					nv1[j]=Integer.parseInt(sp[3+j]);
 				}
 				int[] nv=new int[nVerts];	
+				if(nVerts==8){
 				nv[0]=nv1[0];
 				nv[1]=nv1[3];
 				nv[2]=nv1[2];
@@ -3267,6 +3272,10 @@ public void getFromIr3(int numElemNodes){
 				nv[5]=nv1[7];
 				nv[6]=nv1[6];
 				nv[7]=nv1[5];
+				}else{
+					for(int j=0;j<nVerts;j++)
+						nv[j]=nv1[j];	
+				}
 				
 				model1.element[i].setVertNumb(nv);
 				model1.element[i].setRegion(nReg);

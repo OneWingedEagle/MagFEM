@@ -1433,6 +1433,12 @@ public class Model{
 			setElementJStaticJe2D(i);
 			return;
 		}
+		if(elCode==2) {
+
+			Vect J= getElementJStaticTetra(i);
+			element[i].setJe(J);
+			return;
+			}
 		Node[] vertexNode=elementNodes(i);
 		Edge[] elemEdges=elementEdges(i);
 		boolean[] edgeDir=element[i].getEdgeReverse();
@@ -1626,6 +1632,42 @@ public class Model{
 			element[i].setJe(new Vect(0,0,-(A+gradPhiz)*element[i].getSigmaZ()*rdt));
 			
 		}	
+	
+	
+	private Vect getElementJStaticTetra(int i){
+
+		Node[] vertexNode=elementNodes(i);
+		Edge[] elemEdges=elementEdges(i);
+		boolean[] edgeDir=element[i].getEdgeReverse();
+
+		double[] A=new double[this.nElEdge];
+		for(int j=0;j<this.nElEdge;j++)	
+			A[j]=elemEdges[j].getA();
+
+			double[] nodePhi=new double[nElVert];
+			Vect gradPhi=new Vect(dim);
+
+			Vect localCo=new Vect().ones(4).times(.25);
+
+			gradPhi=femCalc.gradPhiTet(vertexNode,nodePhi);
+			
+			Mat jac=femCalc.jacobianTetra(vertexNode,localCo);
+
+			Vect[] Ne=femCalc.NeTetra(jac, localCo, edgeDir);
+			
+			Vect Adot=new Vect(dim);
+			
+			for(int j=0;j<this.nElEdge;j++){
+				Adot=Adot.add(Ne[j].times(A[j]));
+			
+			}
+
+			Vect Je=	gradPhi.add(Adot).times(element[i].getSigma()).times(-1);
+
+		
+		return Je;
+
+	}
 
 	public Vect getElementA(int ie){
 
