@@ -24,6 +24,7 @@ import javax.swing.JFrame;
 import materialData.CurrentWaveForm;
 import triangulation.ConvexHull;
 
+import org.apache.commons.math3.special.Erf;
 import org.math.plot.Plot2DPanel;
 
 import fem.Element;
@@ -40,73 +41,231 @@ public class util {
 
 	public static void main(String[] args) {
 
-		String fileMat="C:\\Users\\Hassan\\Desktop\\Km3.txt";
-		
-		int N=51;
-		int P=1000;
-		double sum=0;
-		for(int k=-(N*P);k<=N*P;k++){
-		for(int i=-N;i<=N;i++)
-			for(int j=-N;j<=N;j++){
-				//int r21=i*i+j*j;
-				//if(r21>N*N) continue;
-				double ir=1.*i;
-				double jr=1.*j;
-				double kr=1.*k;
-				double r2=ir*ir+jr*jr+kr*kr;
-				if(r2==0) continue;
-			
-				double rx=r2*sqrt(r2);
-
-				sum+=(1.-3.*(i*i)/r2)/rx;
-						
-			}
-		//if(k%P==0)
-		//util.pr(sum);
-		}
-	
-	
-	double Ref=2*PI/3;
-	double err=100*abs(Ref-sum)/Ref;
-	util.pr("sum= "+sum+"  2*PI/3 ="+Ref+"  err (%) ="+err);
-		//SpMat Ms=loadSpMat(fileMat);
-		//Ms.lower=true;
-	//	Ms.showcl();
-	
-		//String fileV="C:\\Users\\Hassan\\Desktop\\Fe3.txt";
-	//	String fileMat2="C:\\Users\\Hassan\\Desktop\\Km2.txt";
-		//Mat M=Ms.matForm(false);
-		//for(int k=0;k<Ms.nRow;k++) M.el[k][k]*=0.5;
-		//M=M.add(M.transp());
-	//	Ms=new SpMat(M);
-	//	M.transpVoid();
-
-	//	Ms.plot();
-//M.show();
-//Writer wr=new Writer();
-//wr.writeArray(M.el, "C:\\Users\\Hassan\\Desktop\\Km_hassan2.txt");
-
-	//	Loader loader=new Loader();
-	//	Vect b1=loadSpVect(fileV,Ms.nRow);
-		//b1.show();
-		//String fileV2="C:\\Users\\Hassan\\Desktop\\Fe2.txt";
-
-	//	Vect b2=new Vect(loader.loadArray(fileV2));
-		//b2=Ms.smul(b1.times(1e-15));
-	
-	//	b.show();
-		//b=Ms.smul(b);
-	//util.pr(b.length);
-		//b.show();
-		//Ms.lower=true;
-		//Ms.diagSym().show();
-		
-		//Vect x=Ms.solveICCG(b1);
-
-
+		ContaminTransport();
 
 	}
 
+
+	public static void ContaminTransport() {
+		// 1 D steady
+		
+		double x0=0, xn=1000;
+		int N=200;
+
+		double dx=(xn-x0)/N;
+		int nT1=10;
+		int nTsub=15;
+		int nT=nT1*nTsub;
+		double t0=0;
+		double t1=nT1*86400;
+		double dt=(t1-t0)/nT;
+		
+
+		
+		int nunx=0;
+		
+
+		double src_duration=1e6*dt;
+		
+		double[] knownValues=new double[N];
+		int[] un_kn_map=new int[N];
+		int[] unIndex=new int[N];
+		for(int i=0;i<N;i++){
+			un_kn_map[i]=-1;
+			unIndex[i]=-1;
+		}
+		for(int i=0;i<N;i++){
+			if(i>=0 && i<-1){
+				knownValues[i]=1;
+			}else{
+				unIndex[i]=nunx;
+				un_kn_map[nunx]=i;
+				nunx++;
+			}
+		}
+		
+		double V=4e-4;
+		double D=5e-3;
+		double Cr =V*dt/dx; // Cre should be less than 1.
+		double Pe =V*dx/D; // Pe should be less than 2.
+		util.pr(Cr);
+		util.pr(Pe);
+		double C0=1;
+		
+			double dx2=dx*dx;
+		double at=1/dt;
+		double am=-(V/(2*dx)+D/dx2);
+		double a=2*D/dx2;
+		double an=(V/(2*dx)-D/dx2);
+
+		Mat H=new Mat(N, N);
+		
+		for(int i=0;i<N;i++){
+
+			if(i>0)
+				H.el[i][i-1]=am;
+			
+			H.el[i][i]=a;
+			
+		if(i<N-1) H.el[i][i+1]=an;
+
+			if(nT>1)
+				H.el[i][i]+=at;
+
+		}
+		
+
+		int nun=nunx;
+	//	H.show();
+
+		Mat H2=new Mat(nun, nun);
+	//	util.show(unIndex);	
+
+
+		for(int k=0;k<N;k++){
+			if(unIndex[k]>=0) {
+			Vect v=new Vect(nun);
+
+			for(int j=0;j<N;j++){
+				if(unIndex[j]>=0){
+				v.el[unIndex[j]]=H.el[k][j];
+				H.el[k][j]=0;
+				}
+			}
+			//v.hshow();
+			H2.setRow(v, unIndex[k]);
+			}
+			}
+//H2.show();
+//util.hshow(un_kn_map);
+//util.hshow(unIndex);
+		Vect Cx=new Vect(N);
+		for(int i=0;i<N;i++){
+			if(unIndex[i]<0)
+				Cx.el[i]=knownValues[i];
+		}
+	
+//		Cx.show();
+//H.show();
+		Vect bx=H.mul(Cx);
+		
+		Vect qC0=new Vect(N);
+		
+		qC0.el[100]=-1.6e-4;
+		
+		qC0.el[50]=-1.0e-4;
+	
+
+		
+//	bx.show();
+		Vect b0=new Vect(nun);
+		Vect qC=new Vect(nun);
+		for(int i=0;i<N;i++){
+			if(unIndex[i]>=0){
+				b0.el[unIndex[i]]=-bx.el[i];
+				qC.el[unIndex[i]]=-qC0.el[i];
+			}
+		}
+
+		Mat M=H2;
+		
+		Vect[] C=new Vect[nT1];
+		
+		
+		C[0]= new Vect(N);
+		for(int k=0;k<N;k++)
+			C[0].el[k]=Cx.el[k];
+		
+		Vect sol=new Vect(nun);
+			
+		Vect b=new Vect(nun);
+		Mat Minv=M.inv();
+
+		int m=0;
+		for(int m1=0;m1<nT1;m1++)
+			for(int m2=0;m2<nTsub;m2++){
+			m++;
+			double t=m*dt;
+			double f=1;//exp(-1*t*.000002);//+.9*cos(t*m/N*2*4*PI);
+			if(t>5*86400) f=0;
+		//	if(t>src_duration)
+			//	b=sol.times(at);
+		//	else
+				b=b0.add(qC.times(f)).add(sol.times(1*at));	
+			
+			sol=Minv.mul(b);
+
+	//		sol.hshow();
+
+			if(m2==0 && m1>0){
+			 C[m1]= new Vect(N);
+			// if(t<=src_duration)
+
+				for(int k=0;k<N;k++){
+					if(unIndex[k]>=0)
+						C[m1].el[k]=sol.el[unIndex[k]];
+					else
+						C[m1].el[k]=knownValues[k];
+				}
+			 
+		//	 C[m1].hshow();
+			}
+			}
+//
+		//analytical
+
+		
+		Mat y=new Mat(nT1,N);
+	
+		for(int m1=0;m1<nT1;m1++){
+			double t=m1*nTsub*dt;
+			if(t==0) t=1e-6;
+		for(int k=0;k<N;k++){
+			double x=k*dx;
+			double tt=C0*.5*(Erf.erfc((x-V*t)/(2*sqrt(D*t)))+Math.exp(V*x/D)*Erf.erfc((x+V*t)/(2*sqrt(D*t))));;
+	
+			y.el[m1][k]=tt;
+		}
+		}
+		
+	Mat AN=new Mat(N,1+nT1);
+	Mat NUM=new Mat(N,nT1+1);
+	
+	for(int k=0;k<N;k++){
+		AN.el[k][0]=k*dx;
+		NUM.el[k][0]=k*dx;
+		for(int m1=0;m1<nT1;m1++){
+			AN.el[k][m1+1]=y.el[m1][k];
+		}
+		
+		for(int m1=0;m1<nT1;m1++){
+			NUM.el[k][m1+1]=C[m1].el[k];
+		}
+	//	X.el[k][1+nT]=y.el[k];
+	}
+	//X.show();
+	
+
+	
+	String[] titles1=new String[AN.nCol];
+	for(int k=0;k<titles1.length;k++)
+		titles1[k]="AN, t= "+(k)*nTsub*dt;
+	String[] titles2=new String[AN.nCol];
+	for(int k=0;k<titles2.length;k++)
+		titles2[k]="NUM, t= "+(k)*nTsub*dt;
+	
+	//titles[X.nCol-2]="Analytical steady ";
+	
+	//util.plotBunch(X.el,titles);
+	
+	util.plotBunch(AN.el,titles1);
+	//NUM.show();
+
+	util.plotBunch(NUM.el,titles2);
+	
+
+	}
+	
 	public static void gmeshFunc() 		{
 		double height=10;
 		//DFTdecopler();
@@ -1380,6 +1539,20 @@ public class util {
 	public static void plotBunch(double[][] data){
 		//	DecimalFormat df=new DecimalFormat("00.0");
 
+		String[] titles = new String[data[0].length-1];
+
+		for(int j=0;j<titles.length;j++)
+			titles[j]="data "+j;
+
+			
+		plotBunch(data,titles);
+		
+
+	}
+	
+	public static void plotBunch(double[][] data, String[] titles){
+		//	DecimalFormat df=new DecimalFormat("00.0");
+
 		Plot2DPanel plot = new Plot2DPanel();
 		double[] x=new double[data.length];
 		double[] y=new double[data.length];
@@ -1390,7 +1563,7 @@ public class util {
 		for(int j=0;j<data[0].length-1;j++){
 			for(int i=0;i<x.length;i++)
 				y[i]=data[i][j+1];
-			plot.addLinePlot(" curve  "+j, x, y);
+			plot.addLinePlot(titles[j], x, y);
 
 		}
 
@@ -1400,7 +1573,7 @@ public class util {
 
 		JFrame frame = new JFrame("plot panel");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.setSize(500,400);
+		frame.setSize(1000,800);
 		frame.setContentPane(plot);
 		frame.setVisible(true);
 
@@ -1410,11 +1583,13 @@ public class util {
 
 		int n=data.length;
 		String[] name=new String[n];
+	
 		for(int j=0;j<n;j++)
 			name[j]="curve "+j;
 
 		plotBunch(name,data);
 	}
+	
 
 	public static void plotBunch(String[] name, double[][]... data){
 		//	DecimalFormat df=new DecimalFormat("00.0");

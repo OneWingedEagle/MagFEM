@@ -6,5 +6,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JAMA"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JPlot"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JTransform"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/common_math3"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
