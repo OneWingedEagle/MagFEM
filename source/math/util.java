@@ -47,15 +47,24 @@ public class util {
 
 
 	public static void ContaminTransport() {
-		// 1 D steady
+		// 1 D 
+
+		boolean steady=false;
 		
-		double x0=0, xn=1000;
+		double x0=0, xn=10000;
 		int N=200;
+
 
 		double dx=(xn-x0)/N;
 		int nT1=10;
-		int nTsub=15;
+		int nTsub=10;
+		if(steady){
+			 nT1=1;
+			 nTsub=1;
+		}
+		
 		int nT=nT1*nTsub;
+
 		double t0=0;
 		double t1=nT1*86400;
 		double dt=(t1-t0)/nT;
@@ -70,26 +79,46 @@ public class util {
 		double[] knownValues=new double[N];
 		int[] un_kn_map=new int[N];
 		int[] unIndex=new int[N];
+		
 		for(int i=0;i<N;i++){
 			un_kn_map[i]=-1;
 			unIndex[i]=-1;
 		}
+
 		for(int i=0;i<N;i++){
-			if(i>=0 && i<-1){
+
+			if(i>=0 && i<1){
 				knownValues[i]=1;
-			}else{
+			}else
+				if(i>=N-1 && i<-N){
+					knownValues[i]=.5;
+				}else{
 				unIndex[i]=nunx;
 				un_kn_map[nunx]=i;
 				nunx++;
 			}
+			
 		}
 		
-		double V=4e-4;
-		double D=5e-3;
+		Vect qC0=new Vect(N);
+		
+		for(int i=0;i<N;i++){
+
+		//	if(i>=95 && i<=105)
+		///	qC0.el[100]=-1.6e-4;
+					
+		}
+		//qC0.el[N-1]=-1.2e-3;
+		
+		//qC0.el[50]=-1.0e-4;
+		
+		double V=4e-3;
+		double D=2e-1;
 		double Cr =V*dt/dx; // Cre should be less than 1.
 		double Pe =V*dx/D; // Pe should be less than 2.
-		util.pr(Cr);
-		util.pr(Pe);
+		util.pr("Cr = "+Cr+ "     *****  Cre = V*dt/dx  should be <= 1.");
+		util.pr("Pe = "+Pe+ "     *****  Pe = V*dx/D  should be <= 2.");
+	//	util.pr(Pe);
 		double C0=1;
 		
 			double dx2=dx*dx;
@@ -120,7 +149,8 @@ public class util {
 
 		Mat H2=new Mat(nun, nun);
 	//	util.show(unIndex);	
-
+//util.hshow(H.size());
+//util.hshow(H2.size());
 
 		for(int k=0;k<N;k++){
 			if(unIndex[k]>=0) {
@@ -149,11 +179,7 @@ public class util {
 //H.show();
 		Vect bx=H.mul(Cx);
 		
-		Vect qC0=new Vect(N);
-		
-		qC0.el[100]=-1.6e-4;
-		
-		qC0.el[50]=-1.0e-4;
+
 	
 
 		
@@ -187,7 +213,7 @@ public class util {
 			m++;
 			double t=m*dt;
 			double f=1;//exp(-1*t*.000002);//+.9*cos(t*m/N*2*4*PI);
-			if(t>5*86400) f=0;
+			//if(t>5*86400) f=0;
 		//	if(t>src_duration)
 			//	b=sol.times(at);
 		//	else
@@ -197,7 +223,7 @@ public class util {
 
 	//		sol.hshow();
 
-			if(m2==0 && m1>0){
+			if(m2==0 && (steady ||m1>0)){
 			 C[m1]= new Vect(N);
 			// if(t<=src_duration)
 
@@ -252,13 +278,13 @@ public class util {
 		titles1[k]="AN, t= "+(k)*nTsub*dt;
 	String[] titles2=new String[AN.nCol];
 	for(int k=0;k<titles2.length;k++)
-		titles2[k]="NUM, t= "+(k)*nTsub*dt;
+		titles2[k]="t= "+(k)+" days";
 	
 	//titles[X.nCol-2]="Analytical steady ";
 	
 	//util.plotBunch(X.el,titles);
 	
-	util.plotBunch(AN.el,titles1);
+	//util.plotBunch(AN.el,titles1);
 	//NUM.show();
 
 	util.plotBunch(NUM.el,titles2);
