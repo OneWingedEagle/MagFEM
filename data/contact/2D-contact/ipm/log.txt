@@ -1,0 +1,95 @@
+
+Loading mesh file completed.
+// data type (0: Magnetic)
+1
+// dimension (2: 2D, 3:3D 
+// coordCode (0: Cartesian, 1: Cylindrical 
+ Number of known u components : 696
+Numb of unknown displacements: 6969
+ Number of known u components : 13764
+
+Loading data file completed.
+mech integ mode: -4
+
+ Bun data was written to:
+    D:\JavaWorks\FEM problems\structural\2D-Contact\ipm\bun.txt
+
+Force was loaded from D:\JavaWorks\FEM problems\structural\2D-contact\ipm\force0.txt to the model.
+ Structural analysis... 
+
+ Number of unknown non-fixed points : 6969
+
+ Calculating stiffness matrix ...
+ Calculating deformation....
+numContacting:   55
+Computing Preconditioner..
+ICCG iteration:     0	 error : 1.00E00	 res max: 3.38E-02
+ICCG iteration:    50	 error : 4.03E-02	 res max: 1.36E-03
+ICCG iteration:   100	 error : 5.24E-02	 res max: 1.77E-03
+ICCG iteration:   150	 error : 2.60E-02	 res max: 8.78E-04
+ICCG iteration:   200	 error : 8.48E-03	 res max: 2.86E-04
+ICCG iteration:   250	 error : 1.07E-03	 res max: 3.60E-05
+ICCG iteration:   300	 error : 2.88E-05	 res max: 9.73E-07
+ICCG iteration:   328	 error : 7.84E-07	 res max: 2.65E-08
+numContacting:   45
+Computing Preconditioner..
+ICCG iteration:     0	 error : 1.00E00	 res max: 1.58E-02
+ICCG iteration:    50	 error : 4.28E-02	 res max: 6.75E-04
+ICCG iteration:   100	 error : 4.05E-02	 res max: 6.40E-04
+ICCG iteration:   150	 error : 3.30E-02	 res max: 5.21E-04
+ICCG iteration:   200	 error : 1.36E-02	 res max: 2.14E-04
+ICCG iteration:   250	 error : 7.57E-04	 res max: 1.20E-05
+ICCG iteration:   300	 error : 9.65E-05	 res max: 1.52E-06
+ICCG iteration:   334	 error : 9.94E-07	 res max: 1.57E-08
+numContacting:   45
+Computing Preconditioner..
+ICCG iteration:     0	 error : 1.00E00	 res max: 7.82E-03
+ICCG iteration:    50	 error : 4.38E-02	 res max: 3.43E-04
+ICCG iteration:   100	 error : 4.04E-02	 res max: 3.16E-04
+ICCG iteration:   150	 error : 3.68E-02	 res max: 2.88E-04
+ICCG iteration:   200	 error : 1.49E-02	 res max: 1.16E-04
+ICCG iteration:   250	 error : 7.75E-04	 res max: 6.06E-06
+ICCG iteration:   300	 error : 9.40E-05	 res max: 7.35E-07
+ICCG iteration:   333	 error : 9.42E-07	 res max: 7.37E-09
+numContacting:   45
+Computing Preconditioner..
+ICCG iteration:     0	 error : 1.00E00	 res max: 3.89E-03
+ICCG iteration:    50	 error : 4.45E-02	 res max: 1.73E-04
+ICCG iteration:   100	 error : 4.02E-02	 res max: 1.56E-04
+ICCG iteration:   150	 error : 4.31E-02	 res max: 1.68E-04
+ICCG iteration:   200	 error : 1.62E-02	 res max: 6.32E-05
+ICCG iteration:   250	 error : 8.31E-04	 res max: 3.23E-06
+ICCG iteration:   300	 error : 9.27E-05	 res max: 3.61E-07
+ICCG iteration:   335	 error : 9.43E-07	 res max: 3.67E-09
+numContacting:   45
+Computing Preconditioner..
+ICCG iteration:     0	 error : 1.00E00	 res max: 1.99E-03
+ICCG iteration:    50	 error : 4.36E-02	 res max: 8.69E-05
+ICCG iteration:   100	 error : 3.88E-02	 res max: 7.74E-05
+ICCG iteration:   150	 error : 5.03E-02	 res max: 1.00E-04
+ICCG iteration:   200	 error : 1.83E-02	 res max: 3.64E-05
+ICCG iteration:   250	 error : 9.30E-04	 res max: 1.85E-06
+ICCG iteration:   300	 error : 6.89E-05	 res max: 1.37E-07
+ICCG iteration:   333	 error : 9.37E-07	 res max: 1.87E-09
+Gap[micon] vs aug_iter
+   0.07626
+
+slide[micon] vs aug_iter
+   0.27024
+
+NR error
+   1.00000
+   0.68891
+   0.33827
+   0.16595
+   0.08350
+
+Deformation Max: 6.304691367351964E-7 at node 1298
+ Magnetic nodal force was written to D:\JavaWorks\FEM problems\structural\2D-Contact\ipm\force0.txt
+ Magnetic nodal displacement was written to D:\JavaWorks\FEM problems\structural\2D-Contact\ipm\disp0.txt
+ Structural stress was written to D:\JavaWorks\FEM problems\structural\2D-Contact\ipm\stress0.txt
+ Data file was written to D:\JavaWorks\FEM problems\structural\2D-Contact\ipm\data_out.txt
+   0.00000
+
+Computation time: 10.484 seconds
+Total cpu time (s):       10.8

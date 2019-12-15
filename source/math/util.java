@@ -40,8 +40,36 @@ public class util {
 	public util(){}
 
 	public static void main(String[] args) {
+		int N=10;
+		int P=3,Q=4;
+		int M=P*Q;
+		
+		double [][] data=new double[N][M];
+		for(int i=0;i<N;i++){
+			int jx=0;
+			for(int j=0;j<P;j++)
+				for(int k=0;k<Q;k++){
+					data[i][jx]=(int)(100*Math.exp(-abs(i-jx)*1./N));
+					jx++;
+				}
+		}
 
-		ContaminTransport();
+		
+		util.pr(N+"   "+M);
+		for(int i=0;i<M;i++){
+			util.ph("A10"+i+"\t");
+		}
+		util.pr("");
+		for(int i=0;i<N;i++){
+			for(int j=0;j<M;j++){
+
+			util.ph(data[i][j]+"\t");
+				}
+			util.ph("B10"+i+"\t");
+			util.pr("");
+			
+		}
+
 
 	}
 

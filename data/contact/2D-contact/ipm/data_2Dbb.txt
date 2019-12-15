@@ -1,0 +1,43 @@
+//data file format code  (0. Magnetic, 1. Mechanical, 2. coupled) 
+1
+//dimension 
+2
+//coordinate system  (0. Cartesian 1. Cylindrical, 2. Spherical) 
+0
+//motor
+false
+//Number_of_Regions
+5
+//(name, density, E, v, [alpha,dT])
+rotor,t,7800, 2e11, .3
+PM1,t,7800, 1.6e11, .24
+PM2,t,7800, 1.6e11, .24
+stopper1,t,7800, 2e11, .3
+stopper2,t,7800, 2e11, .3
+//boundary condition:
+b1:
+b2:
+b3:
+b4:
+4
+x,-1,.0001,0,0
+y,-1,.0001,1,0
+x,.021,.025,y,0.05,0.07,0,0,1,0
+x,.05,.07,y,0.021,0.025,0,0,1,0
+force folder:
+D:\JavaWorks\FEM problems\structural\2D-contact\ipm
+force files:0,0,1
+
+intm:0
+
+dt:5.55555e-6
+
+transfer2DTo3D:f
+mechAnalysis:true
+modalAnalysis:f
+loadDisp:f	
+saveForce:t
+saveDisp:t
+saveStress:t	
+rayAlpha=1e-5
+rayBeta=1e-5

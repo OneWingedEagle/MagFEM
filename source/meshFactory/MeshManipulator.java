@@ -47,13 +47,26 @@ public class MeshManipulator {
 	public static void main(String[] args){
 
 		MeshManipulator mf=new MeshManipulator();
-
+		int n1=2602;
+		for(int i=0;i<100;i++){
+			n1+=1;
+			
+			int n2=n1+1;
+			if(n1>2621) break;
+			//util.pr(n1+"\t"+" 0.0  -1.0 ");
+			//util.pr(n1);
+			util.pr(n1+"  "+n2);
+		}
+		int[] regs={1,2};
+		//mf.extractReg(regs);mf.dropUnusedNodes();
+		//mf.translate(0,-1e-3,0);
 		//Model model=new Model("D:\\JavaWorks\\FEM problems\\Hamed solver\\bun1elem.txt");
 		//model.setEdge();
 		//mf.reRegionb();
-	//mf.connectivity(1e-6);	mf.dropUnusedNodes();
+	//mf.connectivity(1e-4);	mf.dropUnusedNodes();
 	//	mf.dropUnusedNodes();
-	//mf.deform();
+	
+//	mf.deform();
 	//mf.rescale(1./500);
 	//	mf.rotate(9*PI/180);
 		
@@ -73,8 +86,8 @@ public class MeshManipulator {
 			regs0[i-1]=i;
 		}
 		//mf.revolveLine(new Vect().linspace(1, 10, Nr+1), regs0, 45, PI/2/45);
-		int[] regs={1,2};
-		mf.extractReg(regs);mf.dropUnusedNodes();
+		//int[] regs={1,2};
+	//	mf.extractReg(regs);mf.dropUnusedNodes();
 		String stat="D:\\JavaWorks\\FEM problems\\Solver Gaol\\noUnusedNodes.txt";
 		 String rot="D:\\JavaWorks\\FEM problems\\Solver Gaol\\bunTranslated.txt";
 		//mf.assemble(rot,stat);
@@ -1598,7 +1611,7 @@ util.pr(rm);
 		boolean[] nn=new boolean[1+model.numberOfNodes];
 		
 		for(int ir=1;ir<=model.numberOfRegions;ir++){
-			if(ir<=7)
+			if(ir==2)
 			for(int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++)
 				{
 				int[] nv=model.element[i].getVertNumb();
@@ -1606,6 +1619,7 @@ util.pr(rm);
 					nn[nv[k]]=true;
 				}
 		}
+				
 		double R=Math.sqrt(3)*.2;
 		for(int i=1;i<=1*model.numberOfNodes;i++){
 
@@ -1615,14 +1629,31 @@ util.pr(rm);
 		double r=v.v2().norm();
 
 		double tt=util.getAng(v);
-		if(tt>PI) tt-=2*PI;
+		//if(tt>PI) tt-=2*PI;
 		
 		//double r2=v.el[0];
 		//double t2=(v.el[1]/0.08)*9.*PI/180;
 	//	Vect v2=new Vect(r2*Math.cos(t2),r2*Math.sin(t2),v.el[2]);
-		Vect v2=new Vect(r*Math.cos(22.5/9*tt),r*Math.sin(22.5/9*tt),v.el[2]);
-		model.node[i].setCoord(v2);
+	//	Vect v2=new Vect(r*Math.cos(22.5/9*tt),r*Math.sin(22.5/9*tt),v.el[2]);
+	//	if(v.el[0]<.0201) util.pr(i);
 		
+		v.el[1]-=1e-3;
+		if(v.el[1]>v.el[0]) {
+			//v.el[0]*=-1;
+			///v.el[0]-=1e-3;
+			//v.el[1]+=1e-3;
+			//if(v.el[0]>.03)
+			//v.el[0]*=1.05;
+		}else{
+			//v.el[1]*=-1;
+			//v.el[0]+=1e-3;
+			//v.el[1]-=1e-3;
+			//if(v.el[1]>.03)
+				//v.el[1]*=1.05;
+		}
+	//	util.ph(i+"\t"); v.hshow();
+		model.node[i].setCoord(v);
+
 /*		if(v.el[2]>.1 && v.el[2]<.45 && r<.8 ){
 			double t2=tt;
 			double r2=v.el[0];
@@ -6629,7 +6660,7 @@ for(int i=0; i<dh.length; i++){
 			
 			for(int j=0;j<model.nElVert;j++){
 				Vect v=model.node[vn[j]].getCoord();
-				if(abs(v.el[0])>1e-4)continue;
+				//if(abs(v.el[0])>eps)continue;
 					nnc[vn[j]]=true;
 			}
 		}
