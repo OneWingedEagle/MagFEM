@@ -66,7 +66,7 @@ public class MeshManipulator {
 	//mf.connectivity(1e-4);	mf.dropUnusedNodes();
 	//	mf.dropUnusedNodes();
 	
-//	mf.deform();
+	mf.deform();
 	//mf.rescale(1./500);
 	//	mf.rotate(9*PI/180);
 		
@@ -1611,7 +1611,7 @@ util.pr(rm);
 		boolean[] nn=new boolean[1+model.numberOfNodes];
 		
 		for(int ir=1;ir<=model.numberOfRegions;ir++){
-			if(ir==2)
+			if(ir==3)
 			for(int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++)
 				{
 				int[] nv=model.element[i].getVertNumb();
@@ -1637,7 +1637,8 @@ util.pr(rm);
 	//	Vect v2=new Vect(r*Math.cos(22.5/9*tt),r*Math.sin(22.5/9*tt),v.el[2]);
 	//	if(v.el[0]<.0201) util.pr(i);
 		
-		v.el[1]-=1e-3;
+		v.el[1]+=1e-3;
+		v.el[0]+=2e-3;
 		if(v.el[1]>v.el[0]) {
 			//v.el[0]*=-1;
 			///v.el[0]-=1e-3;

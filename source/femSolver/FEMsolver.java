@@ -294,9 +294,6 @@ public class FEMsolver {
 			
 			errFlux=model.getDiffMax(B1,B2);
 
-			
-	
-
 		}
 		
 
