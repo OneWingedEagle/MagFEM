@@ -47,45 +47,76 @@ public class MeshManipulator {
 	public static void main(String[] args){
 
 		MeshManipulator mf=new MeshManipulator();
-		int n1=2602;
+		int n1=1271;
 		for(int i=0;i<100;i++){
 			n1+=1;
 			
 			int n2=n1+1;
-			if(n1>2621) break;
+			if(n1>1298) break;
 			//util.pr(n1+"\t"+" 0.0  -1.0 ");
 			//util.pr(n1);
-			util.pr(n1+"  "+n2);
+		//	util.pr(n1+"  "+n2);
 		}
-		int[] regs={1,2};
+		int[] regs={1};
+		
+		double min=0;
+		double max=8;
+		double mean=(max+min)/2;
+
+		Vect cc=new Vect(100);
+		double dd=(max-min)/cc.length;
+		for(int k=0;k<cc.length;k++)
+		{
+			double xx=k*dd;
+			double val=min*(xx-1)*(xx-max)/((min-1)*(min-max))+mean*(xx-min)*(xx-max)/((1-min)*(1-max))+max*(xx-min)*(xx-1)/((max-min)*(max-1));
+			cc.el[k]=val;
+		}
+		util.plot(cc);
 		//mf.extractReg(regs);mf.dropUnusedNodes();
-		//mf.translate(0,-1e-3,0);
+	//	mf.translate(new Vect(0,.0,.005));
 		//Model model=new Model("D:\\JavaWorks\\FEM problems\\Hamed solver\\bun1elem.txt");
 		//model.setEdge();
-		//mf.reRegionb();
-	//mf.connectivity(1e-4);	mf.dropUnusedNodes();
-	//	mf.dropUnusedNodes();
-	
-	mf.deform();
+	//mf.reRegionb();
+	//	int[] nrs={1,2};
+	//mf.connectivity(1e-5,nrs);	mf.dropUnusedNodes();
+//		mf.dropUnusedNodes();
+
+	//	mf.assemble();
+	//	mf.copy(new Vect(.0,-.1), 1);
+	//	mf.rescale(new Vect(5./7.5,1));
+//mf.extendFlip(0);
+//	mf.deform();
 	//mf.rescale(1./500);
-	//	mf.rotate(9*PI/180);
+	//mf.rotate(-90*PI/180);
+//	mf.translate(new Vect(0.,0.001));
+	//	mf.rotate(-(PI/2-1.3089969375826278));
+	
+	//	mf.rescale(new Vect(1.0,1.0,1.05), regs);
+	//mf.cut(-.03,.03,-1,1,0,1);
 		
-	//	mf.translate(new Vect(1,.0,1));
-	//	Mat R=util.rotMat(new Vect(0,0,1), new Vect(1,1.4,0));
+	//mf.translate(new Vect(.001,.0));
+		Mat R=util.rotMat(new Vect(1,0,0), new Vect(0,0,1));
 	//	Mat R=util.rotEuler(new Vect(0,0,1), 45*PI/180);
 	//	mf.rotate(R);
-	//	mf.pileRotate(10, 1*PI/180);
+	//	mf.pileRotate(5, 18*PI/180);
 
 	//mf.reverseHexa();
+		
+	//	mf.reverseFace2D();
 
-	//Model model=mf.rotExtendNfold(29);
-	//model.writeMesh(new File(model.meshFilePath).getParentFile().getPath()+"\\extenRot.txt");
-		int Nr=10;
+	//Model model=mf.rotExtendNfold(1);
+//	model.writeMesh(new File(model.meshFilePath).getParentFile().getPath()+"\\extenRot.txt");
+		int Nr=25;
 		int[] regs0=new  int[Nr];
 		for(int i=1;i<=Nr;i++){
 			regs0[i-1]=i;
 		}
-		//mf.revolveLine(new Vect().linspace(1, 10, Nr+1), regs0, 45, PI/2/45);
+		
+		double arr[]={1,3.07,5.14,7.21,9.28,11.35,13.42,15.49,17.56,19.63,21.7,23.77,25.84,27.91,29.98,32.05,34.12,36.19,38.26,40.33,42.4,44.47,46.54,48.61,50.68};
+		Vect vx=new Vect(arr);
+
+	//	mf.revolveLine(vx, regs0, 45, PI/2/45);
+	//	mf.revolveLine(new Vect().linspace(2, 2.1, Nr), regs0, 180, PI/2/45);
 		//int[] regs={1,2};
 	//	mf.extractReg(regs);mf.dropUnusedNodes();
 		String stat="D:\\JavaWorks\\FEM problems\\Solver Gaol\\noUnusedNodes.txt";
@@ -94,7 +125,7 @@ public class MeshManipulator {
 
 		//mf.assemble();
 	//mf.rescale(new Vect(1,1,0.54641016151377545870548926830117));
-	//	mf.extractReg(-0.001,6.2,0,2*PI,0,.19e-3);
+	//	mf.extractReg(-0.001,1,0,5*PI/180,0,1);
 		//mf.copy(new Vect(0,0,2), 9);
 		/*String bun=util.getFile();
 		Model model1=new Model(bun);
@@ -125,11 +156,12 @@ public class MeshManipulator {
 		}*/
 	//	model.writeMesh("D:\\JavaWorks\\FEM problems\\ipm_motor2D\\compacted.txt");*/
 		//	mf.rotate(PI/2);
-	//	mf.pileUpHexa(40, .05);
+		//mf.pileUpHexa(40, .002);
+		// mf.pileUpHexa(1, .01);
 		
 	//	mf.pileHelic(6*8, PI/4, .0125*18);
 		
-		//mf.pileRotate(10, PI/18);
+	//	mf.pileRotate(10, PI/18);
 
 
 
@@ -294,7 +326,9 @@ public class MeshManipulator {
 
 
 		md1.scaleFactor=md0.scaleFactor;
-		String file = System.getProperty("user.dir") + "//reflected.txt";
+		
+		String folder=new File(md0.meshFilePath).getParentFile().getPath();
+		String file = folder + "//reflected.txt";
 		md1.writeMesh(file);
 
 	}
@@ -807,8 +841,14 @@ public class MeshManipulator {
 			model.writeMeshTriToTri(finerMesh, r1,  r2);
 
 	}
-
+	
+	
 	public void rescale(double scale){
+		rescale(scale , null);
+	}
+	
+
+	public void rescale(double scale,int[] nrs){
 
 		String bun=util.getFile();
 		if(bun==null || bun.equals("") )return;
@@ -821,8 +861,35 @@ public class MeshManipulator {
 		String sqaledMesh = folder + "//scaled.txt";
 
 
+	boolean[] nc=new boolean[1+model.numberOfNodes];
+		
+		for(int ir=1;ir<=model.numberOfRegions;ir++){
+			
+			boolean included=true;
+			
+			if(nrs!=null){
+				 included=false;
+			for(int i=0;i<nrs.length;i++){
+				if(ir==nrs[i]){
+					included=true;
+					break;
+				}
+			}
+			}
+			
+			if(!included) continue;
+
+			for( int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++)
+		{
+			int[] vn=model.element[i].getVertNumb();
+			for(int j=0;j<vn.length;j++)
+			nc[vn[j]]=true;
+		}
+		}
+		
 		for(int i=1;i<=model.numberOfNodes;i++)
 		{
+			if(!nc[i]) continue;
 			Vect v=model.node[i].getCoord().times(scale);
 		
 			//if(util.getAng(v)<.003) v.el[1]-=.00002;
@@ -838,8 +905,11 @@ public class MeshManipulator {
 		
 	}
 	
-	
 	public void rescale(Vect scale){
+		rescale(scale , null);
+	}
+	
+	public void rescale(Vect scale, int [] nrs){
 
 		String bun=util.getFile();
 		if(bun==null || bun.equals("") )return;
@@ -852,9 +922,35 @@ public class MeshManipulator {
 		String sqaledMesh = folder + "//scaled.txt";
 
 
+		boolean[] nc=new boolean[1+model.numberOfNodes];
+			
+			for(int ir=1;ir<=model.numberOfRegions;ir++){
+				
+				boolean included=true;
+				
+				if(nrs!=null){
+					 included=false;
+				for(int i=0;i<nrs.length;i++){
+					if(ir==nrs[i]){
+						included=true;
+						break;
+					}
+				}
+				}
+				
+				if(!included) continue;
 
-		for(int i=1;i<=model.numberOfNodes;i++)
-		{
+				for( int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++)
+			{
+				int[] vn=model.element[i].getVertNumb();
+				for(int j=0;j<vn.length;j++)
+				nc[vn[j]]=true;
+			}
+			}
+			
+			for(int i=1;i<=model.numberOfNodes;i++)
+			{
+				if(!nc[i]) continue;
 			Vect v=model.node[i].getCoord().times(scale);
 
 			//	if(v.norm()<.027755) v=v.normalized().times(.02775);
@@ -1102,65 +1198,15 @@ public void hexaToTetra()
 
 		for(int ir=1;ir<=model.numberOfRegions;ir++){
 
+			if(ir>=1)
 			for(int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++){
 				
-/**/
-/*				if(ir>7) model.element[i].setRegion(5);
-				else if(ir==7) model.element[i].setRegion(4);
-				else if(ir<4) model.element[i].setRegion(1);
-				else {
-					Vect c=model.getElementCenter(i);	
-					double tt=util.getAng(c);
-					if(tt>PI/2/9 && tt<3*PI/2/9) model.element[i].setRegion(2);
-					else if(tt>6*PI/2/9 && tt<8*PI/2/9) model.element[i].setRegion(3);
-					else model.element[i].setRegion(1);
-				}*/
-				//if(ir<4){ model.element[i].setRegion(1);
-			//	model.element[i].setRegion(3);
-				Vect c=model.getElementCenter(i);	
-				
-/*				if(ir==1){
-				if(c.el[0]<.004&&c.el[1]<.004) model.element[i].setRegion(2);
-				else if(c.el[0]<.006&&c.el[1]<.006) model.element[i].setRegion(3);
-				else if(c.el[0]>.009||c.el[1]>.009) model.element[i].setRegion(3);
-				}else if(c.el[0]<.004&&c.el[1]<.004 && c.el[2]<.01) model.element[i].setRegion(2);
-				else				
-					 model.element[i].setRegion(3);*/
-				
-	/*			int[][] regs ={ {24, 26, 31, 25, 27, 10, 8, 7, 9, 6, 3, 2, 4, 5, 1, 39, 41, 40, 43, 37},
-						{33, 30, 29, 11, 12, 13, 35, 34},
-						{23, 32, 28, 22, 18, 17, 14, 20, 21, 19, 16, 15, 44, 42, 38, 36}};*/
-				
-				int[][] regs ={ {6},
-						{2},
-						{1,3,4,5,7}};
-				int ix=0;
-				
-				for(int j=0;j<regs.length;j++)
-					for(int k=0;k<regs[j].length;k++){
-						if(ir==regs[j][k]){
-							ix=j+1;
-							break;
-						}
-					}
-				if(ix>0)
-				model.element[i].setRegion(ix);
-				
-				double r=c.v2().norm();
-				
-				if(r<-.49) model.element[i].setRegion(2);
 
-			//	else model.element[i].setRegion(2);
-				double tt=util.getAng(c);
-				double rr=c.norm();
-				//if(rr<.05) model.element[i].setRegion(1);
-				//else
-					// model.element[i].setRegion(2);
-				//if(rr>1.2 && rr<1.4 && tt>0*PI/18/2 && tt<2*PI/18/2) model.element[i].setRegion(2);
-				//else if(rr>1.2 && rr<1.4 && tt>4*PI/18/2 && tt<6*PI/18/2) model.element[i].setRegion(3);
-			//	}
+				Vect c=model.getElementCenter(i);	
+				if(c.el[0]>.095 && c.el[0]<.11 && c.el[1]>-.03 ) 
+				{ model.element[i].setRegion(4);
 				
-				//if(model.getElementArea(i)<1e-7) model.element[i].setRegion(2);
+				}
 
 			}
 		}
@@ -1308,7 +1354,7 @@ public void hexaToTetra()
 		
 		for(int ir=1;ir<=1*model.numberOfRegions;ir++){
 
-			if(ir==4|| ir>7) continue;
+		//	if(ir==4|| ir>7) continue;
 			
 			for(int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++){
 
@@ -1609,24 +1655,58 @@ util.pr(rm);
 			
 	
 		boolean[] nn=new boolean[1+model.numberOfNodes];
-		
+		double[] cc=new double[1+model.numberOfNodes];
 		for(int ir=1;ir<=model.numberOfRegions;ir++){
-			if(ir==3)
+			if(ir==1)
 			for(int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++)
 				{
 				int[] nv=model.element[i].getVertNumb();
 				for(int k=0;k<nv.length;k++)
 					nn[nv[k]]=true;
+					//if(ir==1) cc[i]=0.0;
 				}
 		}
 				
-		double R=Math.sqrt(3)*.2;
+	
+	//	double y2=model.node[6184].getCoord(1);
+	//	int[] mns=new int[1000];
+		//int ix=0;
+		//double R=Math.sqrt(3)*.2;
+		//Vect d=model.node[140].getCoord().sub(model.node[139].getCoord());
+		//Vect d=model.node[905].getCoord().sub(model.node[904].getCoord());
+/*		Vect v0=model.node[238].getCoord();
+		
+		Vect d=model.node[232].getCoord().sub(model.node[229].getCoord());
+		Vect h=model.node[196].getCoord().sub(model.node[224].getCoord());
+		Vect dir=d.normalized();
+		Vect normal=new Vect(-dir.el[1],dir.el[0]);*/
 		for(int i=1;i<=1*model.numberOfNodes;i++){
 
 		if(nn[i]){
 			Vect v=model.node[i].getCoord();
-		
-		double r=v.v2().norm();
+			
+		//	v.el[0]+=.0005;
+/*			if(v.el[1]>.0001){
+				double r=v.el[0];
+				double tt=2*PI/180;
+				Vect v1=new Vect(r*Math.cos(tt),r*Math.sin(tt));
+				
+				v=v1.deepCopy();
+			}*/
+			
+			if(v.el[0]>model.node[2423].getCoord(0)){
+				double r=v.el[0];
+				double tt=2*PI/180;
+				Vect v1=new Vect(r*Math.cos(tt),r*Math.sin(tt));
+				//int kk=(int)((v.el[0]-model.node[2411].getCoord(0))/model.node[2411].getCoord(0));
+				//v.el[0]=model.node[2411].getCoord(0)+kk*.004;
+			//	v=v1.deepCopy();
+				double dc=v.el[0]-model.node[2411].getCoord(0);
+			//	v.el[0]=model.node[2411].getCoord(0)+dc*.8;
+				v.el[0]=.1;
+			}
+
+		//	v.el[0]*=.9;
 
 		double tt=util.getAng(v);
 		//if(tt>PI) tt-=2*PI;
@@ -1635,23 +1715,30 @@ util.pr(rm);
 		//double t2=(v.el[1]/0.08)*9.*PI/180;
 	//	Vect v2=new Vect(r2*Math.cos(t2),r2*Math.sin(t2),v.el[2]);
 	//	Vect v2=new Vect(r*Math.cos(22.5/9*tt),r*Math.sin(22.5/9*tt),v.el[2]);
-	//	if(v.el[0]<.0201) util.pr(i);
+	//	if(v.el[0]>.04) v.el[0]=.04+2.5*(v.el[0]-.04);
+		//if(v.el[0]>.05) v.el[0]-=.004;
+
 		
-		v.el[1]+=1e-3;
-		v.el[0]+=2e-3;
+	//	v.el[1]-=1e-3;
+		//v.el[0]+=2e-3;
 		if(v.el[1]>v.el[0]) {
 			//v.el[0]*=-1;
-			///v.el[0]-=1e-3;
+		//	v.el[0]=-1;
+		//	v.el[1]=1;
 			//v.el[1]+=1e-3;
 			//if(v.el[0]>.03)
 			//v.el[0]*=1.05;
 		}else{
+			//v.el[0]=1;
+		//	v.el[1]=-1;
 			//v.el[1]*=-1;
 			//v.el[0]+=1e-3;
 			//v.el[1]-=1e-3;
 			//if(v.el[1]>.03)
 				//v.el[1]*=1.05;
 		}
+		
+	// v=v.times(cc[i]);
 	//	util.ph(i+"\t"); v.hshow();
 		model.node[i].setCoord(v);
 
@@ -1682,7 +1769,11 @@ util.pr(rm);
 			}
 		}
 			//list1.add(c.el[2]);
-		
+	//	int kx=0;
+		//for(int i=0;i<ix-1;i++){
+
+		//	util.pr(mns[kx]+"\t"+mns[++kx]);
+	//	}
 
 		String folder=new File(bun).getParentFile().getPath();
 		String bunFilePath = folder+ "//deformed.txt";
@@ -5000,6 +5091,61 @@ for(int i=0; i<dh.length; i++){
 		String bun=util.getFile(0);
 		extractReg(bun,r1,r2,t1,t2,-1e10,1e10,null);
 	}
+	
+	public void cut(double x1, double x2,double y1,double y2,double z1,double z2){
+
+		String bun=util.getFile(0);
+		Model model1=new Model(bun);
+
+		int nReg=model1.numberOfRegions+1;
+		int nEls=model1.numberOfElements;
+		int nNodes=model1.numberOfNodes;
+		String type=model1.elType;
+		
+		 model1=null;
+
+		 System.gc();
+		
+		Model model2=new Model();
+		model2.alloc(nReg,nEls,nNodes,type);
+		model2.loadMesh(bun);
+
+		double x,y,z=0;
+		int[] list;
+
+
+
+		for(int ir=1;ir<=model2.numberOfRegions;ir++)
+			for(int i=model2.region[ir].getFirstEl();i<=model2.region[ir].getLastEl();i++){
+
+			
+
+				Vect c=model2.getElementCenter(i);
+				x=c.el[0];
+				y=c.el[1];
+				if(model2.dim==3)
+					z=c.el[2];
+
+				if((x<x1 || x>x2 )|| (y<y1 || y>y2 ) || (model2.dim==3 &&(z<z1 || z>z2 )))
+				{
+
+					model2.element[i].setRegion(model2.numberOfRegions);
+				}
+
+
+			}
+		
+
+
+		reRegionGroupEls(model2);
+		String folder=new File(bun).getParentFile().getPath();
+		String bunFilePath =folder+ "//bunReReg.txt";
+
+
+		model2.writeMesh(bunFilePath);
+
+
+	}
 
 	public void extractReg(String bun, double r1, double r2,double t1,double t2,double z1,double z2,int[] regList){
 
@@ -6644,6 +6790,10 @@ for(int i=0; i<dh.length; i++){
 	}
 	
 	public void connectivity(double eps){
+		connectivity( eps,null);
+	}
+	
+	public void connectivity(double eps,int[] nrs){
 
 		String bun=util.getFile();
 		if(bun==null || bun.equals("") )  throw new NullPointerException("file not found.");
@@ -6653,7 +6803,21 @@ for(int i=0; i<dh.length; i++){
 		boolean[] nnc=new boolean[1+model.numberOfNodes];
 		
 		for(int ir=1;ir<=model.numberOfRegions;ir++){
-
+			
+			boolean included=true;
+			
+			if(nrs!=null){
+				 included=false;
+			for(int i=0;i<nrs.length;i++){
+				if(ir==nrs[i]){
+					included=true;
+					break;
+				}
+			}
+			}
+			
+			if(!included) continue;
+			util.pr(ir);
 			for( int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++)
 		{
 			int[] vn=model.element[i].getVertNumb();
@@ -6661,6 +6825,7 @@ for(int i=0; i<dh.length; i++){
 			
 			for(int j=0;j<model.nElVert;j++){
 				Vect v=model.node[vn[j]].getCoord();
+			//	if(v.el[2]<.101)continue;
 				//if(abs(v.el[0])>eps)continue;
 					nnc[vn[j]]=true;
 			}

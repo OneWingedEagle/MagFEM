@@ -16,6 +16,7 @@ import femSolver.StaticLinearMagSolver;
 import main.Main;
 import math.Complex;
 import math.SpMat;
+import math.SpVect;
 import math.Vect;
 import math.VectComp;
 import math.util;
@@ -128,6 +129,12 @@ public class RunCLN {
 	//	magsolver.RHS=magsolver.RHS.times(resistances.el[0]);
 
 		Vect rhs1=magsolver.RHS.deepCopy();
+		
+	
+/*		Vect v1=rhs1.deepCopy();
+		for(int i=0;i<v1.length;i++)
+			if(Math.abs(v1.el[i])<1e-6) v1.el[i]=0;
+		new SpVect(v1).shownzA();*/
 
 		x=magsolver.solve(model);
 		

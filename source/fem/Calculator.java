@@ -15,9 +15,10 @@ public class Calculator {
 	double[][] PWNL;
 	double[][] PW3ang;
 	double[][] PWtetra;
+	double[][] PWpyr;
 	boolean centerNu;
 	public int dim,elCode,nElVert,nElEdge,numberOfElements,numberOfNodes,numberOfRegions;
-	public int struc2D=1;
+	public int struc2D=0; // 0:plane stress, 1: plain strain
 
 	public Calculator(){	}
 
@@ -34,7 +35,8 @@ public class Calculator {
 		this.PWNL=gaussInteg(3);
 		this.PW3ang=gaussInteg3(4);
 		this.PWtetra=gaussIntegTetra(5);
-
+		this.PWpyr=gaussIntegPyramid(8);
+		
 		this.centerNu=false;
 	}
 
@@ -90,6 +92,7 @@ public class Calculator {
 		else 	if(this.elCode==1&& !model.axiSym) return HeQuad(model,nBH,ie,nonLinear,eddy,hasJ,hasM);
 		else 	if(this.elCode==1&& model.axiSym) return HeQuadAxi(model,nBH,ie,nonLinear,eddy,hasJ,hasM);
 		else 	if(this.elCode==3) return HePrism(model,nBH,ie,nonLinear,eddy,hasJ,hasM);
+		else 	if(this.elCode==5) return HePyramid(model,nBH,ie,nonLinear,eddy,hasJ,hasM);
 		else 	if(this.elCode==2) {
 			 return HeTetra(model,nBH,ie,nonLinear,eddy,hasJ,hasM);
 		//	String msg="Tetrahedral edge element not implemented!";
@@ -1454,6 +1457,179 @@ public class Calculator {
 
 	}
 
+	
+	public double[][] HePyramid(Model model,int nBH,int ie, boolean nonLinear,boolean eddy,boolean hasJ,boolean hasM){
+
+
+		double vol=0;
+		Vect nu=new Vect(this.dim),nuVar=new Vect(this.dim);
+		Vect B=new Vect();
+		Vect  M=new Vect();		
+
+		if(hasM){ M=model.element[ie].getM();}
+		
+		boolean[] edgeDir=model.element[ie].getEdgeReverse();
+
+
+
+		double[][] PWpyramid=this.PWpyr;
+		int nGauss=PWpyramid.length;
+
+		if(!nonLinear){
+			nu=model.element[ie].getNu();
+			nGauss=PWpyramid.length; 
+		}
+		else{
+			nGauss=PWpyramid.length; 
+			if(this.centerNu){
+				double nux,nuv=0;
+				B=model.element[ie].getB();
+				double Bn2=B.norm2();
+				double Bn=sqrt(Bn2);
+
+				nux=model.BH[nBH].getNu(Bn);
+				nu=new Vect(nux,nux,nux);
+				if(Bn>0){
+					nuv=model.BH[nBH].getdHdB(Bn);	
+					nuVar.el[0]=(nuv-nux)/Bn2;
+					nuVar.el[1]=nuVar.el[0];
+					nuVar.el[2]=nuVar.el[0];
+
+				}
+			}
+		}
+
+		Node[] vertexNode=model.elementNodes(ie);
+		double[][] H1=new double[model.nElEdge][model.nElEdge];
+		double[][] H2=new double[model.nElEdge][model.nElEdge];
+		double[][] H3=new double[model.nElEdge][model.nElEdge];
+		double[] C=new double[model.nElEdge];
+		Vect[] Cj=new Vect[model.nElEdge];
+		for(int i=0;i<model.nElEdge;i++)
+			Cj[i]=new Vect(3);
+
+		double detJac,ws=1,wsJ=0,term1,term2,term3;
+
+		Mat jac;
+
+
+		Vect[] rotNe=new Vect[model.nElEdge];
+
+
+		Vect localCo=new Vect(this.dim);
+
+		Vect[] Ne=new Vect[model.nElEdge];
+
+
+
+		Vect sigma=new Vect();
+
+		if(eddy)
+			sigma=model.element[ie].getSigma();
+
+		for(int p=0;p<nGauss;p++){
+
+				if(nonLinear){
+					localCo.el[0]=PWpyramid[p][0];
+					localCo.el[1]=PWpyramid[p][1];
+					localCo.el[2]=PWpyramid[p][2];
+					
+					ws=PWpyramid[p][3];
+
+	
+					B=this.getBAt(model,ie,localCo);
+					double Bn2=B.norm2();
+					double Bn=sqrt(Bn2);
+
+					if(!this.centerNu){
+						double nux,nuv=0;
+
+
+						nux=model.BH[nBH].getNu(Bn);
+						nu=new Vect(nux,nux,nux);
+
+						if(Bn>0){
+							nuv=model.BH[nBH].getdHdB(Bn);	
+							nuVar.el[0]=(nuv-nux)/Bn2;
+							nuVar.el[1]=nuVar.el[0];
+							nuVar.el[2]=nuVar.el[0];
+
+						}
+					}
+
+				}
+				else
+				{
+					localCo.el[0]=PWpyramid[p][0];
+					localCo.el[1]=PWpyramid[p][1];
+					localCo.el[2]=PWpyramid[p][2];
+					ws=PWpyramid[p][3];
+
+				}
+
+				jac=jacobian(vertexNode,localCo);
+
+				detJac=abs(jac.determinant());
+
+				wsJ=ws*detJac;
+
+
+				rotNe=rotNePyramid(jac,localCo,edgeDir);
+				//if(hasJ || eddy)
+				//	Ne=NePyramid(jac,localCo,edgeDir);
+
+				for(int i=0;i<model.nElEdge;i++){
+
+					if(hasJ){
+						Cj[i]=Cj[i].add(Ne[i].times(wsJ));
+					}
+
+					if(hasM){
+						C[i]+=wsJ*rotNe[i].dot(M);
+
+					}
+
+					for(int j=0;j<=i;j++){
+
+						term1=wsJ*rotNe[i].times(nu).dot(rotNe[j]);
+						H1[i][j]+=term1;
+
+						if(nonLinear){
+							term2=wsJ*rotNe[i].dot(B)*rotNe[j].dot(B.times(nuVar));
+							H2[i][j]+=term2;
+
+
+						}
+
+						if(eddy){
+							term3=wsJ*Ne[i].dot(Ne[j].times(sigma));
+							H3[i][j]+=term3;
+
+						}
+
+
+					}
+				}
+		}
+
+		lowSym(H1);
+		if(nonLinear)
+			lowSym(H2);
+		if(eddy){
+			lowSym(H3);
+		}
+
+		model.H2=H2;
+		model.H3=H3;
+		model.C=C;
+		model.Cj=Cj;
+
+//util.pr("volume of el "+ie+" = "+vol);
+		return H1;
+
+
+	}
+
 
 	public double[][] He3ang(Model model,int nBH,int ie, boolean nonLinear,boolean eddy,boolean hasJ, boolean hasM){
 
@@ -1961,6 +2137,7 @@ public class Calculator {
 		if(this.elCode==1) return rotNeQuad(jac,localCo);
 		if(this.elCode==2) return rotNeTetra(jac,localCo,edgeReverse);
 		if(this.elCode==3) return rotNePrism(jac,localCo,edgeReverse);
+		if(this.elCode==5) return rotNePyramid(jac,localCo,edgeReverse);
 		Vect[] rotNe=new Vect[this.nElEdge];
 
 		double a=localCo.el[0];
@@ -2075,6 +2252,43 @@ public class Calculator {
 		return rotNe;
 	}
 	
+	public Vect[] rotNePyramid(Mat jac,Vect localCo,boolean[] edgeReverse){
+
+		double u=localCo.el[0];
+		double v=localCo.el[1];
+		double w=localCo.el[2];
+
+		Mat invJac=jac.inv3();
+
+		Vect[] grad=new Vect[3];
+
+		for(int j=0;j<3;j++)
+			grad[j]=invJac.getColVect(j);
+
+		Vect[] rotNe=new Vect[8];
+
+		Vect cross12=grad[1].cross(grad[2]);
+		Vect cross20=grad[2].cross(grad[0]);
+		Vect cross01=grad[0].cross(grad[1]);
+
+		rotNe[0] = cross12.times(u/(4*(w - 1))).add(cross20.times(- v/(4*(w - 1)) - 0.5)).add(cross01.times(.25));
+		rotNe[1] = cross12.times(u/(4*(w - 1)) + 0.5).add(cross20.times(-v/(4*(w - 1)))).add(cross01.times(-.25));	
+		rotNe[2] = cross12.times(-0.5*((u+w-1)/(w-1))).add(cross20.times(0.5*(v+w-1)/(w-1)));
+		rotNe[3] = cross12.times(0.5 - u/(4*(w - 1))).add(cross20.times(v/(4*(w - 1)))).add(cross01.times(.25));
+		rotNe[4] = cross12.times((u/(4*(w - 1)))).add(cross20.times(-0.5*((v+w-1)/(w-1))));	
+		rotNe[5] = cross12.times(u/(4*(w - 1))).add(cross20.times(0.5 - v/(4*(w - 1)))).add(cross01.times(.25));
+		rotNe[6] = cross12.times(-0.5*((u-w+1)/(w-1))).add(cross20.times(+0.5*((v-w+1)/(w-1))));
+		rotNe[7] = cross12.times(0.5*((u+w-1)/(w-1))).add(cross20.times(-0.5*((v-w+1)/(w-1))));
+		
+
+		for(int k=0;k<rotNe.length;k++)
+			if(edgeReverse[k])
+				rotNe[k].timesVoid(-1);
+
+
+		return rotNe;
+	}
+	
 	public Vect[] rotNeTetra(Mat jac,Vect localCo,boolean[] edgeReverse){
 
 
@@ -2121,6 +2335,7 @@ public class Calculator {
 		if(this.elCode==0) return localGradN3ang();
 		else if(this.elCode==1) return localGradNQuad(localCo);
 		else if(this.elCode==3) return localGradNPrism(localCo);
+		else if(this.elCode==5) return localGradNPyramid(localCo);
 		double a=localCo.el[0];
 		double b=localCo.el[1];
 		double c=localCo.el[2];
@@ -2185,6 +2400,26 @@ public class Calculator {
 		gradN[3]=new Vect(h1,0,-a);
 		gradN[4]=new Vect(0,h1,-b);
 		gradN[5]=new Vect(-h1,-h1,-c);
+
+		return gradN;
+	}
+	
+	public Vect[] localGradNPyramid(Vect localCo){
+
+		double u=localCo.el[0];
+		double v=localCo.el[1];
+		double w=localCo.el[2];
+
+	
+		Vect[] gradN=new Vect[6];
+		
+		double val3=u*v/((1-w)*(1-w));
+
+		gradN[0]=new Vect(-(1-v)+v*w/(1-w),-(1-u)+u*w/(1-w),-1+val3).times(.25);
+		gradN[1]=new Vect((1-v)+v*w/(1-w),-(1+u)+u*w/(1-w),-1-val3).times(.25);
+		gradN[2]=new Vect((1+v)+v*w/(1-w),(1+u)+u*w/(1-w),-1+val3).times(.25);
+		gradN[3]=new Vect(-(1+v)+v*w/(1-w),(1-u)+u*w/(1-w),-1-val3).times(.25);
+		gradN[4]=new Vect(0,0,1);
 
 		return gradN;
 	}
@@ -2321,6 +2556,7 @@ public class Calculator {
 
 	public  Vect[] Ne(Mat jac,Vect localCo, boolean[] edgeReverse){
 		if(elCode==2) return NeTetra(jac,localCo,  edgeReverse);
+	//	if(elCode==5) return NePyramid(jac,localCo,  edgeReverse);
 		
 		double a=localCo.el[0];
 		double b=localCo.el[1];
@@ -2486,6 +2722,30 @@ public class Calculator {
 
 	}
 
+	double[] localNPyramid(Vect lc){
+		
+
+		
+		double u=lc.el[0];
+		double v=lc.el[1];
+		double w=lc.el[2];
+		
+		double r=0;
+		   if(w != 1.) r = u*v*w / (1.-w) ;
+	
+
+		
+		double[] N=new double[5];
+	
+	    
+	     N[0]=1/4*((1-u)*(1-v)-w+r);
+	     N[1]=1/4*((1+u)*(1-v)-w-r);
+	     N[2]=1/4*((1+u)*(1+v)-w+r);
+	     N[3]=1/4*((1-u)*(1+v)-w-r);
+	     N[4]=w;
+	     
+	     return N;
+	}
 
 
 	//============
@@ -2738,7 +2998,7 @@ public class Calculator {
 		if(this.elCode==0) return jacobian3ang(vertexNode,localCo);
 		if(this.elCode==2) return jacobianTetra(vertexNode,localCo);
 		if(this.elCode==3) return jacobianPrism(vertexNode,localCo);
-
+		if(this.elCode==5) return jacobianPyramid(vertexNode,localCo);
 
 
 		Mat J=new Mat(this.dim,this.dim);
@@ -2805,6 +3065,25 @@ public class Calculator {
 		Vect[] gN=new Vect[this.nElVert];
 
 		gN=localGradNPrism(localCo);
+
+		for(int i=0;i<this.nElVert;i++) {
+			for(int j=0;j<this.dim;j++)
+				for(int k=0;k<this.dim;k++)
+					J.el[j][k]+=gN[i].el[j]* vertexNode[i].getCoord(k);
+		}
+
+		return J;
+	}
+
+	
+	public Mat jacobianPyramid(Node[] vertexNode,Vect localCo){
+
+		Mat J=new Mat(3,3);
+
+		Vect[] gN=new Vect[this.nElVert];
+	
+
+		gN=localGradNPyramid(localCo);
 
 		for(int i=0;i<this.nElVert;i++) {
 			for(int j=0;j<this.dim;j++)
@@ -4208,6 +4487,70 @@ public class Calculator {
 		return PW;
 	}
 
+	public double[][] gaussIntegPyramid(int n){
+	
+		double[][] PW=new double[n][4];
+
+		if(n==4){
+		int ix=0;
+		
+		PW[ix][0]=0.750000;
+		PW[ix][1]=0;
+		PW[ix][2]=1./2*(-0.500000000000000+1);
+		PW[ix][3]=0.699453551912568;
+		
+		ix++;
+		PW[ix][0]=-0.266666666666667;
+		PW[ix][1]=0.700991361493770;
+		PW[ix][2]=1/2*(-0.500000000000000+1);
+		PW[ix][3]=0.699453551912568;
+		
+		
+		ix++;
+		PW[ix][0]=-0.266666666666667;
+		PW[ix][1]=-0.386753854617252;
+		PW[ix][2]=1/2*(+0.131034482758621+1);
+		PW[ix][3]=0.560442489670798;
+		
+		ix++;
+		PW[ix][0]=-0.266666666666667;
+		PW[ix][1]=-0.386753854617252;
+		PW[ix][2]=1/2*(-1.000000000000000+1);
+		PW[ix][3]=0.699453551912568;
+		
+	}
+		else if(n==8){
+			
+
+	 double upyr8[] = {0.2631840555694285,-0.2631840555694285,
+				  0.2631840555694285,-0.2631840555694285,
+				  0.5066163033492386,-0.5066163033492386,
+				  0.5066163033492386,-0.5066163033492386};
+	 double vpyr8[] = {0.2631840555694285,0.2631840555694285,
+				  -0.2631840555694285,-0.2631840555694285,
+				  0.5066163033492386,0.5066163033492386,
+				  -0.5066163033492386,-0.5066163033492386};
+	 double wpyr8[] = {0.544151844011225,0.544151844011225,
+				  0.544151844011225,0.544151844011225,
+				  0.122514822655441,0.122514822655441,
+				  0.122514822655441,0.122514822655441};
+	 
+	 double ppyr8[] = {0.100785882079825,0.100785882079825,
+				  0.100785882079825,0.100785882079825,
+				  0.232547451253508,0.232547451253508,
+				  0.232547451253508,0.232547451253508};
+	 
+	 for(int i=0;i<n;i++){
+		 PW[i][0]=upyr8[i];
+		 PW[i][1]=vpyr8[i];
+		 PW[i][2]=wpyr8[i];
+		 PW[i][3]=ppyr8[i];
+		 }
+	}
+
+
+		return PW;
+	}
 	public double[][] gaussIntegTetra(int n){
 
 

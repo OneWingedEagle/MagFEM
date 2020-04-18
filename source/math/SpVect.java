@@ -414,6 +414,15 @@ public SpVect deepCopy(){
 		
 		util.hshow(el);
 	}
+	
+	public void shownzA(){
+		System.out.format(" Sparse Vector ********  dimention: %d  size: %d \n",length, nzLength);
+	
+				for(int j=0;j<nzLength;j++)
+				System.out.format(" ( %d )  %25.12e\n",index[j], el[j]);
+	}
+	
+	
 public void showr(){
 		
 		util.hshow(index);

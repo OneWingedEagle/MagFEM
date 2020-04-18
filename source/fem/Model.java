@@ -663,6 +663,13 @@ public class Model{
 			edge[unknownEdgeNumber[i]].setSolvedAL(x.el[i-1]);	
 
 		}
+		
+		Vect BB=new Vect(1,0,0);
+		for(int i=1;i<=numberOfEdges;i++){
+			Vect v=edge[i].node[1].getCoord().sub(edge[i].node[0].getCoord());
+			double a=BB.dot(v);
+			edge[i].setSolvedAL(a);	
+		}
 
 
 		if(this.hasPBC ){
@@ -930,6 +937,7 @@ public class Model{
 
 		if( this.elCode==2) return getElementVolumeTetra( i);
 		if( this.elCode==3) return getElementVolumePrism( i);
+		
 
 		if(dim==2) return 0;
 		double vol=0;
@@ -1683,6 +1691,7 @@ public class Model{
 		else if(this.elCode==1) lc=new Vect(2);
 		else if(this.elCode==2) lc=new Vect().ones(4).times(1./4);
 		else if(this.elCode==4) lc=new Vect(3);
+		else if(this.elCode==5) lc=new Vect(0,0,1./3);
 		
 		return lc;
 	}

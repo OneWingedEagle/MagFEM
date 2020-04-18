@@ -558,7 +558,7 @@ public Vect add(double a){
 		int I;
 		I=this.length;
 		for(int i=0;i<I;i++)
-				System.out.format("%10.5e\n",this.el[i]);
+				System.out.format("%10.8e\n",this.el[i]);
 		System.out.println();
 
 	}
@@ -574,13 +574,13 @@ public Vect add(double a){
 		int nf=(int)log10(am);
 		if(nf<5)
 		for(int i=0;i<I;i++)
-				System.out.format("%15.5f\t",this.el[i]);
+				System.out.format("%15.8f\t",this.el[i]);
 		else if(nf<10)
 			for(int i=0;i<I;i++)
-				System.out.format("%20.5f\t",this.el[i]);
+				System.out.format("%20.8f\t",this.el[i]);
 		else
 			for(int i=0;i<I;i++)
-				System.out.format("%25.5f\t",this.el[i]);
+				System.out.format("%25.8f\t",this.el[i]);
 		System.out.println();
 
 	}

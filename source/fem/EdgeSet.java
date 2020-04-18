@@ -11,27 +11,20 @@ public class EdgeSet {
 
 		if(model.dim==2) {setEdge2D(model); return;}
 
-		if(model.elCode==2) {setEdgeTetra(model); return;}
-
-		if(model.elCode==3) {setEdgePrism(model); return;}
+		byte[][] edgeLocalNodesHexa={{6,7},{5,4},{2,3},{1,0},{6,5},{7,4},{2,1},{3,0},{6,2},{7,3},{5,1},{4,0}};
+		byte[][] edgeLocalNodesTetra={{0,1},{1,2},{2,0},{0,3},{1,3},{2,3}};
+		byte[][] edgeLocalNodesPryism={{0,1},{1,2},{2,0},{3,4},{4,5},{5,3},{0,3},{1,4},{2,5}};
+		byte[][] edgeLocalNodesPyramid={{0,1},{1,2},{2,3},{3,0},{0,4},{1,4},{2,4},{3,4}};
 		
-		if(model.elCode==4) {setEdgeHexa(model); return;}
-
-		
-		if(model.elCode==5) {setEdgePyramid(model); return;}
-
-
-		//
-	
-
-	
-
-	
-	}
-
-	public void setEdgeHexa(Model model){
-
-		byte[][] edgeLocalNodes={{6,7},{5,4},{2,3},{1,0},{6,5},{7,4},{2,1},{3,0},{6,2},{7,3},{5,1},{4,0}};
+		byte[][] edgeLocalNodes=null;
+		if(model.elCode==2)
+			edgeLocalNodes=edgeLocalNodesTetra;
+		else if(model.elCode==3)
+			edgeLocalNodes=edgeLocalNodesPryism;
+		else if(model.elCode==4)
+			edgeLocalNodes=edgeLocalNodesHexa;
+		else if(model.elCode==5)
+			edgeLocalNodes=edgeLocalNodesPyramid;
 
 
 		IntVect[][] nodeNode=new IntVect[2][model.numberOfNodes+1];
@@ -113,188 +106,7 @@ public class EdgeSet {
 		
 		System.gc();
 
-	}
-
-	public void setEdgeTetra(Model model){
-
-
-		byte[][] edgeLocalNodes={{0,1},{1,2},{2,0},{0,3},{1,3},{2,3}};
-
-		int[][][] nodeNode=new int[2][model.numberOfNodes+1][5*model.nBoundary];
-		byte[] nodeNodeIndex=new byte[model.numberOfNodes+1];
-		int nEdge=0;
-		int n1,n2,m;
-		int[][] edgeNodes=new int[20*model.numberOfNodes+1][2];
-
-		boolean[][] edgeEdgeRev=new boolean[model.numberOfElements+1][model.nElEdge];
-
-			for(int i=1;i<=model.numberOfElements;i++){
-			int[] vertNumb=model.element[i].getVertNumb();
-			for(int j=0;j<model.nElEdge;j++){
-				n1=vertNumb[edgeLocalNodes[j][0]];
-				n2=vertNumb[edgeLocalNodes[j][1]];
-				if(n2<n1) { int tmp=n1; n1=n2; n2=tmp; edgeEdgeRev[i][j]=true;}
-				m=util.search(nodeNode[0][n1],n2);
-
-				if(m<0){
-
-					nEdge++;
-					edgeNodes[nEdge][0]=n1;
-					edgeNodes[nEdge][1]=n2;
-					nodeNode[0][n1][nodeNodeIndex[n1]]=n2;
-					nodeNode[1][n1][nodeNodeIndex[n1]++]=nEdge;
-					model.element[i].setEdgeNumb(j,nEdge);
-				}
-				else
-					model.element[i].setEdgeNumb(j,nodeNode[1][n1][m]);
-
-			}
-
-		}
-
-		model.numberOfEdges=nEdge;
-
-		model.edge=new Edge[model.numberOfEdges+1];
-
-		for(int i=1;i<=nEdge;i++){
-			model.edge[i]=new Edge(model.node[edgeNodes[i][0]],model.node[edgeNodes[i][1]]);
-			model.edge[i].setLength(model.edgeLength(i));
-
-		}
-
-		for(int i=1;i<=model.numberOfElements;i++){
-			model.element[i].setEdgeReverse(edgeEdgeRev[i]);
-			
-		}
-
-		model.setMinEdge();
-		model.setMaxEdge();
-
-	}
 	
-	public void setEdgePyramid(Model model){
-
-
-		byte[][] edgeLocalNodes={{0,1},{1,2},{2,3},{3,0},{0,4},{1,4},{2,4},{3,4}};
-
-		int[][][] nodeNode=new int[2][model.numberOfNodes+1][5*model.nBoundary];
-		byte[] nodeNodeIndex=new byte[model.numberOfNodes+1];
-		int nEdge=0;
-		int n1,n2,m;
-		int[][] edgeNodes=new int[10*model.numberOfNodes+1][2];
-
-		boolean[][] edgeEdgeRev=new boolean[model.numberOfElements+1][model.nElEdge];
-
-		for(int i=1;i<=model.numberOfElements;i++){
-			int[] vertNumb=model.element[i].getVertNumb();
-			for(int j=0;j<model.nElEdge;j++){
-				n1=vertNumb[edgeLocalNodes[j][0]];
-				n2=vertNumb[edgeLocalNodes[j][1]];
-				if(n2<n1) { int tmp=n1; n1=n2; n2=tmp;edgeEdgeRev[i][j]=true;}
-				m=util.search(nodeNode[0][n1],n2);
-
-				if(m<0){
-
-					nEdge++;
-					edgeNodes[nEdge][0]=n1;
-					edgeNodes[nEdge][1]=n2;
-					nodeNode[0][n1][nodeNodeIndex[n1]]=n2;
-					nodeNode[1][n1][nodeNodeIndex[n1]++]=nEdge;
-					model.element[i].setEdgeNumb(j,nEdge);
-				}
-				else
-					model.element[i].setEdgeNumb(j,nodeNode[1][n1][m]);
-
-			}
-
-		}
-
-		model.numberOfEdges=nEdge;
-
-		model.edge=new Edge[model.numberOfEdges+1];
-
-		for(int i=1;i<=nEdge;i++){
-			model.edge[i]=new Edge(model.node[edgeNodes[i][0]],model.node[edgeNodes[i][1]]);
-
-		//	model.edge[i]=new Edge(edgeNodes[i][0],edgeNodes[i][1]);
-			model.edge[i].setLength(model.edgeLength(i));
-
-		}
-		
-		for(int i=1;i<=model.numberOfElements;i++){
-			
-			model.element[i].setEdgeReverse(edgeEdgeRev[i]);
-			
-		}
-
-
-
-		model.setMinEdge();
-		model.setMaxEdge();
-
-	}
-
-	public void setEdgePrism(Model model){
-
-
-		byte[][] edgeLocalNodes={{0,1},{1,2},{2,0},{3,4},{4,5},{5,3},{0,3},{1,4},{2,5}};
-		
-	//	byte[][] edgeLocalNodes={{1,2},{2,0},{0,1},{4,5},{5,3},{3,4},{1,4},{2,5},{0,3}};
-
-		int[][][] nodeNode=new int[2][model.numberOfNodes+1][5*model.nBoundary];
-		byte[] nodeNodeIndex=new byte[model.numberOfNodes+1];
-		int nEdge=0;
-		int n1,n2,m;
-		int[][] edgeNodes=new int[20*model.numberOfNodes+1][2];
-
-		boolean[][] edgeEdgeRev=new boolean[model.numberOfElements+1][model.nElEdge];
-
-		for(int i=1;i<=model.numberOfElements;i++){
-			int[] vertNumb=model.element[i].getVertNumb();
-			for(int j=0;j<model.nElEdge;j++){
-				n1=vertNumb[edgeLocalNodes[j][0]];
-				n2=vertNumb[edgeLocalNodes[j][1]];
-				if(n2<n1) { int tmp=n1; n1=n2; n2=tmp; edgeEdgeRev[i][j]=true;}
-				m=util.search(nodeNode[0][n1],n2);
-
-				if(m<0){
-
-					nEdge++;
-					edgeNodes[nEdge][0]=n1;
-					edgeNodes[nEdge][1]=n2;
-					nodeNode[0][n1][nodeNodeIndex[n1]]=n2;
-					nodeNode[1][n1][nodeNodeIndex[n1]++]=nEdge;
-					model.element[i].setEdgeNumb(j,nEdge);
-				}
-				else
-					model.element[i].setEdgeNumb(j,nodeNode[1][n1][m]);
-
-			}
-
-		}
-
-		model.numberOfEdges=nEdge;
-
-		model.edge=new Edge[model.numberOfEdges+1];
-
-		for(int i=1;i<=nEdge;i++){
-			model.edge[i]=new Edge(model.node[edgeNodes[i][0]],model.node[edgeNodes[i][1]]);
-
-		//	model.edge[i]=new Edge(edgeNodes[i][0],edgeNodes[i][1]);
-			model.edge[i].setLength(model.edgeLength(i));
-
-		}
-
-		for(int i=1;i<=model.numberOfElements;i++){
-			
-			model.element[i].setEdgeReverse(edgeEdgeRev[i]);
-			
-		}
-
-		model.setMinEdge();
-		model.setMaxEdge();
-
-		//setSurfPrism(model);
 	}
 
 	public void setEdge2D(Model model){
