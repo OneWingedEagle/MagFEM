@@ -1,10 +1,13 @@
 package fem;
+import static java.lang.Math.PI;
+
 import java.io.File;
 
 import java.text.DecimalFormat;
 
 import femSolver.StaticElectricSolver;
 import main.Main;
+import math.Mat;
 import math.Vect;
 import math.util;
 
@@ -231,7 +234,8 @@ public class RunMag {
 		//	util.plot(errs);
 
 
-
+	///	model.plotNe(1,4);
+	
 
 	}
 

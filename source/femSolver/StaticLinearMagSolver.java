@@ -21,13 +21,17 @@ public class StaticLinearMagSolver{
 	public StaticLinearMagSolver(){	}
 
 	public Vect solve(Model model,int step,Vect x_init){
+
 		
 		this.stepNumb=step;
-		
-		if(!usePrev || x_init.length==0)
+
+		if(!usePrev || x_init.length==0){
 			x_init=new Vect(model.numberOfUnknowns);
 
+		}
 
+		if(model.numberOfUnknowns==0)
+			return new Vect(model.numberOfUnknowns);
 	
 	SpMat L=new SpMat();
 

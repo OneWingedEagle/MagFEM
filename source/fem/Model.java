@@ -663,12 +663,45 @@ public class Model{
 			edge[unknownEdgeNumber[i]].setSolvedAL(x.el[i-1]);	
 
 		}
-		
-		Vect BB=new Vect(1,0,0);
-		for(int i=1;i<=numberOfEdges;i++){
+
+		for(int i=1;i<=0*numberOfEdges;i++){
+			///if(i>1) continue;
+			edge[i].A=0;
+		}
+		Vect BB=new Vect(0,0,1);
+/*		for(int i=1;i<=this.numberOfElements;i++){
+		//	if(i!=5) continue;
+			int[] en=element[i].getEdgeNumb();
+			//boolean[] edgeDir=element[i].getEdgeReverse();
+
+			for(int j=0;j<en.length;j++){
+				int n=en[j];
+				Vect v=edge[n].node[1].getCoord().sub(edge[n].node[0].getCoord());
+				//	v.hshow();
+					Vect c=edge[n].node[1].getCoord().add(edge[n].node[0].getCoord()).times(.5);
+					double a=BB.dot(v);//*c.el[1];
+
+					util.pr(a);
+					edge[n].A=a;
+			}
+			
+		}*/
+	
+		for(int i=1;i<=0*numberOfEdges;i++){
+			///if(i>1) continue;
 			Vect v=edge[i].node[1].getCoord().sub(edge[i].node[0].getCoord());
-			double a=BB.dot(v);
-			edge[i].setSolvedAL(a);	
+			//v.hshow();
+			Vect c=edge[i].node[1].getCoord().add(edge[i].node[0].getCoord()).times(.5);
+			double a=BB.dot(v);//*c.el[1];
+		//	util.pr(a);
+		//	a=1;
+			//Vect v1=v.normalized();
+			//if(v1.dot(BB)>.1e-7) a=1;
+			//else if(v1.dot(BB)<-.1e-7) a=-1;
+		//	else if(v1.dot(BB)<-.8) a=-1;
+			//else a=0;
+		//	util.pr(a);
+			edge[i].A=a;
 		}
 
 
@@ -730,7 +763,11 @@ public class Model{
 			Mat jac=femCalc.jacobian(vertexNode,lc);
 			Vect B;
 			Vect[] rotNe=femCalc.rotNe(jac,lc,edgeDir);
-	
+		//////	util.pr("[u,v,w]   : ");
+			//lc.hshow();
+			///util.pr("rotNe[4]   : ");
+			
+			///rotNe[4].hshow();
 			B=getElementB(i,rotNe);
 
 		return B;
@@ -893,9 +930,7 @@ public class Model{
 		Edge[] edge=elementEdges(i);
 		Vect B=new Vect(dim);
 		for(int j=0;j<nElEdge;j++)		{
-		//	util.pr(edge[j].A);
-		//	rotNe[j].hshow();
-			
+
 		B=B.add(rotNe[j].times(edge[j].A));
 		}
 	
@@ -2137,8 +2172,9 @@ public double getElementA3ang(int ie,Vect lc){
 		Vect lc=this.centerLocalCo();
 
 		for(int i=1;i<=numberOfElements;i++){
-			
+		
 			Vect B=getElementB(i,lc);
+
 			element[i].setB(B);
 			Bn2=B.dot(B);
 			if(Bn2>Bmax2)
@@ -2606,6 +2642,112 @@ public void solveCoils(){
 	
 	
 	
+}
+
+public void plotNe(int ie,int ish){
+	
+
+	int nd=8;
+	int ndw=1;
+	int nelm=nd*nd*ndw;
+	int nreg=1;
+	 int nNodes=nelm*8;;
+	 
+		double du=2./nd;
+		double dv=2./nd;
+		double dw=2./nd;
+		
+	Model md0=new Model(nreg,nelm,nNodes,"hexahedron");
+	
+
+	md0.region[1].setMaterial("mat"+1);
+	md0.region[1].setName("reg"+1);
+	
+	md0.region[1].setFirstEl(1);
+	md0.region[1].setLastEl(nelm);
+	int n1=1,N;
+
+	   int nx=0;
+	   int kx=0;
+	   for(int k=0;k<ndw;k++){
+	   for(int j=0;j<nd;j++){
+
+	   for(int p=0;p<nd;p++){
+	
+		//   util.pr(kx);
+			Vect lc=new Vect(-1+j*du,-1+p*dv,k*dw);
+			md0.element[kx+1].setVertNumb(0, kx*8+1);  
+			md0.element[kx+1].setVertNumb(1,kx*8+2); 
+			md0.element[kx+1].setVertNumb(2, kx*8+3); 
+			md0.element[kx+1].setVertNumb(3, kx*8+4); 
+			md0.element[kx+1].setVertNumb(4, kx*8+5);  
+			md0.element[kx+1].setVertNumb(5,kx*8+6); 
+			md0.element[kx+1].setVertNumb(6, kx*8+7); 
+			md0.element[kx+1].setVertNumb(7, kx*8+8);
+	   
+	   double u=lc.el[0];
+	   double v=lc.el[1];
+	   double w=lc.el[2];
+	   Vect vv=new Vect(u,v,w+dw);
+	   md0.node[kx*8+1].setCoord(vv);
+	   vv=new Vect(u+du,v,w+dw);
+	   md0.node[kx*8+2].setCoord(vv);
+	   vv=new Vect(u+du,v+dv,w+dw);
+	   md0.node[kx*8+3].setCoord(vv);
+	   vv=new Vect(u,v+dv,w+dw);
+	   md0.node[kx*8+4].setCoord(vv);
+	   
+	   vv=new Vect(u,v,w);
+	   md0.node[kx*8+5].setCoord(vv);
+	   vv=new Vect(u+du,v,w);
+	   md0.node[kx*8+6].setCoord(vv);
+	   vv=new Vect(u+du,v+dv,w);
+	   md0.node[kx*8+7].setCoord(vv);
+	   vv=new Vect(u,v+dv,w);
+	   md0.node[kx*8+8].setCoord(vv);
+	   kx++;
+		   }
+		   
+	   }
+	   }
+
+	   String folder=new File(this.meshFilePath).getParentFile().getPath();
+	  
+	   md0.writeMesh(folder+"\\bunNe.txt");
+	   
+		boolean[] edgeDir=element[ie].getEdgeReverse();
+
+		Node[] vertexNode=elementNodes(ie);
+		
+	   kx=0;
+	   double w0=1./3;
+	   double dw1=1./nd;
+	   for(int k=0;k<ndw;k++)
+	for(int j=0;j<nd;j++)
+		for(int p=0;p<nd;p++){
+		Vect lc=new Vect(-1+j*du,-1+p*dv,k*dw1+w0);
+	Mat jac=femCalc.jacobian(vertexNode,lc);
+
+
+	Vect[] rotNe=femCalc.Ne(jac,lc,edgeDir);
+	
+	if(j==4 && p==4) {
+		util.pr("[u,v,w]   : ");
+		lc.hshow();
+		jac.show("%5.3e");
+		for(int m=0;m<8;m++)
+			rotNe[m].hshow();
+	}
+	kx++;
+	//// if(p<k||p>nd-k||j<k||j>nd-k)rotNe[ish].timesVoid(0);
+	 md0.element[kx].setB(rotNe[ish]);
+
+	}
+	   md0.writeB(folder+"\\Ne.txt");
+	//util.pr("[u,v,w]   : ");
+//	//lc.hshow();
+	//util.pr("rotNe[4]   : ");
+
 }
 }
 

@@ -14,7 +14,7 @@ public class EdgeSet {
 		byte[][] edgeLocalNodesHexa={{6,7},{5,4},{2,3},{1,0},{6,5},{7,4},{2,1},{3,0},{6,2},{7,3},{5,1},{4,0}};
 		byte[][] edgeLocalNodesTetra={{0,1},{1,2},{2,0},{0,3},{1,3},{2,3}};
 		byte[][] edgeLocalNodesPryism={{0,1},{1,2},{2,0},{3,4},{4,5},{5,3},{0,3},{1,4},{2,5}};
-		byte[][] edgeLocalNodesPyramid={{0,1},{1,2},{2,3},{3,0},{0,4},{1,4},{2,4},{3,4}};
+		byte[][] edgeLocalNodesPyramid={{0,1},{3,2},{0,3},{1,2},{0,4},{1,4},{2,4},{3,4}};
 		
 		byte[][] edgeLocalNodes=null;
 		if(model.elCode==2)
@@ -93,7 +93,7 @@ public class EdgeSet {
 	
 			model.edge[i]=new Edge(model.node[edgeNodes[0].el[i]],model.node[edgeNodes[1].el[i]]);
 			model.edge[i].setLength(model.edgeLength(i));
-			//util.pr("edge "+i+" ("+model.edge[i].node[0].id+"Å®"+model.edge[i].node[1].id+")");
+			util.pr("edge "+i+" ("+model.edge[i].node[0].id+"Å®"+model.edge[i].node[1].id+")");
 		}
 
 		for(int i=1;i<=model.numberOfElements;i++){
