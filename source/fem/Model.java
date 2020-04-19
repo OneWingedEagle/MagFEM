@@ -664,30 +664,34 @@ public class Model{
 
 		}
 
-		for(int i=1;i<=0*numberOfEdges;i++){
+		for(int i=1;i<=numberOfEdges;i++){
 			///if(i>1) continue;
 			edge[i].A=0;
 		}
 		Vect BB=new Vect(0,0,1);
-/*		for(int i=1;i<=this.numberOfElements;i++){
+	for(int i=1;i<=0*this.numberOfElements;i++){
 		//	if(i!=5) continue;
 			int[] en=element[i].getEdgeNumb();
-			//boolean[] edgeDir=element[i].getEdgeReverse();
+			boolean[] edgeDir=element[i].getEdgeReverse();
 
 			for(int j=0;j<en.length;j++){
 				int n=en[j];
+			//	util.pr(edge[n].node[0].id);
+			//	util.pr(edge[n].node[1].id);
 				Vect v=edge[n].node[1].getCoord().sub(edge[n].node[0].getCoord());
+			
 				//	v.hshow();
 					Vect c=edge[n].node[1].getCoord().add(edge[n].node[0].getCoord()).times(.5);
 					double a=BB.dot(v);//*c.el[1];
 
-					util.pr(a);
-					edge[n].A=a;
+					
+				//	util.pr(a);
+					edge[n].A=1;
 			}
 			
-		}*/
+		}
 	
-		for(int i=1;i<=0*numberOfEdges;i++){
+		for(int i=1;i<=1*numberOfEdges;i++){
 			///if(i>1) continue;
 			Vect v=edge[i].node[1].getCoord().sub(edge[i].node[0].getCoord());
 			//v.hshow();
@@ -699,8 +703,9 @@ public class Model{
 			//if(v1.dot(BB)>.1e-7) a=1;
 			//else if(v1.dot(BB)<-.1e-7) a=-1;
 		//	else if(v1.dot(BB)<-.8) a=-1;
-			//else a=0;
+			if(a<0) a=-a;
 		//	util.pr(a);
+
 			edge[i].A=a;
 		}
 
@@ -749,6 +754,7 @@ public class Model{
 
 	public Vect getElementB(int i,Vect lc){
 
+	//	lc.el[2]=.9999;
 		if(elCode==0&& !this.axiSym)set3angElementB(i);
 		else if(elCode==0) set3angElementAxiB(i);
 		else if(elCode==1&& !this.axiSym)setQuadElementB(i);
@@ -762,7 +768,7 @@ public class Model{
 			
 			Mat jac=femCalc.jacobian(vertexNode,lc);
 			Vect B;
-			Vect[] rotNe=femCalc.rotNe(jac,lc,edgeDir);
+			Vect[] rotNe=femCalc.Ne(jac,lc,edgeDir);
 		//////	util.pr("[u,v,w]   : ");
 			//lc.hshow();
 			///util.pr("rotNe[4]   : ");

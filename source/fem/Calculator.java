@@ -2772,20 +2772,23 @@ util.pr("volume of el "+ie+" = "+vol);
 		Ne[6]= grad[2].times((1-u)*(1+w)*0.25); 
 		Ne[7]= grad[2].times((1+u)*(1+w)*0.25); */
 
-
-		Ne[0]= grad[0].times((1-v-w)*0.25).add(grad[2].times((u-u*v)/(1-w)*0.25)); 
-		Ne[1]= grad[0].times((1+v-w)*0.25).add(grad[2].times((u+u*v)/(1-w)*0.25)); 
-	//	Ne[1]= grad[0].times(-(1+v-w)*0.25).add(grad[2].times((u+u*v)/(1-w)*0.25)); 
+		
+		Ne[0]= grad[0].times((1-v-w)*0.25).add(grad[2].times((u-u*v/(1-w))*0.25)); 
+		Ne[1]= grad[0].times((1+v-w)*0.25).add(grad[2].times((u+u*v/(1-w))*0.25)); 
+		//Ne[1]= grad[0].times(-(1+v-w)*0.25).add(grad[2].times(u+u*v/(1-w)*0.25)); 
 	
 
-		Ne[2]=  grad[1].times((1-u-w)*0.25).add(grad[2].times((v-u*v)/(1-w)*0.25)); 
-		Ne[3]= grad[1].times((1-u-w)*0.25).add(grad[2].times((v-u*v)/(1-w)*0.25)); 
-		//Ne[3]=  grad[1].times((1+u-w)*0.25).add(grad[2].times((v+u*v)/(1-w)*0.25)); 
+		Ne[2]=  grad[1].times((1-u-w)*0.25).add(grad[2].times((v-u*v/(1-w))*0.25));
+		Ne[3]= grad[1].times((1-u-w)*0.25).add(grad[2].times((v-u*v/(1-w))*0.25)); 
+		//Ne[3]=  grad[1].times((1+u-w)*0.25).add(grad[2].times((v+u*v/(1-w))*0.25));
 	
 		Ne[4]= grad[0].times((w-v*w/(1-w))*0.25).add(grad[1].times((w-u*w/(1-w))*0.25)).add(grad[2].times((1-u-v+u*v*(1-2*w)/pow(1-w,2))*.25)); 
 		Ne[5]= grad[0].times(-(w-v*w/(1-w))*0.25).add(grad[1].times(-(w+u*w/(1-w))*0.25)).add(grad[2].times((1+u-v-u*v*(1-2*w)/pow(1-w,2))*0.25)); 
 		Ne[6]= grad[0].times(-(w+v*w/(1-w))*0.25).add(grad[1].times(-(w+u*w/(1-w))*0.25)).add(grad[2].times((1+u+v+u*v*(1-2*w)/pow(1-w,2))*0.25)); 
 		Ne[7]= grad[0].times((w+v*w/(1-w))*0.25).add(grad[1].times((w-u*w/(1-w))*0.25)).add(grad[2].times((1-u+v-u*v*(1-2*w)/pow(1-w,2))*0.25)); 
+		
+	//	for(int k=0;k<Ne.length;k++) Ne[k].hshow();
+	///	Ne[k].timesVoid(0);
 		
 		for(int k=0;k<Ne.length;k++)
 			if(edgeReverse[k])
