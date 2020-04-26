@@ -93,7 +93,7 @@ public class EdgeSet {
 	
 			model.edge[i]=new Edge(model.node[edgeNodes[0].el[i]],model.node[edgeNodes[1].el[i]]);
 			model.edge[i].setLength(model.edgeLength(i));
-			util.pr("edge "+i+" ("+model.edge[i].node[0].id+"Å®"+model.edge[i].node[1].id+")");
+		//	util.pr("edge "+i+" ("+model.edge[i].node[0].id+"Å®"+model.edge[i].node[1].id+")");
 		}
 
 		for(int i=1;i<=model.numberOfElements;i++){

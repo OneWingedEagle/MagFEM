@@ -186,6 +186,8 @@ public class RunMag {
 				String fluxFile = fluxFolder+"\\flux"+step+".txt";
 				if(step==nBegin)
 					model.writeMesh(fluxFolder+"\\bun"+step+".txt");
+				
+				model.writer.writeA_as_flux(model,fluxFolder+"\\A"+step+".txt");
 				model.writeB(fluxFile);
 
 			}
@@ -234,8 +236,7 @@ public class RunMag {
 		//	util.plot(errs);
 
 
-		model.plotNe(1,0);
-	
+		model.plotShapePyr(1,0,false);
 
 	}
 

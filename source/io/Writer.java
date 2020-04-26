@@ -2260,8 +2260,9 @@ Vect[] v=new Vect[A.length];
 	
 
 	public double outputLoss(Model model,String file,int step,double phase_time,boolean append){
-		
 
+		if(model.elCode==5) return 0;	
+		
 		double totalLoss=0;
 		try{
 			PrintWriter pw=new PrintWriter(new BufferedWriter(new FileWriter(file,append)));
@@ -2303,6 +2304,7 @@ Vect[] v=new Vect[A.length];
 	public double outputEnergies(Model model,String file,int step,double phase_time,boolean append){
 	
 
+		if(model.elCode==5) return 0;
 
 		double totalEnergy=0;
 		try{

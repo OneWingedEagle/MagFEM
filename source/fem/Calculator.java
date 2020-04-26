@@ -1630,7 +1630,7 @@ public class Calculator {
 		model.C=C;
 		model.Cj=Cj;
 
-util.pr("volume of el "+ie+" = "+vol);
+//util.pr("volume of el "+ie+" = "+vol);
 		return H1;
 
 
@@ -2272,17 +2272,23 @@ util.pr("volume of el "+ie+" = "+vol);
 			grad[j]=invJac.getColVect(j);
 
 		Vect[] rotNe=new Vect[8];
+		
+		Vect[] cross=new Vect[3];
+		
 
+		cross[0]=grad[1].cross(grad[2]);
+		cross[1]=grad[2].cross(grad[0]);
+		cross[2]=grad[0].cross(grad[1]);
 		
-		rotNe[0] =  grad[0].times(-0.25*u/(1 - w)+0.0).add(grad[1].times(+0.25*v/(1 - w)-0.5)).add(grad[2].times(+0.25));
-		rotNe[1] =  grad[0].times(+0.25*u/(1 - w)+0.0).add(grad[1].times(-0.25*v/(1 - w)-0.5)).add(grad[2].times(-0.25));
-		rotNe[2] =  grad[0].times(+0.25*u/(1 - w)+0.5).add(grad[1].times(-0.25*v/(1 - w)+0.0)).add(grad[2].times(+0.25));
-		rotNe[3] =  grad[0].times(-0.25*u/(1 - w)+0.5).add(grad[1].times(+0.25*v/(1 - w)+0.0)).add(grad[2].times(-+0.25));
+		rotNe[0] =  cross[0].times(-0.25*u/(1 - w)+0.0).add(cross[1].times(+0.25*v/(1 - w)-0.5)).add(cross[2].times(+0.25));
+		rotNe[1] =  cross[0].times(+0.25*u/(1 - w)+0.0).add(cross[1].times(-0.25*v/(1 - w)-0.5)).add(cross[2].times(-0.25));
+		rotNe[2] =  cross[0].times(+0.25*u/(1 - w)+0.5).add(cross[1].times(-0.25*v/(1 - w)+0.0)).add(cross[2].times(+0.25));
+		rotNe[3] =  cross[0].times(-0.25*u/(1 - w)+0.5).add(cross[1].times(+0.25*v/(1 - w)+0.0)).add(cross[2].times(-+0.25));
 		
-		rotNe[4] = grad[0].times(-0.5*(1-u/(1-w))).add(grad[1].times(+0.5*(1-v/(1-w))));
-		rotNe[5] = grad[0].times(-0.5*(1+u/(1-w))).add(grad[1].times(-0.5*(1-v/(1-w))));
-		rotNe[6] = grad[0].times(+0.5*(1+u/(1-w))).add(grad[1].times(-0.5*(1+v/(1-w))));
-		rotNe[7] = grad[0].times(+0.5*(1-u/(1-w))).add(grad[1].times(+0.5*(1+v/(1-w))));
+		rotNe[4] = cross[0].times(-0.5*(1-u/(1-w))).add(cross[1].times(+0.5*(1-v/(1-w))));
+		rotNe[5] = cross[0].times(-0.5*(1+u/(1-w))).add(cross[1].times(-0.5*(1-v/(1-w))));
+		rotNe[6] = cross[0].times(+0.5*(1+u/(1-w))).add(cross[1].times(-0.5*(1+v/(1-w))));
+		rotNe[7] = cross[0].times(+0.5*(1-u/(1-w))).add(cross[1].times(+0.5*(1+v/(1-w))));
 		
 
 		for(int k=0;k<rotNe.length;k++){
@@ -2414,23 +2420,10 @@ util.pr("volume of el "+ie+" = "+vol);
 		double u=localCo.el[0];
 		double v=localCo.el[1];
 		double w=(localCo.el[2]);
-	//	localCo.show();
-	
-/*		r=u*v*w/(1-w);
-        N.PYRAMIDS(:,:,ii,1)=1/4*((1-u)*(1-v)-w+r);
-        N.PYRAMIDS(:,:,ii,2)=1/4*((1+u)*(1-v)-w-r);
-        N.PYRAMIDS(:,:,ii,3)=1/4*((1+u)*(1+v)-w+r);
-        N.PYRAMIDS(:,:,ii,4)=1/4*((1-u)*(1+v)-w-r);
-        N.PYRAMIDS(:,:,ii,5)=w;
-        */
+
+
 		Vect[] gradN=new Vect[5];
 		
-		// w has a value betwen 0 and 1
-	//	w=0;
-		//w=2*(w-.5);
-		//w=-1;
-		//u=-1;
-	//	v=-1;
 		
 		double r2=0;
 		if(w!=1)
@@ -2704,8 +2697,10 @@ util.pr("volume of el "+ie+" = "+vol);
 
 		Vect[] grad=new Vect[3];
 
-		for(int j=0;j<3;j++)
+		for(int j=0;j<3;j++){
 			grad[j]=invJac.getColVect(j);
+		}
+		
 
 
 		double u=a;
@@ -3159,11 +3154,12 @@ util.pr("volume of el "+ie+" = "+vol);
 
 		for(int i=0;i<this.nElVert;i++) {
 			for(int j=0;j<this.dim;j++)
-				for(int k=0;k<this.dim;k++)
+				for(int k=0;k<this.dim;k++){
 					J.el[j][k]+=gN[i].el[j]* vertexNode[i].getCoord(k);
+				
+				}
 		}
 
-	//	J.show();
 		return J;
 	}
 
