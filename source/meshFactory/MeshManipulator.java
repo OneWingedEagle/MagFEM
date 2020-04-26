@@ -71,15 +71,15 @@ public class MeshManipulator {
 			double val=min*(xx-1)*(xx-max)/((min-1)*(min-max))+mean*(xx-min)*(xx-max)/((1-min)*(1-max))+max*(xx-min)*(xx-1)/((max-min)*(max-1));
 			cc.el[k]=val;
 		}
-		util.plot(cc);
+	//	util.plot(cc);
 		//mf.extractReg(regs);mf.dropUnusedNodes();
 	//	mf.translate(new Vect(0,.0,.005));
 		//Model model=new Model("D:\\JavaWorks\\FEM problems\\Hamed solver\\bun1elem.txt");
 		//model.setEdge();
 	//mf.reRegionb();
-	//	int[] nrs={1,2};
-	//mf.connectivity(1e-5,nrs);	mf.dropUnusedNodes();
-//		mf.dropUnusedNodes();
+		int[] nrs={1,2};
+//	mf.connectivity(1e-5,nrs);	mf.dropUnusedNodes();
+		mf.dropUnusedNodes();
 
 	//	mf.assemble();
 	//	mf.copy(new Vect(.0,-.1), 1);

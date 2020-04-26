@@ -2273,68 +2273,21 @@ util.pr("volume of el "+ie+" = "+vol);
 
 		Vect[] rotNe=new Vect[8];
 
-		Vect cross12=grad[1].cross(grad[2]);
-		Vect cross20=grad[2].cross(grad[0]);
-		Vect cross01=grad[0].cross(grad[1]);
 		
-		//w=2*(w-.5);
+		rotNe[0] =  grad[0].times(-0.25*u/(1 - w)+0.0).add(grad[1].times(+0.25*v/(1 - w)-0.5)).add(grad[2].times(+0.25));
+		rotNe[1] =  grad[0].times(+0.25*u/(1 - w)+0.0).add(grad[1].times(-0.25*v/(1 - w)-0.5)).add(grad[2].times(-0.25));
+		rotNe[2] =  grad[0].times(+0.25*u/(1 - w)+0.5).add(grad[1].times(-0.25*v/(1 - w)+0.0)).add(grad[2].times(+0.25));
+		rotNe[3] =  grad[0].times(-0.25*u/(1 - w)+0.5).add(grad[1].times(+0.25*v/(1 - w)+0.0)).add(grad[2].times(-+0.25));
 		
-		rotNe[0]= grad[1].times(-w).add(grad[2].times((1-v))).times(0.25).cross(grad[0]); 
-		rotNe[1]= grad[1].times(w).add(grad[2].times((1+v))).times(0.25).cross(grad[0]); 
-	
-		rotNe[2]= grad[0].times(-w).add(grad[2].times((1-u))).times(0.125).cross(grad[1]);
-		rotNe[3]= grad[0].times(w).add(grad[2].times((1+u))).times(0.125).cross(grad[1]);
+		rotNe[4] = grad[0].times(-0.5*(1-u/(1-w))).add(grad[1].times(+0.5*(1-v/(1-w))));
+		rotNe[5] = grad[0].times(-0.5*(1+u/(1-w))).add(grad[1].times(-0.5*(1-v/(1-w))));
+		rotNe[6] = grad[0].times(+0.5*(1+u/(1-w))).add(grad[1].times(-0.5*(1+v/(1-w))));
+		rotNe[7] = grad[0].times(+0.5*(1-u/(1-w))).add(grad[1].times(+0.5*(1+v/(1-w))));
 		
-
-		rotNe[4]= grad[0].times(-(1-v)).add(grad[1].times(-(1-u))).times(0.25).cross(grad[2]);
-		rotNe[5]= grad[0].times((1-v)).add(grad[1].times(-(1+u))).times(0.25).cross(grad[2]);
-		rotNe[6]= grad[0].times(-(1+v)).add(grad[1].times(+(1-u))).times(0.25).cross(grad[2]);
-		rotNe[7]= grad[0].times((1+v)).add(grad[1].times(+(1+u))).times(0.25).cross(grad[2]);
-		
-		
-
-		
-	//	cross01.hshow();
-	//	w=0;
-	//	v=-1;
-
- 
-/*		rotNe[0] = cross01.times(u/(4*(w - 1))).add(cross20.times(- v/(4*(w - 1)) - 0.5)).add(cross01.times(.25));
-		rotNe[1] = cross12.times(0.5 - u/(4*(w - 1))).add(cross20.times(v/(4*(w - 1)))).add(cross01.times(.25));
-		rotNe[2] = cross12.times(u/(4*(w - 1))).add(cross20.times(0.5 - v/(4*(w - 1)))).add(cross01.times(.25));	
-		rotNe[3] = cross12.times(u/(4*(w - 1)) + 0.5).add(cross20.times(-v/(4*(w - 1)))).add(cross01.times(-.25));	
-		
-		rotNe[4] = cross12.times(-0.5*((u+w-1)/(w-1))).add(cross20.times(0.5*(v+w-1)/(w-1)));
-		rotNe[5] = cross12.times((u/(4*(w - 1)))).add(cross20.times(-0.5*((v+w-1)/(w-1))));	
-		rotNe[6] = cross12.times(-0.5*((u-w+1)/(w-1))).add(cross20.times(+0.5*((v-w+1)/(w-1))));
-		rotNe[7] = cross12.times(0.5*((u+w-1)/(w-1))).add(cross20.times(-0.5*((v-w+1)/(w-1))));*/
-		
-/*		rotNe[0]= grad[1].times(-(1-w)).add(grad[2].times(-(1-v))).times(0.125).cross(grad[0]); 
-		rotNe[2]= grad[1].times((1-w)).add(grad[2].times(-(1+v))).times(0.125).cross(grad[0]).times(-1);
-		rotNe[1]= grad[1].times(-(1+w)).add(grad[2].times(+(1-v))).times(0.125).cross(grad[1]);
-		rotNe[3]= grad[1].times((1+w)).add(grad[2].times(+(1+v))).times(0.125).cross(grad[1]).times(-1);*/
-		
-		//rotNe[0] = cross12.times(u/(4*(w - 1))).add(cross20.times(- v/(4*(w - 1)) - 0.5)).add(cross01.times(.25));
-	//	rotNe[1] = cross12.times(0.5 - u/(4*(w - 1))).add(cross20.times(v/(4*(w - 1)))).add(cross01.times(.25));
-		//rotNe[2] = cross12.times(u/(4*(w - 1))).add(cross20.times(0.5 - v/(4*(w - 1)))).add(cross01.times(.25));	
-		//rotNe[3] = cross12.times(u/(4*(w - 1)) + 0.5).add(cross20.times(-v/(4*(w - 1)))).add(cross01.times(-.25));	
-		
-		/*rotNe[4] = cross12.times(-0.5*((u+w-1)/(w-1))).add(cross20.times(0.5*(v+w-1)/(w-1)));
-		rotNe[5] = cross12.times((u/(4*(w - 1)))).add(cross20.times(-0.5*((v+w-1)/(w-1))));	
-		rotNe[6] = cross12.times(-0.5*((u-w+1)/(w-1))).add(cross20.times(+0.5*((v-w+1)/(w-1))));
-		rotNe[7] = cross12.times(0.5*((u+w-1)/(w-1))).add(cross20.times(-0.5*((v-w+1)/(w-1))));
-		*/
-		
-	//	for(int k=0;k<4;k++) ////rotNe[k].hshow();
-		//	rotNe[k].timesVoid(0);
 
 		for(int k=0;k<rotNe.length;k++){
 			if(edgeReverse[k])
 				rotNe[k].timesVoid(-1);
-		//	if(k<1)
-		//	rotNe[k].hshow();
-		//	if(k>0)
-			//	rotNe[k].timesVoid(0);
 		}
 
 
@@ -2758,34 +2711,20 @@ util.pr("volume of el "+ie+" = "+vol);
 		double u=a;
 		double v=b;
 		double w=c;
-		
-
-/*		Ne[0]= grad[0].times((1-v)*w*0.25); 
-		Ne[1]= grad[0].times((1+v)*w*0.25); 
-	
-
-		Ne[2]= grad[1].times((1-u)*w*0.25); 
-		Ne[3]= grad[1].times((1+u)*w*0.25); 
-		
-		Ne[4]= grad[2].times((1-u)*(1-w)*0.25); 
-		Ne[5]= grad[2].times((1+u)*(1-w)*0.25); 
-		Ne[6]= grad[2].times((1-u)*(1+w)*0.25); 
-		Ne[7]= grad[2].times((1+u)*(1+w)*0.25); */
-
-		
+				
 		Ne[0]= grad[0].times((1-v-w)*0.25).add(grad[2].times((u-u*v/(1-w))*0.25)); 
 		Ne[1]= grad[0].times((1+v-w)*0.25).add(grad[2].times((u+u*v/(1-w))*0.25)); 
-		//Ne[1]= grad[0].times(-(1+v-w)*0.25).add(grad[2].times(u+u*v/(1-w)*0.25)); 
+
 	
 
-		Ne[2]=  grad[1].times((1-u-w)*0.25).add(grad[2].times((v-u*v/(1-w))*0.25));
+		Ne[2]=  grad[1].times((1+u-w)*0.25).add(grad[2].times((v+u*v/(1-w))*0.25));
 		Ne[3]= grad[1].times((1-u-w)*0.25).add(grad[2].times((v-u*v/(1-w))*0.25)); 
-		//Ne[3]=  grad[1].times((1+u-w)*0.25).add(grad[2].times((v+u*v/(1-w))*0.25));
+
 	
 		Ne[4]= grad[0].times((w-v*w/(1-w))*0.25).add(grad[1].times((w-u*w/(1-w))*0.25)).add(grad[2].times((1-u-v+u*v*(1-2*w)/pow(1-w,2))*.25)); 
-		Ne[5]= grad[0].times(-(w-v*w/(1-w))*0.25).add(grad[1].times(-(w+u*w/(1-w))*0.25)).add(grad[2].times((1+u-v-u*v*(1-2*w)/pow(1-w,2))*0.25)); 
+		Ne[5]= grad[0].times(-(w-v*w/(1-w))*0.25).add(grad[1].times((w+u*w/(1-w))*0.25)).add(grad[2].times((1+u-v-u*v*(1-2*w)/pow(1-w,2))*0.25)); 
 		Ne[6]= grad[0].times(-(w+v*w/(1-w))*0.25).add(grad[1].times(-(w+u*w/(1-w))*0.25)).add(grad[2].times((1+u+v+u*v*(1-2*w)/pow(1-w,2))*0.25)); 
-		Ne[7]= grad[0].times((w+v*w/(1-w))*0.25).add(grad[1].times((w-u*w/(1-w))*0.25)).add(grad[2].times((1-u+v-u*v*(1-2*w)/pow(1-w,2))*0.25)); 
+		Ne[7]= grad[0].times(+(w+v*w/(1-w))*0.25).add(grad[1].times(-(w-u*w/(1-w))*0.25)).add(grad[2].times((1-u+v-u*v*(1-2*w)/pow(1-w,2))*0.25)); 
 		
 	//	for(int k=0;k<Ne.length;k++) Ne[k].hshow();
 	///	Ne[k].timesVoid(0);

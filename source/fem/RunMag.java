@@ -234,7 +234,7 @@ public class RunMag {
 		//	util.plot(errs);
 
 
-	///	model.plotNe(1,4);
+		model.plotNe(1,0);
 	
 
 	}
