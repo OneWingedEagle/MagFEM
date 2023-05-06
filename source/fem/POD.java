@@ -36,6 +36,8 @@ public class POD {
 	
 	public void setMagPOD(Model model, Main main){
 		
+		//model.POD=-1;
+		model.snapShot=1;
 		
 		double tStart=System.currentTimeMillis();
 

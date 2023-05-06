@@ -23,14 +23,14 @@ public class RunMag {
 	}
 
 	public void runMag(Model model, Main main){
-
-		model.POD=1;
-		model.snapShot=10;
+		
+		//model.POD=-1;
+		model.snapShot=0;
 		if(model.POD>0){
-			if(model.POD==1){
+			//if(model.POD==1){
 				POD pod=new POD();
 				pod.setMagPOD(model,main);	
-			}
+			//}
 	
 			return;
 		}
@@ -90,10 +90,11 @@ public class RunMag {
 
 		
 		Mat W=new Mat();
+		
+		model.setMagBC();
 
 		if(model.POD==-1){
-			
-			model.setMagBC();
+
 			W=new Mat(model.numberOfUnknowns,model.snapShot);
 		}
 
@@ -104,13 +105,15 @@ public class RunMag {
 		main.gui.lbX[1].setText("Trq. ");
 
 
-		model.setMagBC();
+		
 
 		model.solveCoils();
 
+	//	if(model.POD==-1) nEnd=model.snapShot;
 
 		for(int step=nBegin;step<=nEnd;step+=inc){
 			
+			//if(model.POD==-1 && step>nBegin) nEnd=model.snapShot;)
 
 			main.gui.tfX[0].setText((step)+"/"+nEnd);
 
@@ -215,8 +218,9 @@ public class RunMag {
 
 			model.writer.outputEnergies(model,model.resultFolder+"\\outputs.txt",step,model.getCurrentTime(),append);
 
-			T.el[ix++]=model.element[100].getB().el[1];
-			//T.el[ix++]=loss;
+			Vect B=model.getBAt(new Vect(0,0,0));
+			T.el[ix++]=B.el[1];
+			///T.el[ix++]=loss;
 
 
 			if(model.saveForce){

@@ -47,6 +47,9 @@ public class MeshManipulator {
 	public static void main(String[] args){
 
 		MeshManipulator mf=new MeshManipulator();
+		
+		//mf.extractReg(2);
+		mf.dropUnusedNodes();
 		int n1=1271;
 		for(int i=0;i<100;i++){
 			n1+=1;
@@ -76,7 +79,7 @@ public class MeshManipulator {
 	//	mf.translate(new Vect(0,.0,.005));
 		//Model model=new Model("D:\\JavaWorks\\FEM problems\\Hamed solver\\bun1elem.txt");
 		//model.setEdge();
-	mf.reRegionb();
+//	mf.reRegionb();
 		int[] nrs={1,2};
 //	mf.connectivity(1e-5,nrs);	mf.dropUnusedNodes();
 //		mf.dropUnusedNodes();
