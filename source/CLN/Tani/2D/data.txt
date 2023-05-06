@@ -1,0 +1,35 @@
+//data file format code  (0. Magnetic, 1. Mechanical, 2. coupled, 3:electrostatic) 
+3
+//dimension : 
+2
+//coordinate system  (0. Cartesian 1. Cylindrical, 2. Spherical): 
+0
+//Number_of_Regions:
+3
+// NUMBER OF STAGES
+1
+//REG_ID,BH_ID,mu,sigma,M
+1,0,1,5.8e7
+2,0,1,0
+3,0,1,5.8e7
+//Boundary conditions
+D
+D
+D
+D
+//numb of regs with current
+2
+1,0
+x,0,10,y,-10,10
+3,0
+x,-10,0,y,-10,10
+// unif field
+false
+// Connections
+NETWORK
+VPS 	1	1	2	1
+R 	2	2	3	1e-8
+FEM	3	3	4	1
+FEM	4	4	1	2
+END
+//false

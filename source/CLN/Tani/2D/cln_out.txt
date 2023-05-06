@@ -1,0 +1,11 @@
+*NO_MODES * NO_PORTS * R_TERMINATION * FOR_SPICE * 
+
+   1 	 1 	 0 	 0 
+*** LTspice .cir ************
+
+SPICE
+
+    R1_0 	 p1 	 n1_1 	 5.48765e-03
+    L1_1 	 n1_1 	 g1 	 3.80878e-08 	 Rser=0
+END
+
