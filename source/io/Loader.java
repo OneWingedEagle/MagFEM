@@ -523,6 +523,10 @@ public class Loader {
 				double phase=0;
 				if(ib<sp.length)
 				 phase= Double.parseDouble(sp[ib++]);
+				if(model.AC) {
+					per=1./model.freq;
+				}
+				
 				model.timeFunctions[id]=new TimeFunction(id,amp,per,phase);
 
 				}else if(type==1){

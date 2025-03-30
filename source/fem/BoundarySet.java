@@ -340,13 +340,13 @@ public class BoundarySet {
 						model.edge[i].setKnownA(0);
 						nDirichlet++;
 					//	break;					
-					}		
-					else if(model.BCtype[j]==0 && model.edge[i].node[0].onBound[j] && 
+					}else if(model.BCtype[j]==0 && model.edge[i].node[0].onBound[j] && 
 							model.edge[i].node[1].onBound[j]){
 						model.edge[i].edgeKnown=false;
 						nNeumann++;
 						//break;					
-					}			
+					}
+			
 				}
 			}
 			
@@ -884,7 +884,10 @@ public class BoundarySet {
 	
 	private void detectFarboundaryEdges(Model model){
 
-			if(model.elCode<2)  return;
+			if(model.elCode<2)  {
+				detectFarboundaryEdges2D(model);
+				return;
+			}
 			
 			int nEdge=model.numberOfEdges;
 
@@ -973,6 +976,45 @@ public class BoundarySet {
 
 	}
 
+
+	private void detectFarboundaryEdges2D(Model model){
+
+		if(model.elCode>1)  return;
+	
+		int nEdge=model.numberOfEdges;
+
+
+		int[] visited=new int[nEdge+1];
+		for(int i=1;i<=nEdge;i++){
+			visited[i]=0;
+		}
+		
+		for(int ir=1;ir<=model.numberOfRegions;ir++){
+
+		for(int i=model.region[ir].getFirstEl();i<=model.region[ir].getLastEl();i++){
+			
+			int[] edgeNumb=model.element[i].getEdgeNumb();
+
+			for(int j=0;j<model.nElEdge;j++){
+				int ne=edgeNumb[j];
+				visited[ne]++;
+			}			
+		}
+		}
+
+		
+		int nx=0;
+		for(int i=1;i<=nEdge;i++){
+
+			if(visited[i]<=2 && model.edge[i].map==0) {		
+				model.edge[i].setKnownA(0);
+				nx++;
+			}
+
+		}
+		
+		util.pr("Number of edges on far boundary = "+nx);
+	}
 
 
 }

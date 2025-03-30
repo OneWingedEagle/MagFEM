@@ -39,7 +39,7 @@ public class MagMatAssembler {
 		setReactMat(model);
 
 
-		if(model.analysisMode>0)
+		if(model.analysisMode>0 || model.AC)
 			setConductMat(model);
 
 		if(model.analysisMode>1 && model.dim==3){

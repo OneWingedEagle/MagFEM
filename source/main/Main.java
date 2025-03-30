@@ -114,6 +114,40 @@ import fem.RunMagAC;
 				 if(model.magAnalysis) {
 			
 					runMag(); 
+					
+					
+//					int ny=0;
+//					for(int i=1;i<=model.numberOfEdges;i++){
+//						if(model.edge[i].node[0].getCoord(1)==0) {
+//						ny++;
+//						}
+//					}
+//					Vect xA=new Vect(ny);
+//					Vect AA=new Vect(ny);
+//					int [] inds=new int[ny];
+//					ny=0;
+//					for(int i=1;i<=model.numberOfEdges;i++){
+//						if(model.edge[i].node[0].getCoord(1)==0) {
+//						xA.el[ny]=model.edge[i].node[0].getCoord(0);
+//						AA.el[ny]=model.edge[i].getA();
+//						inds[ny]=ny;
+//						ny++;
+//						}
+//					}
+//					util.quickSort(xA.el,inds);
+//					Vect AA2=new Vect(ny);
+//					for(int i=0;i<ny;i++) {
+//						AA2.el[i]=AA.el[inds[i]];
+//					}
+//					
+//					for(int i=1;i<=model.numberOfEdges;i++){
+//						if(model.edge[i].node[0].getR()>.299)
+//						util.pr("AAAAA on Bounday AAA "+i+"    "+model.edge[i].getA());
+//					}
+//
+//					xA.show();
+//					AA2.show();
+//					util.plot(xA,AA2);
 
 					}
 		

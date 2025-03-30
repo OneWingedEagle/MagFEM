@@ -218,8 +218,8 @@ public class RunMag {
 
 			model.writer.outputEnergies(model,model.resultFolder+"\\outputs.txt",step,model.getCurrentTime(),append);
 
-			Vect B=model.getBAt(new Vect(0,0,0));
-			T.el[ix++]=B.el[1];
+			//Vect B=model.getBAt(new Vect(0,0,0));
+			//T.el[ix++]=B.el[1];
 			///T.el[ix++]=loss;
 
 
@@ -242,7 +242,7 @@ public class RunMag {
 
 		}
 		//	util.pr(model.main.gui.iccgArea.getText());
-
+		
 		util.plot(T);
 		//	T.show();
 		

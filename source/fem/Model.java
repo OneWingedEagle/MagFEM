@@ -1119,7 +1119,11 @@ public class Model{
 			
 			regJ=region[ir].getJ();
 
-			double timeFactor=this.timeFunctions[region[ir].getTimeId()].getValue(time);
+			double timeFactor=1.0;
+			if(this.AC)
+			 timeFactor=1.0;
+			else
+			 timeFactor=this.timeFunctions[region[ir].getTimeId()].getValue(time);
 
 			regJ=regJ.times(timeFactor);
 	
